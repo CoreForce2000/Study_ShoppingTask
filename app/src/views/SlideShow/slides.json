@@ -1,0 +1,34 @@
+[
+  {
+    "id": 1,
+    "type": "multiple-choice",
+    "imageUrl": "slides/Phase1/Slide1.png",
+    "text": "Please select all that apply:",
+    "options": [
+      { "id": "opt1", "label": "Option 1" },
+      { "id": "opt2", "label": "Option 2" },
+      { "id": "opt3", "label": "Option 3" },
+      { "id": "opt4", "label": "Option 4" }
+    ],
+    "variableName": "selectedOptions"
+  },
+  {
+    "id": 2,
+    "type": "text",
+    "imageUrl": "slides/Phase1/Slide2.png",
+    "text": "You have selected: {{selectedOptions}}.",
+    "variableText": "This text will include the selected options from the previous slide."
+  },
+  {
+    "id": 3,
+    "type": "information",
+    "imageUrl": "slides/Phase1/Slide3.png",
+    "text": "This is an informational slide."
+  },
+  {
+    "id": 4,
+    "type": "summary",
+    "imageUrl": "slides/Phase1/Slide8.png",
+    "text": "This is the summary slide."
+  }
+]

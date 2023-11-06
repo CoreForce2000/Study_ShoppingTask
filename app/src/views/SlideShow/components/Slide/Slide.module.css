@@ -1,0 +1,13 @@
+/* SlideViewPort.module.css */
+.slideContainer {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+  }
+  
