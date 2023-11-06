@@ -1,0 +1,41 @@
+[
+    {
+      "id": 1,
+      "content": "Before we start the task, we would like to ask you how often you shop online?",
+      "type": "radio-button",
+      
+      "options": ["Several times a day", "Once a day", ""],
+
+      "backgroundImage": "path/to/assets/slide_background.jpg",
+      "response": null
+    },
+    {
+        "id": 2,
+        "content": "Welcome, you have been assigned to {group}.",
+        "type": "text",
+        "variables": {
+          "group": "selectedGroup"
+        },
+        "backgroundImage": "path/to/assets/slide_background.jpg",
+        "response": null
+    },
+
+
+
+    {
+      "id": 2,
+      "content": "How do you feel about the following statement: 'I enjoy group activities.'",
+      "type": "radio-button",
+      "options": ["Strongly Agree", "Agree", "Neutral", "Disagree", "Strongly Disagree"],
+      "response": null
+    },
+    {
+      "id": 3,
+      "content": "This is a timed slide, please wait for the next instructions.",
+      "type": "information",
+      "duration": 5000,
+      "backgroundImage": "path/to/assets/timed_slide_background.jpg"
+    },
+    // Additional slides...
+  ]
+  

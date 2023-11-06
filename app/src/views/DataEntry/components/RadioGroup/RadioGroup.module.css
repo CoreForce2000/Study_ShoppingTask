@@ -1,0 +1,14 @@
+
+.radioGroup {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+.radioButton {
+/* You can add custom styles for your radio buttons if needed */
+}
+
+.radioLabel {
+margin-right: 20px; /* or any spacing you prefer */
+}

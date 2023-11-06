@@ -1,0 +1,35 @@
+import React from 'react';
+import styles from './ParticipantId.module.css';
+
+interface ParticipantIdProps {
+    setParticipantId: (value: string) => void
+}
+
+const ParticipantId: React.FC<ParticipantIdProps> = ({ setParticipantId }) => {
+    
+    const handleParticipantIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        // Allow only up to 4 digits
+        if (value.match(/^\d{0,4}$/)) {
+          setParticipantId(value);
+        }
+      };
+
+    return (
+        <div className={styles.participantIdContainer}>
+          <label htmlFor="participantId">Participant ID</label>
+          <input
+            id="participantId"
+            type="text"
+            className={styles.participantIdInput}
+            maxLength={4}
+            onChange={handleParticipantIdChange}
+          />
+        </div>
+    );
+};
+
+export default ParticipantId;
+
+
+

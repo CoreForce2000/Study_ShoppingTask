@@ -1,0 +1,48 @@
+/* DataEntry.module.css */
+.inputBox {
+  /* Add styles to replicate the div with id="input-box" */
+}
+
+.logoImage {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+
+.fieldsetStyle {
+  border-color: rgb(139, 139, 139);
+  box-shadow: 0 0 0px;
+}
+
+.selectGroup {
+  height: 24px;
+}
+
+.ageInput {
+  height: 24px;
+}
+
+.divider {
+  height: 1px;
+  border: none;
+  color: rgb(139, 139, 139);
+  background-color: rgb(141, 141, 141);
+}
+
+.centeredContainer {
+  margin: auto;
+  width: fit-content;
+}
+
+.runTaskButton {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
