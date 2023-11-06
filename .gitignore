@@ -1,4 +1,6 @@
 app/node_modules/*
 app/src/assets/*
 server/assets/*
+gameplan.ipynb
+
 
