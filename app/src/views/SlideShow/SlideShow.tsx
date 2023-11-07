@@ -23,6 +23,7 @@ const SlideShow: React.FC = () => {
     shoppingSatisfaction: 0,
   });
 
+
   // Handlers for updating the survey responses
   const setOnlineShoppingFrequency = (selection: string[]) => {
     setSurveyResponses((prev) => ({
@@ -149,8 +150,6 @@ const SlideShow: React.FC = () => {
 
   const [allSlides, setAllSlides] = useState([...baseSlides]);
 
-
-  // ... (rest of your component)
 
   // When rendering, use the allSlides array
   const currentSlide = allSlides[currentSlideIndex];
