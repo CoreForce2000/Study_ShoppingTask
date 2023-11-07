@@ -8,7 +8,8 @@
       { "id": "opt1", "label": "Option 1" },
       { "id": "opt2", "label": "Option 2" },
       { "id": "opt3", "label": "Option 3" },
-      { "id": "opt4", "label": "Option 4" }
+      { "id": "opt4", "label": "Option 4" },
+      { "id": "opt5", "label": "Option 5" }
     ],
     "variableName": "selectedOptions"
   },
