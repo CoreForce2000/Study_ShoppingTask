@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styles from './Slide.module.css'; // Make sure the path is correct
 
 interface SlideProps {
-    backgroundImage: string;
+    backgroundImage?: string;
     children: React.ReactNode;
 }
 
@@ -26,11 +26,14 @@ const Slide: React.FC<SlideProps> = ({ backgroundImage, children }) => {
       newHeight = '100vh';
       newWidth = `calc(${newHeight} / ${aspectRatio})`;
     }
+    const backgroundStyle = backgroundImage
+    ? { backgroundImage: `url(${backgroundImage})` }
+    : { backgroundColor: 'white' };
 
     setSlideStyle({
       width: newWidth,
       height: newHeight,
-      backgroundImage: `url(${backgroundImage})`
+      ...backgroundStyle
     });
   };
 
