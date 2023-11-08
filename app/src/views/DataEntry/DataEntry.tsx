@@ -16,6 +16,7 @@ import { setParticipantId, setAge, setGroup, setGender, setHandedness } from '..
 
 import saveParticipantData from '../../api/saveParticipantData';
 import { RootState } from '../../store/store';
+import { createDispatchHandler } from '../../util/reduxUtils';
 
 
 const DataEntry: React.FC = () => {
@@ -26,12 +27,6 @@ const DataEntry: React.FC = () => {
   const participantData = useSelector((state: RootState) => state.survey);
   const [configVisible, setConfigVisible] = useState(false);
   const [groups, setGroups] = useState<string[]>(['Group A', 'Group B']);
-
-  const createDispatchHandler = (actionCreator: (value: string) => { payload: string; type: string }) => {
-    return (value: string) => {
-      dispatch(actionCreator(value));
-    };
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,12 +44,13 @@ const DataEntry: React.FC = () => {
     navigate('/slide');
   };
 
+
   return (
     <form onSubmit={handleSubmit}>
       <div className={styles.inputBox}>
         <img src={logo} className={styles.logoImage} alt="Cambridge Logo" />
 
-        <ParticipantId setParticipantId={createDispatchHandler(setParticipantId)} />
+        <ParticipantId setParticipantId={createDispatchHandler(setParticipantId, dispatch)} />
 
         <fieldset className={styles.fieldsetStyle}>
           <legend className={styles.legend}>Gender</legend>
@@ -62,7 +58,7 @@ const DataEntry: React.FC = () => {
             name="gender"
             options={["male", "female"]}
             value={participantData.gender}
-            setValue={createDispatchHandler(setGender)}
+            setValue={createDispatchHandler(setGender, dispatch)}
           />
         </fieldset>
 
@@ -71,13 +67,13 @@ const DataEntry: React.FC = () => {
           <Dropdown
             options={groups}
             value={participantData.group}
-            setValue={createDispatchHandler(setGroup)}
+            setValue={createDispatchHandler(setGroup, dispatch)}
           />
         </fieldset>
 
         <fieldset className={styles.fieldsetStyle}>
           <legend>Age</legend>
-          <AgeFreetext setAge={createDispatchHandler(setAge)} />
+          <AgeFreetext setAge={createDispatchHandler(setAge, dispatch)} />
         </fieldset>
 
         <fieldset className={styles.fieldsetStyle}>
@@ -86,7 +82,7 @@ const DataEntry: React.FC = () => {
             name="handedness"
             options={["left", "right"]}
             value={participantData.handedness}
-            setValue={createDispatchHandler(setHandedness)}
+            setValue={createDispatchHandler(setHandedness, dispatch)}
           />
         </fieldset>
 

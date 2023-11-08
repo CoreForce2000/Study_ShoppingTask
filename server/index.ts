@@ -6,6 +6,8 @@ import { promisify } from 'util';
 import { createObjectCsvWriter as createCsvWriter } from 'csv-writer';
 import path from 'path';
 
+import fs_1 from "fs";
+
 const app: Application = express();
 const port = 3001;
 
@@ -84,8 +86,64 @@ app.get('/export', async (req: Request, res: Response) => {
   });
 
 
+  const sqlFilePath = 'combined_categories.sql';
+  fs_1.readFile(sqlFilePath, 'utf8', (err, data) => {
+      if (err) {
+          console.error(`Could not read file ${sqlFilePath}:`, err.message);
+          return;
+      }
+      // Execute SQL commands
+      db.exec(data, (err) => {
+          if (err) {
+              console.error(`Error executing ${sqlFilePath}:`, err.message);
+          } else {
+              console.log(`Executed ${sqlFilePath} successfully.`);
+          }
+      });
+  });
+  
+interface RowTypes {
+  image_name: string;
+  item: number;
+  minimum: number;
+  maximum: number;
+  category: string;
+}
+
+// Endpoint to get unique categories
+app.get('/categories', (req, res) => {
+    const query = 'SELECT DISTINCT category FROM products'; 
+    db.all(query, [], (err, rows: RowTypes[]) => {
+        if (err) {
+            res.status(500).send(err.message);
+        } else {
+            res.status(200).send(rows.map(row => row.category));
+        }
+    });
+});
+
+
+app.get('/items', (req, res) => {
+  // Access the category from the query string
+  const category = req.query.category;
+
+  if (!category) {
+    return res.status(400).send('Category parameter is required');
+  }
+
+  const query = 'SELECT DISTINCT image_name, item, minimum, maximum FROM products WHERE category = ?';
+
+  db.all(query, [category], (err, rows) => {
+      if (err) {
+          res.status(500).send(err.message);
+      } else {
+          res.status(200).json(rows);
+      }
+  });
+});
 
 // Start server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
+

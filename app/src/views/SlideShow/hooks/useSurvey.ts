@@ -14,6 +14,7 @@ function useSurvey(initialResponses) {
   const generateVASSlides = useCallback((selectedDrugs, updateFunction) => {
     // Assume `generateSlide` is a function that creates a slide JSX
     // `updateFunction` is a callback to update the dosage for a drug
+
     return selectedDrugs.map(drug => generateSlide(drug, updateFunction));
   }, []);
   

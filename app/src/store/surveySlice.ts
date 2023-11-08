@@ -59,6 +59,7 @@ export const {
     setSelectedDrugs,
     setDrugDosages,
     setShoppingSatisfaction
+    
 } = surveySlice.actions;
 
 export default surveySlice.reducer;

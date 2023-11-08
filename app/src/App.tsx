@@ -5,6 +5,8 @@ import DataEntry from './views/DataEntry/DataEntry';
 import SlideShow from './views/SlideShow/SlideShow';
 import { Provider } from 'react-redux';
 import store from './store/store';
+import CategoryPage from './views/OnlineShop/pages/CategoryPage/CategoryPage';
+import ItemPage from './views/OnlineShop/pages/ItemPage/ItemPage';
 
 const App: React.FC = () => {
   return (
@@ -13,10 +15,12 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<DataEntry/>} />
           <Route path="slide" element={<SlideShow/>} />
-          <Route
+          <Route path="shop" element={<CategoryPage/>} />
+          <Route path="shop_category" element={<ItemPage />} />
+          {/* <Route
             path="*"
             element={<Navigate to="/" replace />}
-          />
+          /> */}
         </Routes>
       </Provider>
     </div>
