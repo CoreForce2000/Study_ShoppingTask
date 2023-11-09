@@ -104,7 +104,8 @@ const SlideShow: React.FC = () => {
     };
   }
 
-  const baseSlides = [
+  
+  const baseSlides = ()=> [
     <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide1.png`} nextButton={goToNextSlide}>
       <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
         <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
@@ -183,7 +184,7 @@ const SlideShow: React.FC = () => {
   ]
 
 
-  const [allSlides, setAllSlides] = useState([...baseSlides]);
+  const [allSlides, setAllSlides] = useState([...baseSlides()]);
 
 
   // When rendering, use the allSlides array
