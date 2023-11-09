@@ -9,14 +9,16 @@ import AgeFreetext from './components/AgeFreetext/AgeFreetext';
 import Dropdown from './components/Dropdown/Dropdown';
 import ParticipantId from './components/ParticipantId/ParticipantId';
 
-import ValueSelector from './components/ValueSelector/Config';
+import ValueSelector from './components/ValueSelector/ValueSelector';
 
 
 import { setParticipantId, setAge, setGroup, setGender, setHandedness } from '../../store/surveySlice'
+import { setDeveloperOptions } from '../../store/configSlice'
 
 import saveParticipantData from '../../api/saveParticipantData';
 import { RootState } from '../../store/store';
 import { createDispatchHandler } from '../../util/reduxUtils';
+import FullscreenView from '../../components/FullscreenView/FullscreenView';
 
 
 const DataEntry: React.FC = () => {
@@ -25,8 +27,11 @@ const DataEntry: React.FC = () => {
 
   // Use the useSelector hook to get the data from the Redux store
   const participantData = useSelector((state: RootState) => state.survey);
+  const configData = useSelector((state: RootState) => state.config);
+
   const [configVisible, setConfigVisible] = useState(false);
   const [groups, setGroups] = useState<string[]>(['Group A', 'Group B']);
+  
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,16 +50,16 @@ const DataEntry: React.FC = () => {
   };
 
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <div className={styles.inputBox}>
+  return (    
+    <FullscreenView style={{display:"flex", justifyContent:"center", alignItems:"center"}}>
+      <form onSubmit={handleSubmit} className={styles.inputBox}>
         <img src={logo} className={styles.logoImage} alt="Cambridge Logo" />
 
-        <ParticipantId setParticipantId={createDispatchHandler(setParticipantId, dispatch)} />
+        <ParticipantId required={!configData.developerOptions} setParticipantId={createDispatchHandler(setParticipantId, dispatch)} />
 
         <fieldset className={styles.fieldsetStyle}>
           <legend className={styles.legend}>Gender</legend>
-          <RadioGroup
+          <RadioGroup required={!configData.developerOptions}
             name="gender"
             options={["male", "female"]}
             value={participantData.gender}
@@ -64,7 +69,7 @@ const DataEntry: React.FC = () => {
 
         <fieldset className={styles.fieldsetStyle}>
           <legend>Group</legend>
-          <Dropdown
+          <Dropdown required={!configData.developerOptions}
             options={groups}
             value={participantData.group}
             setValue={createDispatchHandler(setGroup, dispatch)}
@@ -73,12 +78,13 @@ const DataEntry: React.FC = () => {
 
         <fieldset className={styles.fieldsetStyle}>
           <legend>Age</legend>
-          <AgeFreetext setAge={createDispatchHandler(setAge, dispatch)} />
+          <AgeFreetext required={!configData.developerOptions} 
+            setAge={createDispatchHandler(setAge, dispatch)} />
         </fieldset>
 
         <fieldset className={styles.fieldsetStyle}>
           <legend className={styles.legend}>Handedness</legend>
-          <RadioGroup
+          <RadioGroup required={!configData.developerOptions}
             name="handedness"
             options={["left", "right"]}
             value={participantData.handedness}
@@ -94,15 +100,24 @@ const DataEntry: React.FC = () => {
               <Link to="shop">Jump to shop</Link> <br />
               <Link to="slide">Jump to Slides</Link>
               <ValueSelector options={groups} setOptions={setGroups} />
+              <label>
+                <input
+                type="checkbox"
+                checked={configData.developerOptions}
+                onChange={(e) => createDispatchHandler(setDeveloperOptions, dispatch)(e.target.checked)}
+                />
+                Developer Options    
+              </label>
             </div>
           )}
-          <button onClick={() => setConfigVisible(!configVisible)}>
+          <button type="button" onClick={() => setConfigVisible(!configVisible)}>
             {configVisible ? 'Hide Config' : 'Show Config'}
           </button>
           <button type="submit" className={styles.runTaskButton}>Run Task</button>
         </div>
-      </div>
-    </form>
+      </form>
+    </FullscreenView>
+    
   );
 };
 

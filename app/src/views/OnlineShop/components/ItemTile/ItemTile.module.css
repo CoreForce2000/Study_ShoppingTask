@@ -17,11 +17,3 @@
     justify-content: center;
     align-items: center;
 }
-
-.tile::after {
-    
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-color: white;
-    background-position: center center;
-}

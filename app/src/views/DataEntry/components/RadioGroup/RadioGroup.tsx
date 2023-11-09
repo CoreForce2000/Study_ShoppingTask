@@ -5,15 +5,17 @@ interface RadioGroupProps {
     name: string;
     options: string[];
     value: string;
-    setValue: (value: string) => void
+    setValue: (value: string) => void,
+    required?: boolean
 }
 
-const RadioGroup: React.FC<RadioGroupProps> = ({ name, options, value, setValue }) => {
+const RadioGroup: React.FC<RadioGroupProps> = ({ name, options, value, setValue, required }) => {
 
   var radioButtons = options.map((option) => {
     return (
         <div className={styles.radioGroup}>
             <input
+                key={name}
                 type="radio"
                 id={option}
                 name={name}
@@ -21,6 +23,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ name, options, value, setValue 
                 checked={value === option}
                 onChange={() => setValue(option)}
                 className={styles.radioButton}
+                required={required}
             />
             <label htmlFor={option} className={styles.radioLabel}>{option}</label>
         </div>

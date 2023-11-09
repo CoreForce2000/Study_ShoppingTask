@@ -4,15 +4,17 @@ import styles from './Dropdown.module.css';
 interface DropdownProps {
     options: string[];
     value: string;
-    setValue: (value: string) => void
+    setValue: (value: string) => void,
+    required?: boolean
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, value, setValue }) => {
+const Dropdown: React.FC<DropdownProps> = ({ options, value, setValue, required }) => {
 
 
     return (
         <select
             value={value}
+            required={required}
             onChange={(e) => setValue(e.target.value)}
         >
             {options.map((option) => (

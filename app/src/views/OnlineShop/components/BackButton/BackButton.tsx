@@ -2,7 +2,11 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './BackButton.module.css'; // Assuming you have a CSS module for styles
 
-const BackButton: React.FC = () => {
+interface BackButtonProps {
+  customStyle?: React.CSSProperties;
+}
+
+const BackButton: React.FC<BackButtonProps> = ({ customStyle }) => {
   let navigate = useNavigate();
 
   const goBack = () => {
@@ -10,7 +14,7 @@ const BackButton: React.FC = () => {
   };
 
   return (
-    <button className={styles.button} onClick={goBack}>
+    <button className={styles.button} onClick={goBack} style={customStyle}>
       Back
     </button>
   );

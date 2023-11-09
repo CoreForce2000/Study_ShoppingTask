@@ -21,7 +21,7 @@ const ShopHome: React.FC = () => {
     }, []);
 
     return (
-        <div className={styles.gridContainer}>
+        <div className={styles.categoryPage}>
             {categories.map((category: Category) => (
                 <CategoryTile key={category} categoryName={category} />
             ))}

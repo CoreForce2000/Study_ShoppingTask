@@ -7,6 +7,7 @@ import { Provider } from 'react-redux';
 import store from './store/store';
 import CategoryPage from './views/OnlineShop/pages/CategoryPage/CategoryPage';
 import ItemPage from './views/OnlineShop/pages/ItemPage/ItemPage';
+import OnlineShop from './views/OnlineShop/OnlineShop';
 
 const App: React.FC = () => {
   return (
@@ -15,7 +16,7 @@ const App: React.FC = () => {
         <Routes>
           <Route path="/" element={<DataEntry/>} />
           <Route path="slide" element={<SlideShow/>} />
-          <Route path="shop" element={<CategoryPage/>} />
+          <Route path="shop" element={<OnlineShop/>} />
           <Route path="shop_category" element={<ItemPage />} />
           {/* <Route
             path="*"

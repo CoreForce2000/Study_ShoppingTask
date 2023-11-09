@@ -3,9 +3,10 @@ import styles from './AgeFreetext.module.css';
 
 interface AgeFreetextProps {
     setAge: (value: string) => void
+    required?: boolean
 }
 
-const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge }) => {
+const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge, required }) => {
 
     const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -23,6 +24,7 @@ const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge }) => {
                 className={styles.ageInput}
                 maxLength={2}
                 onChange={handleAgeChange}
+                required={required}
             />
         </div>
     );

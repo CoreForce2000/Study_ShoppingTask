@@ -1,0 +1,10 @@
+.topbarIcons {
+    display:flex;
+    justify-content:space-between;    
+    flex:1;
+    width:300px;
+}
+
+.icon {
+    flex: 1;
+}

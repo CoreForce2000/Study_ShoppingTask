@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 
 interface ValueSelectorProps {
     options: string[];
-    setOptions: (value: string[]) => void
+    setOptions: (value: string[]) => void,
 }
 
-const ValueSelector: React.FC<ValueSelectorProps> = ({ options, setOptions }) => {
+const ValueSelector: React.FC<ValueSelectorProps> = ({ options, setOptions}) => {
     const [newGroup, setNewGroup] = useState('');
 
     const handleAddGroup = () => {
@@ -20,7 +20,7 @@ const ValueSelector: React.FC<ValueSelectorProps> = ({ options, setOptions }) =>
     return (
         <div>
           <div>
-          {options.map((group, index) => (
+          {options.map((group) => (
               <div key={group}>
               <label>
                   <input

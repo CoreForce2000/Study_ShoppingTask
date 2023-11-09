@@ -2,10 +2,13 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import surveyReducer from './surveySlice';
+import configReducer from './configSlice';
 
 const store = configureStore({
   reducer: {
     survey: surveyReducer,
+    config: configReducer,
+    // shopState: shopStateReducer,
   },
 });
 

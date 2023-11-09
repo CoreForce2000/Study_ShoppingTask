@@ -2,10 +2,11 @@ import React from 'react';
 import styles from './ParticipantId.module.css';
 
 interface ParticipantIdProps {
-    setParticipantId: (value: string) => void
+    setParticipantId: (value: string) => void,
+    required?: boolean
 }
 
-const ParticipantId: React.FC<ParticipantIdProps> = ({ setParticipantId }) => {
+const ParticipantId: React.FC<ParticipantIdProps> = ({ setParticipantId, required }) => {
     
     const handleParticipantIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -24,6 +25,7 @@ const ParticipantId: React.FC<ParticipantIdProps> = ({ setParticipantId }) => {
             className={styles.participantIdInput}
             maxLength={4}
             onChange={handleParticipantIdChange}
+            required={required}
           />
         </div>
     );

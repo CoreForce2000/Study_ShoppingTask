@@ -1,13 +1,16 @@
 // SlideViewPort.tsx
 import React, { useEffect, useState } from 'react';
-import styles from './Slide.module.css'; // Make sure the path is correct
+import styles from './SlideView.module.css'; // Make sure the path is correct
+import FullscreenView from '../FullscreenView/FullscreenView';
+import nextButtonImg from '/src/assets/buttonNext.png'
 
-interface SlideProps {
+interface SlideViewProps {
     backgroundImage?: string;
-    children: React.ReactNode;
+    children?: React.ReactNode;
+    nextButton?: () => void;
 }
 
-const Slide: React.FC<SlideProps> = ({ backgroundImage, children }) => {
+const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextButton }) => {
   const aspectRatio = 3 / 4; // Height / Width
   const [slideStyle, setSlideStyle] = useState<React.CSSProperties>({});
 
@@ -48,10 +51,15 @@ const Slide: React.FC<SlideProps> = ({ backgroundImage, children }) => {
   }, [backgroundImage]);
 
   return (
-    <div style={slideStyle} className={styles.slideContainer}>
+    <FullscreenView style={{display:"flex", justifyContent:"center"}}>
+      <div style={slideStyle} className={styles.slideContainer}>
         {children}
-    </div>
+        {nextButton ? <button className={styles.nextButton} onClick={nextButton}>
+          <img src={nextButtonImg} alt="Next" className={styles.nextIcon} />
+        </button> : <></>}
+      </div>
+    </FullscreenView>
   );
 };
 
-export default Slide;
+export default SlideView;
