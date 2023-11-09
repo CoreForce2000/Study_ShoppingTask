@@ -1,8 +1,8 @@
 // Import the useDispatch hook and the action creator from your Redux setup
 import { useDispatch } from 'react-redux';
 import { setVariable } from '../path/to/yourReduxActions'; // Adjust the import path to your actual action creator
-import VAS from '../SlideShow/components/VAS/VAS';
-import Checkbox from '../SlideShow/components/Checkbox/Checkbox';
+import VAS from './elements/VAS/VAS';
+import Checkbox from './elements/Checkbox/Checkbox';
 
 // Extend the ElementConfig interface to include variableName
 interface ElementConfig {

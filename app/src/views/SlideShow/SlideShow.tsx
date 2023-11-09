@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import styles from './SlideShow.module.css';
 import SlideView from '../../components/SlideView/SlideView';
-import Checkbox from './components/Checkbox/Checkbox';
-import VAS from './components/VAS/VAS';
+import Checkbox from '../NiftySlide/elements/Checkbox/Checkbox';
+import VAS from '../NiftySlide/elements/VAS/VAS';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 
