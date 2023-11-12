@@ -12,7 +12,7 @@ interface Item {
     maximum: number;
   }
 
-const CategoryPage: React.FC = () => {
+const ItemPage: React.FC = () => {
     const [items, setItems] = useState<Item[]>([]);
     const [searchParams] = useSearchParams();
     const categoryName = searchParams.get('name') || '';
@@ -31,12 +31,11 @@ const CategoryPage: React.FC = () => {
         }
     }, [categoryName]);
 
-    console.log('items', items)
+    // console.log('items', items)
+    console.log(categoryName)
 
     return (
         <div className={styles.grid}>
-            <BackButton />
-            <h1>{categoryName}</h1>
             {items.map((item: Item) => (
                 <ItemTile key={item.item} categoryName={categoryName} imageName={item.image_name} />
             ))}
@@ -45,4 +44,4 @@ const CategoryPage: React.FC = () => {
 };
 
 
-export default CategoryPage;
+export default ItemPage;

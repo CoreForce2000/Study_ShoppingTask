@@ -30,7 +30,7 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ categoryName }) => {
 
   useEffect(() => {
     if (goTo) {
-      navigate(`/shop_category?name=${encodeURIComponent(categoryName)}`);
+      navigate(`/shop?page=item&name=${encodeURIComponent(categoryName)}`);
     }
   }, [goTo, categoryName]);
 

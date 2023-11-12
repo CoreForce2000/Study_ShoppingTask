@@ -5,6 +5,8 @@ import Checkbox from './components/Checkbox/Checkbox';
 import VAS from './components/VAS/VAS';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
+import nextButtonImg from '/src/assets/buttonNext.png'
+import { useNavigate } from 'react-router-dom';
 
 // Define a type for the survey responses
 interface SurveyResponse {
@@ -15,6 +17,8 @@ interface SurveyResponse {
 }
 
 const SlideShow: React.FC = () => {
+  const navigate = useNavigate();
+
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   const configData = useSelector((state: RootState) => state.config);
@@ -73,22 +77,29 @@ const SlideShow: React.FC = () => {
     );
   };
 
+  const getVasSlides = (drug: string) => {
+    return {slide:'',
+          children:
+          <>
+            <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`How much do you want to use ${drug} right now?`} </div>
+            <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
+              <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
+                <VAS key={drug}  minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />
+              </div>
+            </div>
+          </>
+          }
+  }
+
   
   const goToNextSlide = () => {
     setCurrentSlideIndex((prevIndex) => prevIndex + 1);
-    if (currentSlideIndex === 1) {
+    if (baseSlides[currentSlideIndex].transit === "VAS_FOLLOWUP") {
       // Generate VAS slides for each selected drug
       const vasSlides = surveyResponses.selectedDrugs.map((drug) => (
-        <SlideView key={drug}>
-          <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`How much do you want to use ${drug} right now?`} </div>
-          <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-            <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
-              <VAS minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />
-            </div>
-          </div>
-        </SlideView>
+        getVasSlides(drug)
       ));
-
+      
       console.log(vasSlides)
 
       // Insert the VAS slides at the current index position
@@ -102,85 +113,88 @@ const SlideShow: React.FC = () => {
       // Update the allSlides state with the new slides in the correct position
       setAllSlides(updatedSlides);
     };
+    if (baseSlides[currentSlideIndex].transit === "SHOP") {
+      navigate('/shop?page=category');
+
+    }
   }
 
   const baseSlides = [
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide1.png`} nextButton={goToNextSlide}>
-      <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-        <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
-        <Checkbox key="online-shopping"
-          initialOptions={[
-            
-            "several times a day",
-            "once a day",
-            "a few times a week",
-            "once a week",
-            "once a month or less",
-            "very rarely / not at all"
-          
-          ]} // Replace with actual options
-          allowMultiple={false}
-          columnLayout="single"
-          onChange={setOnlineShoppingFrequency}
-          fontSizeFactor={1}
-        />
-        </div>
+
+    {slide:`/src/assets/slides/Phase1/Slide1.png`,
+    children: <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
+                <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
+                <Checkbox key="online-shopping"
+                  initialOptions={[
+                    
+                    "several times a day",
+                    "once a day",
+                    "a few times a week",
+                    "once a week",
+                    "once a month or less",
+                    "very rarely / not at all"
+                  
+                  ]} // Replace with actual options
+                  allowMultiple={false}
+                  columnLayout="single"
+                  onChange={setOnlineShoppingFrequency}
+                  fontSizeFactor={1}
+                />
+                </div>
+              </div>
+  },
+
+  {slide:`/src/assets/slides/Phase1/Slide2.png`,
+  children: <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
+              <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
+                <Checkbox key="drugs"
+                  initialOptions={[
+
+                      "Tobacco",
+                      "Cannabis",
+                      "Mushrooms",
+                      "Ecstasy",
+                      "Amphetamines",
+                      "Methamphetamine",
+                      "Cocaine",
+                      "Crack-cocaine",
+                      "Heroin",
+                      "Benzodiazepines",
+                      "Ketamine",
+                      "Inhalants",
+                      "Spice",
+                      "LSD",
+                      "Other",
+                      "None of these"
+                    ]
+                  } // Replace with actual options
+                  allowMultiple={true}
+                  columnLayout="double"
+                  onChange={setSelectedDrugs}
+                  fontSizeFactor={0.8}
+                /> </div>
+            </div>,
+  transit:"VAS_FOLLOWUP"},
+
+  {slide:`/src/assets/slides/Phase1/Cover.png`, children: <></>},
+  {slide:`/src/assets/slides/Phase1/Slide3.png`, children: <></>},
+  {slide:`/src/assets/slides/Phase1/Slide4.png`, children: <></>},
+  {slide:`/src/assets/slides/Phase1/Slide5.png`, children: <></>},
+  {slide:`/src/assets/slides/Phase1/Slide6.png`, children: <></>, transit:"SHOP"},
+
+
+  {slide:`/src/assets/slides/Phase2/Slide1.png`, children: <></>},
+  {slide:`/src/assets/slides/White.png`, children: 
+    <>
+    <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`Please indicate on the line below how satisfied you are with your purchases`} </div>
+    <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
+      <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
+        <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
       </div>
-    </SlideView>,
-
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide2.png`} nextButton={goToNextSlide} >
-      <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-        <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
-          <Checkbox key="drugs"
-            initialOptions={[
-
-                "Tobacco",
-                "Cannabis",
-                "Mushrooms",
-                "Ecstasy",
-                "Amphetamines",
-                "Methamphetamine",
-                "Cocaine",
-                "Crack-cocaine",
-                "Heroin",
-                "Benzodiazepines",
-                "Ketamine",
-                "Inhalants",
-                "Spice",
-                "LSD",
-                "Other",
-                "None of these"
-              ]
-            } // Replace with actual options
-            allowMultiple={true}
-            columnLayout="double"
-            onChange={setSelectedDrugs}
-            fontSizeFactor={0.8}
-          /> </div>
-      </div>
-    </SlideView>,
-
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide5.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide6.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide7.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase1/Slide8.png`} nextButton={goToNextSlide}> </SlideView>,
-
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide1.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide2.png`} nextButton={goToNextSlide}> 
-
-    <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`How ?`} </div>
-          <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-            <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
-              <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
-            </div>
-          </div></SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide3.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide4.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide5.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide6.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide7.png`} nextButton={goToNextSlide}> </SlideView>,
-    <SlideView backgroundImage={`/src/assets/slides/Phase2/Slide8.png`} nextButton={goToNextSlide}> </SlideView>
-  ]
+    </div>
+    </>
+  },
+]
 
 
   const [allSlides, setAllSlides] = useState([...baseSlides]);
@@ -198,7 +212,14 @@ const SlideShow: React.FC = () => {
   // Render the current slide and selection state
   return (
     <div className={styles.slideShow}>
-      {currentSlide}
+      <SlideView backgroundImage={currentSlide.slide} >
+
+        {currentSlide.children}
+        <button className={styles.nextButton} onClick={goToNextSlide}>
+          <img src={nextButtonImg} alt="Next" className={styles.nextIcon} />
+        </button>
+      </SlideView>
+      
       {configData.developerOptions ? <div style={{width:"300px"}}>
 
         {renderCurrentSelection()}

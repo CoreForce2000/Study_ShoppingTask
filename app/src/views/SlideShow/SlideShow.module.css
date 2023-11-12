@@ -4,3 +4,20 @@
     display:flex;
     justify-content: center;
 }
+
+
+.nextButton {
+    position: absolute;
+    bottom: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .nextIcon {
+    width: auto; /* Maintain aspect ratio */
+    height: 50px; /* Adjust as needed */
+    /* If you want to ensure the image is not stretched, set only one dimension, either width or height */
+  }

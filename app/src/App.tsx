@@ -17,7 +17,6 @@ const App: React.FC = () => {
           <Route path="/" element={<DataEntry/>} />
           <Route path="slide" element={<SlideShow/>} />
           <Route path="shop" element={<OnlineShop/>} />
-          <Route path="shop_category" element={<ItemPage />} />
           {/* <Route
             path="*"
             element={<Navigate to="/" replace />}

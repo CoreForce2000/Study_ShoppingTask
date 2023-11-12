@@ -5,7 +5,7 @@ import styles from './CategoryPage.module.css';
 // Define a type for the category, which is a simple string in this case
 type Category = string;
 
-const ShopHome: React.FC = () => {
+const CategoryPage: React.FC = () => {
     const [categories, setCategories] = useState<Category[]>([]);
 
     useEffect(() => {
@@ -29,4 +29,4 @@ const ShopHome: React.FC = () => {
     );
 };
 
-export default ShopHome;
+export default CategoryPage;

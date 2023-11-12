@@ -40,7 +40,7 @@ const ValueSelector: React.FC<ValueSelectorProps> = ({ options, setOptions}) => 
               onChange={(e) => setNewGroup(e.target.value)}
               placeholder="Add new group"
           />
-          <button onClick={handleAddGroup}>Add Group</button>
+          <button type="button" onClick={handleAddGroup}>Add Group</button>
           </div>
         </div>
     );
