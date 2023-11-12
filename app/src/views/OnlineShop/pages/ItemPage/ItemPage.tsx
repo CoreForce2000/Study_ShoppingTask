@@ -1,44 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React from 'react';
 import styles from './ItemPage.module.css';
-import ItemTile from '../../components/ItemTile/ItemTile';
-import BackButton from '../../components/BackButton/BackButton';
+import { selectProduct } from '../../../../store/productSlice';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store/store';
 
-// Define types for the item
-interface Item {
-    image_name: string;
+interface ItemPageProps {
+    category: string;
     item: number;
-    minimum: number;
-    maximum: number;
-  }
+}
 
-const ItemPage: React.FC = () => {
-    const [items, setItems] = useState<Item[]>([]);
-    const [searchParams] = useSearchParams();
-    const categoryName = searchParams.get('name') || '';
+const ItemPage: React.FC<ItemPageProps> = ( { category, item }) => {
+    
+    
+    const product = useSelector((state: RootState )=>selectProduct(state, category, item));
 
-    useEffect(() => {
-        if (categoryName) {
-            // API call to fetch items for a category
-            fetch(`http://localhost:3001/items?category=${categoryName}`)
-                .then(response => response.json())
-                .then(data => {
-                    setItems(data);
-                })
-                .catch(error => {
-                    console.error('Error fetching items for category:', error);
-                });
-        }
-    }, [categoryName]);
 
-    // console.log('items', items)
-    console.log(categoryName)
 
     return (
-        <div className={styles.grid}>
-            {items.map((item: Item) => (
-                <ItemTile key={item.item} categoryName={categoryName} imageName={item.image_name} />
-            ))}
+        <div className={styles.component}>
+            <img className={styles.itemImage} src={`src/assets/categories/${category}/${product.image_name}`} alt={product.image_name} />
+            <button className={styles.addToCartButton} onClick>Add to Cart</button>  
         </div>
     );
 };

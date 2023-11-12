@@ -1,4 +1,11 @@
-.grid {
-    display:grid;
-    grid-template-columns: repeat(7, 1fr);
+.component {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
+
+.itemImage {
+  height: 50vh;
+  object-fit: cover;
 }

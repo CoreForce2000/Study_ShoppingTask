@@ -4,3 +4,4 @@ import { ActionCreatorWithPayload, Dispatch } from '@reduxjs/toolkit';
 export function createDispatchHandler<ActionCreator extends ActionCreatorWithPayload<any, string>>(actionCreator: ActionCreator, dispatch: Dispatch) {
     return (value: Parameters<ActionCreator>[0]) => {console.log(value); dispatch(actionCreator(value))};
 }
+

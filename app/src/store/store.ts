@@ -3,11 +3,15 @@
 import { configureStore } from '@reduxjs/toolkit';
 import surveyReducer from './surveySlice';
 import configReducer from './configSlice';
+import shopReducer from './shopSlice';
+import productReducer from './productSlice';
 
 const store = configureStore({
   reducer: {
     survey: surveyReducer,
     config: configReducer,
+    shop: shopReducer,
+    product: productReducer
     // shopState: shopStateReducer,
   },
 });

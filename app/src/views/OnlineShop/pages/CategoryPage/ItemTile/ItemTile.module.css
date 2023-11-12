@@ -1,6 +1,6 @@
 /* ItemTile.module.css */
 .tile {
-    box-shadow: 1px 1px 5px 1px lightgrey;
+    /* box-shadow: 1px 1px 5px 1px lightgrey; */
     background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
     background-size: cover;
 

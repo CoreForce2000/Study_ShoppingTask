@@ -6,12 +6,10 @@ import { useNavigate } from 'react-router-dom';
 // Define the props for the CategoryTile component
 type CategoryTileProps = {
     categoryName: string;
+    onClick: () => void;
 };
 
-const CategoryTile: React.FC<CategoryTileProps> = ({ categoryName }) => {
-  const navigate = useNavigate();
-
-  
+const CategoryTile: React.FC<CategoryTileProps> = ({ categoryName, onClick }) => {
   const [goTo, setGoTo] = useState(false);
   
   // Check sessionStorage for the clicked state of the tile
@@ -30,7 +28,7 @@ const CategoryTile: React.FC<CategoryTileProps> = ({ categoryName }) => {
 
   useEffect(() => {
     if (goTo) {
-      navigate(`/shop?page=item&name=${encodeURIComponent(categoryName)}`);
+      onClick();
     }
   }, [goTo, categoryName]);
 

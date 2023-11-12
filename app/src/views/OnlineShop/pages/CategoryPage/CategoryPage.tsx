@@ -1,32 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import CategoryTile from '../../components/CategoryTile/CategoryTile';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './CategoryPage.module.css';
+import ItemTile from './ItemTile/ItemTile';
+import { useSelector } from 'react-redux';
+import { selectItemsByCategory } from '../../../../store/productSlice';
+import { RootState } from '../../../../store/store';
 
-// Define a type for the category, which is a simple string in this case
-type Category = string;
+interface CategoryPageProps {
+    category: string;
+}
 
-const CategoryPage: React.FC = () => {
-    const [categories, setCategories] = useState<Category[]>([]);
+type Items = Record<string, Product>;
 
-    useEffect(() => {
-        // API call to fetch categories
-        fetch('http://localhost:3001/categories')
-            .then(response => response.json())
-            .then(data => {
-                setCategories(data);
-            })
-            .catch(error => {
-                console.error('Error fetching categories:', error);
-            });
-    }, []);
+
+const CategoryPage: React.FC<CategoryPageProps> = ( { category } ) => {
+    const navigate = useNavigate();    
+    const navigateToItemPage = (item_id: number) => {
+        navigate(`/shop?category=${category}&item=${item_id}`);
+    };
+
+    const items: Items = useSelector((state: RootState) => selectItemsByCategory(state, category));
 
     return (
-        <div className={styles.categoryPage}>
-            {categories.map((category: Category) => (
-                <CategoryTile key={category} categoryName={category} />
+        <div className={styles.grid}>
+            {Object.entries(items).map(([itemId, item]) => (
+                <ItemTile 
+                    key={itemId} 
+                    categoryName={category} 
+                    imageName={item.image_name} 
+                    onClick={() => navigateToItemPage(Number(itemId))} 
+                />
             ))}
         </div>
     );
 };
+
 
 export default CategoryPage;

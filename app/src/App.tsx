@@ -5,8 +5,8 @@ import DataEntry from './views/DataEntry/DataEntry';
 import SlideShow from './views/SlideShow/SlideShow';
 import { Provider } from 'react-redux';
 import store from './store/store';
-import CategoryPage from './views/OnlineShop/pages/CategoryPage/CategoryPage';
-import ItemPage from './views/OnlineShop/pages/ItemPage/ItemPage';
+import CategoryPage from './views/OnlineShop/pages/OverviewPage/OverviewPage';
+import ItemPage from './views/OnlineShop/pages/CategoryPage/CategoryPage';
 import OnlineShop from './views/OnlineShop/OnlineShop';
 
 const App: React.FC = () => {
