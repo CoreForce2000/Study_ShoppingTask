@@ -2,8 +2,7 @@
 
 .checkboxContainer {
   display: grid;
-  gap: 10px; /* Adjust the gap size to your preference */
-  font-size: 3rem;
+  gap: 10px; 
   font-weight: 500;
   color: black;
 }

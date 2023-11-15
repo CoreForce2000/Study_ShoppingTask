@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import styles from './ValueSelector.module.css';
-import { Link } from 'react-router-dom';
+
 
 interface ValueSelectorProps {
     options: string[];

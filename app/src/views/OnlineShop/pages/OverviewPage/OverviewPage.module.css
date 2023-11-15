@@ -1,6 +1,5 @@
 .overviewPage {
     width:100%;
     display: grid;    
-    grid-template-columns: repeat(7, 10vw);
-    grid-gap: 1vw;
+    grid-template-columns: repeat(7, 1fr);
 }

@@ -1,4 +1,3 @@
-/* ItemTile.module.css */
 .tile {
     /* box-shadow: 1px 1px 5px 1px lightgrey; */
     background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
@@ -16,4 +15,32 @@
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+.popupImage {
+    width: 400px;
+    height: 400px;
+    margin-right: 20px;
+    background-color: white;
+    object-fit: contain;
+}
+
+.popupBelowImage {
+    display: flex;
+    vertical-align: center;
+    justify-content: space-between;
+}
+
+.popupButton {
+    cursor: pointer;
+    color: black;
+    width: 50%;
+    font-size: 25px;
+    height: 30%;
+    margin-top: 63px;
+}
+
+.popupButton:hover {
+    background-color: var(--blue);
 }

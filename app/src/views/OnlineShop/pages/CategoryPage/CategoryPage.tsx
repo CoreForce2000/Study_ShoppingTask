@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import styles from './CategoryPage.module.css';
-import ItemTile from './ItemTile/ItemTile';
+import Tile from '../../components/Tile/Tile';
 import { useSelector } from 'react-redux';
-import { selectItemsByCategory } from '../../../../store/productSlice';
 import { RootState } from '../../../../store/store';
+import { selectItemsByCategory } from '../../../../store/shopSlice';
+import { shuffleArray } from '../../../../util/randomize';
 
 interface CategoryPageProps {
     category: string;
 }
-
-type Items = Record<string, Product>;
-
 
 const CategoryPage: React.FC<CategoryPageProps> = ( { category } ) => {
     const navigate = useNavigate();    
@@ -19,16 +17,28 @@ const CategoryPage: React.FC<CategoryPageProps> = ( { category } ) => {
         navigate(`/shop?category=${category}&item=${item_id}`);
     };
 
-    const items: Items = useSelector((state: RootState) => selectItemsByCategory(state, category));
+    const items: Product[] = Object.values(useSelector((state: RootState) => selectItemsByCategory(state, category)));
+
+    const [shuffledItems, setshuffledItems] = useState<Product[]>([]);
+
+    useEffect(() => {
+        let newShuffledItems: Product[] = [...items];
+        // for (let i = 0; i < 10; i++) {
+        newShuffledItems = newShuffledItems.concat(shuffleArray(items));
+        // }
+        setshuffledItems(newShuffledItems);
+    }, [])
 
     return (
         <div className={styles.grid}>
-            {Object.entries(items).map(([itemId, item]) => (
-                <ItemTile 
-                    key={itemId} 
-                    categoryName={category} 
-                    imageName={item.image_name} 
-                    onClick={() => navigateToItemPage(Number(itemId))} 
+            {shuffledItems.map((item: Product) => (
+                <Tile
+                    key={item.image_name}
+                    categoryName={category}
+                    imageName={item.image_name}
+                    onClick={() => navigateToItemPage(Number(item.image_name))}
+                    backgroundColor='royalblue'
+                    type='item'
                 />
             ))}
         </div>

@@ -1,5 +1,6 @@
 // Timer.tsx
 import React, { useState, useEffect } from 'react';
+import styles from './Timer.module.css';
 
 interface TimerProps {
   onComplete: () => void;
@@ -34,8 +35,8 @@ const Timer: React.FC<TimerProps> = ({ onComplete }) => {
   };
 
   return (
-    <div>
-      Timer: {formatTimeLeft()}
+    <div className={styles.timer}>
+      Timer : {formatTimeLeft()}
     </div>
   );
 };

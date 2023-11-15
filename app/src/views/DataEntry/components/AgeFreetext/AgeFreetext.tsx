@@ -23,6 +23,7 @@ const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge, required }) => {
                 type="text"
                 className={styles.ageInput}
                 maxLength={2}
+                minLength={2}
                 onChange={handleAgeChange}
                 required={required}
             />

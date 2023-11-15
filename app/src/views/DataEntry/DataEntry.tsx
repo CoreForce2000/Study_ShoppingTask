@@ -30,7 +30,7 @@ const DataEntry: React.FC = () => {
   const configData = useSelector((state: RootState) => state.config);
 
   const [configVisible, setConfigVisible] = useState(false);
-  const [groups, setGroups] = useState<string[]>(['Group A', 'Group B']);
+  const [groups, setGroups] = useState<string[]>(['Alcohol', 'Cocaine', 'Heroin', 'Control']);
   
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -96,10 +96,14 @@ const DataEntry: React.FC = () => {
 
         <div className={styles.centeredContainer}>
           {configVisible && (
-            <div>
-              <Link to="shop">Jump to shop</Link> <br />
-              <Link to="slide">Jump to Slides</Link>
+            <div>              
+              <fieldset className={styles.fieldsetStyle}>
+                <legend className={styles.legend}>Modify groups</legend>
               <ValueSelector options={groups} setOptions={setGroups} />
+              </fieldset>
+
+              <Link to="shop">Jump to shop</Link> <br />
+              <Link to="slide">Jump to Slides</Link> <br />
               <label>
                 <input
                 type="checkbox"

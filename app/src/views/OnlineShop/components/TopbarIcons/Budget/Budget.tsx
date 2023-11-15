@@ -8,7 +8,7 @@ interface BudgetProps {}
 const Budget: React.FC<BudgetProps> = () => {
     const budget = useSelector((state: RootState) => state.shop.budget);
 
-    return <div className={styles.budget}>Budget: {budget}</div>;
+    return <div className={styles.budget}>Budget : {budget}</div>;
 };
 
 export default Budget;

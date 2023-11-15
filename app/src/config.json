@@ -1,3 +1,9 @@
 {
+    "groups":[
+        "Alcohol",
+        "Tobacco",
+        "Control"
+    ],
+    "budget":1000,
     "thresholdMinimumPrice":100
 }

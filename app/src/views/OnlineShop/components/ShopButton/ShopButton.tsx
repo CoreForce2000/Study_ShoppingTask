@@ -13,15 +13,15 @@ const ShopButton: React.FC<ShopButtonProps> = ({ buttonType }) => {
       case 'back':
         return 'src/assets/back.png'; // Replace with your actual back image path
       case 'cart':
-        return 'src/assets/cart.png'; // Replace with your actual cart image path
+        return 'src/assets/cart_white.png'; // Replace with your actual cart image path
       default:
         return `src/assets/back.png`;
     }
   };
 
   return (
-    <button className={styles.button}>
-      <img src={getImageSrc(buttonType)} alt={buttonType} />
+    <button style={{backgroundColor:"black"}}>
+      <img src={getImageSrc(buttonType)} alt={buttonType} style={{height:"30px", contain:"cover"}}/>
     </button>
   );
 };

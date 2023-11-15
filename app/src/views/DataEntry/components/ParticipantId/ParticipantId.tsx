@@ -24,6 +24,7 @@ const ParticipantId: React.FC<ParticipantIdProps> = ({ setParticipantId, require
             type="text"
             className={styles.participantIdInput}
             maxLength={4}
+            minLength={4}
             onChange={handleParticipantIdChange}
             required={required}
           />

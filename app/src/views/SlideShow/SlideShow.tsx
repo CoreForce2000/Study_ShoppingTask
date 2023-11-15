@@ -16,10 +16,23 @@ interface SurveyResponse {
   shoppingSatisfaction: number;
 }
 
+type SurveyResponseKey = keyof SurveyResponse;
+
+interface BaseSlides {
+  slide: string;
+  children: React.ReactNode;
+  transit?: string;
+  variable?: SurveyResponseKey;
+
+}
+
+
 const SlideShow: React.FC = () => {
   const navigate = useNavigate();
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [valueChanged, setValueChanged] = useState(false);
+  const [numVasSlides, setNumVasSlides] = useState(0);
 
   const configData = useSelector((state: RootState) => state.config);
 
@@ -32,12 +45,14 @@ const SlideShow: React.FC = () => {
   });
 
 
+
   // Handlers for updating the survey responses
   const setOnlineShoppingFrequency = (selection: string[]) => {
     setSurveyResponses((prev) => ({
       ...prev,
       onlineShoppingFrequency: selection,
     }));
+    setValueChanged(true)
   };
 
   const setSelectedDrugs = (selection: string[]) => {
@@ -45,6 +60,7 @@ const SlideShow: React.FC = () => {
       ...prev,
       selectedDrugs: selection,
     }));
+    setValueChanged(true)
   };
 
   const setDrugDosage = (drug: string, dosage: number) => {
@@ -55,6 +71,7 @@ const SlideShow: React.FC = () => {
         [drug]: dosage,
       },
     }));
+    setValueChanged(true)
   };
 
   const setShoppingSatisfaction = (satisfaction: number) => {
@@ -62,6 +79,7 @@ const SlideShow: React.FC = () => {
       ...prev,
       shoppingSatisfaction: satisfaction,
     }));
+    setValueChanged(true)
   };
 
   // ... slides setup
@@ -77,7 +95,7 @@ const SlideShow: React.FC = () => {
     );
   };
 
-  const getVasSlides = (drug: string) => {
+  const getVasSlides = (drug: string): BaseSlides => {
     return {slide:'',
           children:
           <>
@@ -87,16 +105,27 @@ const SlideShow: React.FC = () => {
                 <VAS key={drug}  minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />
               </div>
             </div>
-          </>
+          </>,
+          variable:"drugDosages"
           }
   }
 
   
   const goToNextSlide = () => {
+    const currentSlide = allSlides[currentSlideIndex]
+
+    console.log(currentSlide.variable)
+    if(currentSlide.variable) {
+      if(!valueChanged) {
+        return
+      }
+    }
+    setValueChanged(false)
+    
     setCurrentSlideIndex((prevIndex) => prevIndex + 1);
-    if (baseSlides[currentSlideIndex].transit === "VAS_FOLLOWUP") {
+    if (currentSlide.transit === "VAS_FOLLOWUP") {
       // Generate VAS slides for each selected drug
-      const vasSlides = surveyResponses.selectedDrugs.map((drug) => (
+      const vasSlides: BaseSlides[] = surveyResponses.selectedDrugs.map((drug) => (
         getVasSlides(drug)
       ));
       
@@ -113,13 +142,14 @@ const SlideShow: React.FC = () => {
       // Update the allSlides state with the new slides in the correct position
       setAllSlides(updatedSlides);
     };
-    if (baseSlides[currentSlideIndex].transit === "SHOP") {
-      navigate('/shop?page=category');
+    if (currentSlide.transit === "SHOP") {
+      navigate('/shop');
 
     }
   }
 
-  const baseSlides = [
+  
+  const baseSlides: BaseSlides[] = [
 
     {slide:`/src/assets/slides/Phase1/Slide1.png`,
     children: <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
@@ -141,7 +171,8 @@ const SlideShow: React.FC = () => {
                   fontSizeFactor={1}
                 />
                 </div>
-              </div>
+              </div>,
+    variable:"onlineShoppingFrequency"
   },
 
   {slide:`/src/assets/slides/Phase1/Slide2.png`,
@@ -174,7 +205,8 @@ const SlideShow: React.FC = () => {
                   fontSizeFactor={0.8}
                 /> </div>
             </div>,
-  transit:"VAS_FOLLOWUP"},
+  transit:"VAS_FOLLOWUP",
+  variable:"selectedDrugs"},
 
   {slide:`/src/assets/slides/Phase1/Cover.png`, children: <></>},
   {slide:`/src/assets/slides/Phase1/Slide3.png`, children: <></>},
@@ -192,7 +224,8 @@ const SlideShow: React.FC = () => {
         <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
       </div>
     </div>
-    </>
+    </>,
+    variable:"shoppingSatisfaction"
   },
 ]
 
