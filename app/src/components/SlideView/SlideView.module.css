@@ -10,7 +10,9 @@
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
-  padding: '1rem'
+  padding: '1rem';
+  font-size: 10vh;
+  background-color: black;
   }
 
 .nextButton {

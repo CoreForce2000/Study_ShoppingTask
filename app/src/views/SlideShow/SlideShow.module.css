@@ -1,6 +1,6 @@
 .slideShow {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    text-shadow: 3px 2px 0px rgba(0, 0, 0, 0.3);
+    text-shadow: 0.1em 0.1em 0px rgba(0, 0, 0, 0.3);
     display:flex;
     justify-content: center;
 }

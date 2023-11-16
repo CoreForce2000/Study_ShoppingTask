@@ -11,7 +11,7 @@ interface CheckboxProps {
     fontSizeFactor: number;
 }  
 
-const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, columnLayout, onChange, fontSizeFactor=1 }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, columnLayout, onChange }) => {
   // Convert initialOptions to CheckboxOption[] and manage state internally
   const [options, setOptions] = useState<CheckboxOption[]>(
     initialOptions.map(label => ({ label, checked: false }))
@@ -35,17 +35,29 @@ const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, colu
     onChange(newOptions.filter(option => option.checked).map(option => option.label));
   };
 
+  let fontSizeParent = "0.5em";
+  let boxSize = "3.3vh";
+  const optionRows = columnLayout === 'double' ? options.length/2 : options.length;
+
+  if (optionRows > 6) {
+    fontSizeParent = `${0.5 / (optionRows / 6)}em`;
+    boxSize = `${3.3 / (optionRows / 6)}vh`;
+  }
+  
+
   return (
-    <div className={styles.checkboxContainer} style={{ fontSize : `${fontSizeFactor*3}rem`, gridTemplateColumns: columnLayout === 'double' ? "1fr 1fr" : "1fr" }}>
+    <div className={styles.checkboxContainer} style={{ fontSize: fontSizeParent, gridTemplateColumns: columnLayout === 'double' ? "1fr 1fr" : "1fr" }}>
       {options.map((option, index) => (
-        <label key={index} style={{marginBottom: `${fontSizeFactor*0.5}rem`}} className={`${styles.checkboxLabel} ${columnLayout === 'double' ? (index % 2 === 0 ? styles.leftColumn : styles.rightColumn) : ''}`}>
+        <label 
+          key={index} 
+          className={`${styles.checkboxLabel} ${columnLayout === 'double' ? (index % 2 === 0 ? styles.leftColumn : styles.rightColumn) : ''}`}>
           <input
             type="checkbox"
             checked={option.checked}
             onChange={() => toggleCheckbox(index)}
             className={styles.checkboxInput}
           />
-          <span className={styles.customCheckbox} style={{marginTop: `${fontSizeFactor*1.2}rem`}}></span>
+          <span className={styles.customCheckbox} style={{height:boxSize, width:boxSize}}></span>
           {option.label}
         </label>
       ))}

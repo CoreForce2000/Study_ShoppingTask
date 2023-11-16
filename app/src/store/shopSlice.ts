@@ -10,6 +10,33 @@ const initialState: ShopState = {
     shuffledItems: [],
     shuffledCategories: [],
 };
+interface Product {
+  // Define your Product structure here
+  image_name: string;
+  // Add other fields as necessary
+}
+
+interface ShopState {
+  budget: number;
+  items: Product[];
+  products: Record<string, Product[]>; // Assuming jsonData has this structure
+  shuffledItems: Product[];
+  shuffledCategories: string[];
+  clickedCategories: string[];
+  clickedItems: Record<string, string[]>; // Key: category, Value: array of clicked item names
+}
+
+  
+// Updated initial state
+const initialState: ShopState = {
+  budget: 1000,
+  items: [],
+  products: jsonData,
+  shuffledItems: [],
+  shuffledCategories: [],
+  clickedCategories: [],
+  clickedItems: {}
+};
 
 
 export const shopSlice = createSlice({
@@ -38,21 +65,38 @@ export const shopSlice = createSlice({
         setShuffledCategories: (state, action: PayloadAction<string[]>) => {
             state.shuffledCategories = action.payload;
         },
+        categoryClicked: (state, action: PayloadAction<string>) => {
+        if (!state.clickedCategories.includes(action.payload)) {
+            state.clickedCategories.push(action.payload);
+        }
+        },
+        itemClicked: (state, action: PayloadAction<{ category: string; itemName: string }>) => {
+        const { category, itemName } = action.payload;
+        if (!state.clickedItems[category]) {
+            state.clickedItems[category] = [];
+        }
+        if (!state.clickedItems[category].includes(itemName)) {
+            state.clickedItems[category].push(itemName);
+        }
+        }
     },
 });
 
-
-export const selectAllCategories = (state: RootState) => {
+export const selectAllCategories = (state: RootState): string[] => {
     return Object.keys(state.shop.products);
   };
   
-export const selectItemsByCategory = (state: RootState, category: string) => {
-return state.shop.products[category];
-};
-
-export const selectProduct = (state: RootState, category: string, item: number) => {
-return state.shop.products[category]?.[item];
-};
+  export const selectItemsByCategory = (state: RootState, category: string): Product[] => {
+    return state.shop.products[category] || [];
+  };
+  
+  export const selectShuffledItemsByCategory = (state: RootState, category: string): Product[] => {
+    return state.shop.shuffledItems[category] || [];
+  };
+  
+  export const selectProduct = (state: RootState, category: string, item: number): Product | undefined => {
+    return state.shop.products[category]?.[item];
+  };
 
 
 // Export actions
