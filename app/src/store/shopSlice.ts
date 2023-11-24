@@ -2,36 +2,25 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import jsonData from '../assets/categories/image_data.json';
 
-// Updated initial state
-const initialState: ShopState = {
-    budget: 1000, // Initial budget
-    items: [], // Initial cart items
-    products: jsonData,
-    shuffledItems: [],
-    shuffledCategories: [],
-};
-interface Product {
-  // Define your Product structure here
-  image_name: string;
-  // Add other fields as necessary
+
+interface ProductCategories {
+  [category: string]: { [id: string]: Product };
 }
 
 interface ShopState {
   budget: number;
   items: Product[];
-  products: Record<string, Product[]>; // Assuming jsonData has this structure
+  products: ProductCategories;
   shuffledItems: Product[];
   shuffledCategories: string[];
   clickedCategories: string[];
-  clickedItems: Record<string, string[]>; // Key: category, Value: array of clicked item names
+  clickedItems: Record<string, string[]>;
 }
 
-  
-// Updated initial state
 const initialState: ShopState = {
   budget: 1000,
   items: [],
-  products: jsonData,
+  products: jsonData as ProductCategories,
   shuffledItems: [],
   shuffledCategories: [],
   clickedCategories: [],
@@ -82,23 +71,29 @@ export const shopSlice = createSlice({
     },
 });
 
+
 export const selectAllCategories = (state: RootState): string[] => {
-    return Object.keys(state.shop.products);
-  };
-  
-  export const selectItemsByCategory = (state: RootState, category: string): Product[] => {
-    return state.shop.products[category] || [];
-  };
-  
-  export const selectShuffledItemsByCategory = (state: RootState, category: string): Product[] => {
-    return state.shop.shuffledItems[category] || [];
-  };
-  
-  export const selectProduct = (state: RootState, category: string, item: number): Product | undefined => {
-    return state.shop.products[category]?.[item];
-  };
+  return Object.keys(state.shop.products);
+};
+
+export const selectItemsByCategory = (state: RootState, category: string): Product[] => {
+  const categoryProducts = state.shop.products[category];
+  return categoryProducts ? Object.values(categoryProducts) : [];
+};
+
+export const selectShuffledItemsByCategory = (state: RootState, category: string): Product[] => {
+  return state.shop.shuffledItems.filter(item => item.category === category);
+};
+
+export const selectShuffledCategories = (state: RootState): string[] => {
+  return state.shop.shuffledCategories
+}
+
+export const selectProduct = (state: RootState, category: string, itemId: number): Product | undefined => {
+  return state.shop.products[category]?.[itemId.toString()];
+};
 
 
-// Export actions
+
 export const { setBudget, purchaseItem, returnItem, addItem, removeItem, setShuffledItems, setShuffledCategories } = shopSlice.actions;
 export default shopSlice.reducer;

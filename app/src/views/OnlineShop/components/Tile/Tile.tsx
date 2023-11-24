@@ -13,20 +13,21 @@ const Tile: React.FC<TileProps> = ({ categoryName, imageName, backgroundColor, o
   const [isActive, setIsActive] = useState(false);
 
   // Check sessionStorage for the clicked state of the tile
-  const getInitialClickedState = () => {
-    const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
-    const savedState = sessionStorage.getItem(key);
-    console.log(`Loaded state for ${key}:`, savedState);
-    return savedState === 'true';
-  };
+  // const getInitialClickedState = () => {
 
-  const [clickedState, setClickedState] = useState(getInitialClickedState);
+  //   const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
+  //   const savedState = sessionStorage.getItem(key);
+  //   console.log(`Loaded state for ${key}:`, savedState);
+  //   return savedState === 'true';
+  // };
+
+  const [clickedState, setClickedState] = useState(false);
 
   // Update sessionStorage when the clickedState changes
-  useEffect(() => {
-    const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
-    sessionStorage.setItem(key, clickedState.toString());
-  }, [clickedState, categoryName, imageName, type]);
+  // useEffect(() => {
+  //   const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
+  //   sessionStorage.setItem(key, clickedState.toString());
+  // }, [clickedState, categoryName, imageName, type]);
 
   useEffect(() => {
     if (isActive) {

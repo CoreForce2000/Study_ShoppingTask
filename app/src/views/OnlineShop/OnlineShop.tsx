@@ -16,41 +16,6 @@ interface OnlineShopProps {
 }
 
 
-const drugCategories = [
-    "Cannabis",
-    "Cannabis\nProducts",
-    "Cigarettes",
-    "Cigars",
-    "Ecstasy",
-    "Hashish",
-    "Hookah",
-    "Pipers",
-    "Rolling\nTobacco",
-    "Vapin"
-]
-
-const alcoholCategories = [
-    "Alcopops",
-    "Beer",
-    "Brandy",
-    "Champagne",
-    "Cider",
-    "Cocktails",
-    "Gin",
-    "Prosecco",
-    "Red\nWine",
-    "Vodka",
-    "Rum",
-    "Whisky",
-    "White Wine",
-]
-
-const initialScreenCategories = [
-    "Cocaine",
-    "Crack",
-    "Heroin",
-]
-
 const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
     const [searchParams] = useSearchParams();
 

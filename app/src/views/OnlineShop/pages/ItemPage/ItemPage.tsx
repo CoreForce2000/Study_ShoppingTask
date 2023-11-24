@@ -15,10 +15,10 @@ interface ItemPageProps {
 const ItemPage: React.FC<ItemPageProps> = ( { category, item }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     const product = useSelector((state: RootState )=>selectProduct(state, category, item));
     const budget = useSelector((state: RootState) => state.shop.budget);
-    
+
     const purchaseItem = () => {
         const price = budget < config.thresholdMinimumPrice ? product.minimum : product.maximum;
 
