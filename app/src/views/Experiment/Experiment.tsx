@@ -45,11 +45,17 @@ const Experiment: React.FC = () => {
   // In Experiment component's state
   const [currentSlideType, setCurrentSlideType] = useState<SlideType>('offLightbulb');
 
-  const beerProducts = useSelector((state: RootState) => selectItemsByCategory(state, "Beer"));
-  const cocaineProducts = useSelector((state: RootState) => selectItemsByCategory(state, "Cocaine"));
-  const heroinProducts = useSelector((state: RootState) => selectItemsByCategory(state, "Heroin"));
-  const yogaProducts = useSelector((state: RootState) => selectItemsByCategory(state, "Yoga"));
-  const bbqProducts = useSelector((state: RootState) => selectItemsByCategory(state, "BBQ"));
+  const drugCategories = ["Beer", "Cocaine", "Heroin"];
+  const nonDrugCategories = ["Yoga", "BBQ"];
+
+  const drugProducts = useSelector((state: RootState) =>
+    drugCategories.flatMap(category => selectItemsByCategory(state, category))
+  );
+  const nonDrugProducts = useSelector((state: RootState) =>
+    nonDrugCategories.flatMap(category => selectItemsByCategory(state, category))
+  );
+
+
 
   // In Experiment.tsx or a separate slides data file
 
@@ -79,7 +85,6 @@ const Experiment: React.FC = () => {
     allowKeyPress: false
   };
 
-  
   const [currentSlide, setCurrentSlide] = useState<Slide>(offLightbulbSlide);
 
   const transitionSlide = () => {
@@ -89,26 +94,37 @@ const Experiment: React.FC = () => {
         setCurrentSlide(Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide);
         break;
       case 'coloredLightbulb':
-        // Determine if an item is received
-        if (calculateItemReceivingChance(currentBlock, pressedButton)) {
-          setCurrentSlide(receiveItemSlide);
+        // If the button was pressed during the coloredLightbulb slide
+        if (pressedButton) {
+          if (calculateItemReceivingChance(currentBlock, true)) {
+            // If an item is received, show the receiveItem slide
+            const selectedItem = (currentSlide === blueLightbulbSlide ? nonDrugProducts : drugProducts)
+              [Math.floor(Math.random() * (currentSlide === blueLightbulbSlide ? nonDrugProducts.length : drugProducts.length))];
+            setCurrentSlide({
+              ...receiveItemSlide,
+              image: selectedItem.image_name // Assuming each item has an 'imagePath'
+            });
+          } else {
+            // If no item is received, go back to offLightbulb
+            setCurrentSlide(offLightbulbSlide);
+          }
         } else {
-          // End of trial, reset to off-lightbulb
+          // If no button press, transition back to offLightbulb
           setCurrentSlide(offLightbulbSlide);
-          // Reset the button press state for the next trial
-          setPressedButton(false);
-          // Handle block transition or trial count here (if needed)
         }
+        // Reset the button press state for the next trial
+        setPressedButton(false);
         break;
       case 'receiveItem':
-        // End of trial, reset to off-lightbulb
+        // After showing receiveItem, transition back to offLightbulb
         setCurrentSlide(offLightbulbSlide);
         // Reset the button press state for the next trial
         setPressedButton(false);
-        // Handle block transition or trial count here (if needed)
         break;
     }
   };
+  
+  
 
   const calculateItemReceivingChance = (blockType: BlockType, buttonPressed: boolean): boolean => {
     let probability = 0;
@@ -122,15 +138,21 @@ const Experiment: React.FC = () => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.code === inputKey && currentSlide.type === 'coloredLightbulb' && !pressedButton) {
+      if (event.code === inputKey && currentSlide.allowKeyPress && !pressedButton) {
         setPressedButton(true);
+        // Immediately determine if an item is received and transition
+        if (calculateItemReceivingChance(currentBlock, true)) {
+          setCurrentSlide(receiveItemSlide);
+        } else {
+          setCurrentSlide(offLightbulbSlide);
+          setPressedButton(false); // Reset for the next trial
+        }
       }
     };
-    
-    window.addEventListener('keydown', handleKeyPress);
   
+    window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [inputKey, pressedButton, currentSlide.type]); // Depend on pressedButton state
+  }, [inputKey, currentSlide.allowKeyPress, pressedButton, currentBlock]);
   
 
 useEffect(() => {
