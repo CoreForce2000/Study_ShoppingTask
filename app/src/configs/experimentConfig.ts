@@ -2,9 +2,9 @@
 
 export const experimentConfig = {
     slideTimings: {
-      offLightbulb: 250, // in milliseconds
-      coloredLightbulb: 250,
-      receiveItem: 250,
+      offLightbulb: 2500, // in milliseconds
+      coloredLightbulb: 2500,
+      receiveItem: 2500,
       none:0
     },
     inputKey: 'Space', // The key code for the input

@@ -82,8 +82,6 @@ const Experiment: React.FC = () => {
   
   const [currentSlide, setCurrentSlide] = useState<Slide>(offLightbulbSlide);
 
-  const allSlides: Slide[] = [offLightbulbSlide, blueLightbulbSlide, orangeLightbulbSlide, receiveItemSlide];
-
   const transitionSlide = () => {
     switch (currentSlide.type) {
       case 'offLightbulb':
@@ -124,25 +122,28 @@ const Experiment: React.FC = () => {
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.code === inputKey && currentSlide.type === 'coloredLightbulb') {
+      if (event.code === inputKey && currentSlide.type === 'coloredLightbulb' && !pressedButton) {
         setPressedButton(true);
       }
     };
-  
+    
     window.addEventListener('keydown', handleKeyPress);
+  
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentSlide.type, inputKey]);
+  }, [inputKey, pressedButton, currentSlide.type]); // Depend on pressedButton state
+  
 
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      transitionSlide();
-    }, slideTimings[currentSlide.type]); // Using dynamic timing based on slide type
-  
-    return () => clearTimeout(250);
-  }, [currentSlide, slideTimings]);
-  
-  
+useEffect(() => {
+  // Set a timer for the current slide
+  const timer = setTimeout(() => {
+    transitionSlide();
+  }, slideTimings[currentSlide.type]);
+
+  // Cleanup function to clear the timer if the slide changes
+  return () => clearTimeout(timer);
+}, [currentSlide, slideTimings]);
+
+
   return (
     <div className={styles.experiment}>
       <SlideView
