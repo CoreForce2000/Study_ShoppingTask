@@ -112,25 +112,19 @@ const Experiment: React.FC = () => {
   }, []); // Include drugProducts and nonDrugProducts in the dependency array
   
 
-  useEffect(() => {
-    console.log(drugProducts)
-  }, [drugProducts])
-
-  
-  useEffect(() => {
-    console.log(nonDrugProducts)
-  }, [nonDrugProducts])
-
   const transitionSlide = async () => {
     switch (currentSlide.type) {
       case 'offLightbulb':
         // Randomly select between blue and orange lightbulb
-        setCurrentSlide(Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide);
+
+        const futureSlide = Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide;
+
+        setCurrentSlide(futureSlide);
         setPressedButton(false);
 
         // If an item is received, show the receiveItem slide
-        const selectedItem = (currentSlide.id == 'blueLightbulb' ? nonDrugProducts : drugProducts)
-        [Math.floor(Math.random() * (currentSlide.id == 'blueLightbulb' ? nonDrugProducts.length : drugProducts.length))];
+        const selectedItem = (futureSlide.id === 'blueLightbulb' ? nonDrugProducts : drugProducts)
+        [Math.floor(Math.random() * (futureSlide.id === 'blueLightbulb' ? nonDrugProducts.length : drugProducts.length))];
       
         const localImagePath = `${config.IMAGE_BASE_PATH}${selectedItem.category}/${selectedItem.image_name}`;
         await preloadImage(localImagePath);
@@ -170,8 +164,6 @@ const Experiment: React.FC = () => {
     }
   };
   
-  
-
   const calculateItemReceivingChance = (blockType: BlockType, buttonPressed: boolean): boolean => {
     let probability = 0;
     const blockProbabilities = probabilities[blockType];
@@ -210,10 +202,6 @@ useEffect(() => {
     return () => clearTimeout(timer);
   }
 }, [currentSlide, slideTimings, pressedButton]);
-
-
-
-
 
 
 return (

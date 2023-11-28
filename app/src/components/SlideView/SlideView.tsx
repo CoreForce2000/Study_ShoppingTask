@@ -13,7 +13,7 @@ interface SlideViewProps {
     verticalAlign?: boolean;
 }
 
-const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextButton, verticalAlign }) => {
+const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextButton }) => {
   const dispatch = useDispatch();
 
   const aspectRatio = 3 / 4; // Height / Width
