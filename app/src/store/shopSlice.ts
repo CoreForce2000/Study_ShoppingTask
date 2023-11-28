@@ -1,11 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import jsonData from '../assets/categories/image_data.json';
-import { config } from '../configs/config'; // Adjust the path as needed
-
-
-const IMAGE_BASE_PATH = 'src/assets/categories/';
-
 
 interface ProductCategories {
   [category: string]: { [id: string]: Product };
@@ -96,12 +91,6 @@ export const selectShuffledCategories = (state: RootState): string[] => {
 export const selectProduct = (state: RootState, category: string, itemId: number): Product | undefined => {
   return state.shop.products[category]?.[itemId.toString()];
 };
-
-export const selectImagePath = (state: RootState, category: string, itemId: number): string => {
-  const product = state.shop.products[category]?.[itemId.toString()];
-  return product ? `${config.IMAGE_BASE_PATH}${category}/${product.image_name}` : '';
-};
-
 
 export const { setBudget, purchaseItem, returnItem, addItem, removeItem, setShuffledItems, setShuffledCategories } = shopSlice.actions;
 export default shopSlice.reducer;

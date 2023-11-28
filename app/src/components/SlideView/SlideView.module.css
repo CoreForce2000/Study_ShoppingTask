@@ -4,7 +4,7 @@
   position: relative;
   display: flex;
   justify-content: center;
-  align-items: center;
+  /* align-items: center; */
   overflow: hidden;
   position: relative;
   background-size: cover;
@@ -12,7 +12,7 @@
   background-position: center center;
   padding: '1rem';
   font-size: 10vh;
-  background-color: black;
+  background-color: white;
   }
 
 .nextButton {
