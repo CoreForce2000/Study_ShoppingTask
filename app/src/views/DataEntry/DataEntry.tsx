@@ -20,6 +20,7 @@ import { RootState } from '../../store/store';
 import { createDispatchHandler } from '../../util/reduxUtils';
 import FullscreenView from '../../components/FullscreenView/FullscreenView';
 
+import { config } from '../../configs/config.ts';
 
 const DataEntry: React.FC = () => {
   const dispatch = useDispatch();
@@ -36,14 +37,17 @@ const DataEntry: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // Call the save function with the participantData from the store
-    await saveParticipantData(
-      participantData.participantId,
-      participantData.age,
-      participantData.group,
-      participantData.gender,
-      participantData.handedness
-    );
+    if(config.server_mode) {
+
+      // Call the save function with the participantData from the store
+      await saveParticipantData(
+        participantData.participantId,
+        participantData.age,
+        participantData.group,
+        participantData.gender,
+        participantData.handedness
+      );
+    }
 
     // After saving data navigate to the Slide view
     navigate('/slide');
@@ -102,8 +106,9 @@ const DataEntry: React.FC = () => {
               <ValueSelector options={groups} setOptions={setGroups} />
               </fieldset>
 
-              <Link to="shop">Jump to shop</Link> <br />
+              {/* <Link to="shop">Jump to shop</Link> <br /> */}
               <Link to="slide">Jump to Slides</Link> <br />
+              <Link to="contingency">Jump to Contingency</Link> <br />
               <label>
                 <input
                 type="checkbox"

@@ -1,24 +1,23 @@
 /* SlideViewPort.module.css */
 .slideContainer {
   box-sizing: border-box;
-  position: relative;
   display: flex;
   justify-content: center;
-  /* align-items: center; */
+  align-items: center;
   overflow: hidden;
   position: relative;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
   padding: '1rem';
-  font-size: 10vh;
+  font-size: 1em;
   background-color: white;
   }
 
 .nextButton {
   position: absolute;
-  bottom: 10px; /* Adjust as needed */
-  right: 10px; /* Adjust as needed */
+  bottom: 0.2em; /* Adjust as needed */
+  right: 0.2em; /* Adjust as needed */
   background: none;
   border: none;
   cursor: pointer;
@@ -27,6 +26,6 @@
 
 .nextIcon {
   width: auto; /* Maintain aspect ratio */
-  height: 50px; /* Adjust as needed */
+  height: 2em; /* Adjust as needed */
   /* If you want to ensure the image is not stretched, set only one dimension, either width or height */
 }

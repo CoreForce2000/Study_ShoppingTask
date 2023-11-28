@@ -1,11 +1,3 @@
-interface ParticipantData {
-    participantId: string;
-    age: string;
-    selectedGroup: string;
-    gender: string;
-    handedness: string;
-}
-
 interface ApiResponse {
     id: number;
 }

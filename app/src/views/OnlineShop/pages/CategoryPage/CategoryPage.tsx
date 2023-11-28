@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './CategoryPage.module.css';
 import Tile from '../../components/Tile/Tile';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../../../store/store';
-import { selectItemsByCategory, setShuffledCategories } from '../../../../store/shopSlice';
+import { selectItemsByCategory } from '../../../../store/shopSlice';
 import { shuffleArray } from '../../../../util/randomize';
 
 interface CategoryPageProps {
@@ -12,7 +12,6 @@ interface CategoryPageProps {
 }
 
 const CategoryPage: React.FC<CategoryPageProps> = ( { category } ) => {
-    const dispatch = useDispatch();
     const navigate = useNavigate();    
     const navigateToItemPage = (item_id: number) => {
         navigate(`/shop?category=${category}&item=${item_id}`);

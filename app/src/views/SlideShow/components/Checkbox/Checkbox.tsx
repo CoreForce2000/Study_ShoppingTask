@@ -2,20 +2,18 @@ import React, { useState } from 'react';
 import styles from './Checkbox.module.css';
 import { CheckboxOption } from '../../SlideShowInterface';
 
-
 interface CheckboxProps {
-    initialOptions: string[]; // Change to initialOptions which is a string array
-    allowMultiple: boolean; // Prop to control if multiple selections are allowed
-    columnLayout: 'single' | 'double'; // Prop to control column layout
-    onChange: (selectedOptions: string[]) => void; // Callback to pass the selected options to the parent
-    fontSizeFactor: number;
-}  
+    initialOptions: string[];
+    allowMultiple: boolean;
+    columnLayout: 'single' | 'double';
+    onChange: (selectedOptions: string[]) => void;
+}
 
 const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, columnLayout, onChange }) => {
-  // Convert initialOptions to CheckboxOption[] and manage state internally
-  const [options, setOptions] = useState<CheckboxOption[]>(
-    initialOptions.map(label => ({ label, checked: false }))
-  );
+    const [options, setOptions] = useState<CheckboxOption[]>(
+        initialOptions.map(label => ({ label, checked: false }))
+    );
+
 
   // Function to toggle the checked state of a checkbox
   const toggleCheckbox = (index: number) => {
@@ -35,13 +33,17 @@ const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, colu
     onChange(newOptions.filter(option => option.checked).map(option => option.label));
   };
 
-  let fontSizeParent = "0.5em";
-  let boxSize = "3.3vh";
+  let fontSizeParentNum = 0.7
+  let boxSizeNum = 1
+
+  let fontSizeParent = `${fontSizeParentNum}em`;
+  let boxSize = `${boxSizeNum}em`;
+
   const optionRows = columnLayout === 'double' ? options.length/2 : options.length;
 
   if (optionRows > 6) {
-    fontSizeParent = `${0.5 / (optionRows / 6)}em`;
-    boxSize = `${3.3 / (optionRows / 6)}vh`;
+    fontSizeParent = `${fontSizeParentNum / (optionRows / 6)}em`;
+    boxSize = `${boxSizeNum / (optionRows / 6)}em`;
   }
   
 

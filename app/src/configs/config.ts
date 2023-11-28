@@ -1,7 +1,10 @@
 import TimingObject from "../util/TimingObject";
 
 export const config = {
-    IMAGE_BASE_PATH: 'src/assets/categories/'
+    IMAGE_BASE_PATH: '/assets/categories/',
+    SLIDE_PATH: '/assets/slides/',
+
+    server_mode: false
   };
 
 export const experimentConfig = {

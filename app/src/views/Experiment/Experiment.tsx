@@ -4,7 +4,7 @@ import SlideView from '../../components/SlideView/SlideView';
 
 import styles from './Experiment.module.css';
 
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { selectItemsByCategory } from '../../store/shopSlice';
 
@@ -37,28 +37,25 @@ type SlideType = 'offLightbulb' | 'coloredLightbulb' | 'receiveItem' | 'offLight
 
 
 const Experiment: React.FC = () => {
-  const dispatch = useDispatch();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState<number>(0);
-  const [currentBlock, setCurrentBlock] = useState<BlockType>('nonDegraded');
+  const [currentBlock] = useState<BlockType>('nonDegraded');
   const [pressedButton, setPressedButton] = useState<boolean>(false);
-  
-  // In Experiment component's state
-  const [currentSlideType, setCurrentSlideType] = useState<SlideType>('offLightbulb');
 
   const drugCategories = ["Beer"];
   const nonDrugCategories = ["Yoga", "BBQ"];
 
-  const [drugProducts, setDrugProducts] = useState(useSelector((state: RootState) =>
+  const [drugProducts] = useState(useSelector((state: RootState) =>
           drugCategories.flatMap(category => selectItemsByCategory(state, category))
         ))
 
-  const [nonDrugProducts, setNonDrugProducts] = useState(useSelector((state: RootState) =>
+  const [nonDrugProducts] = useState(useSelector((state: RootState) =>
           nonDrugCategories.flatMap(category => selectItemsByCategory(state, category))
         ));
 
+  const [imagePath, setImagePath] = useState<string>("none");
+
   // In Experiment.tsx or a separate slides data file
 
-  const pathToSlides = 'src/assets/slides/contingency/'
+  const pathToSlides = '/assets/slides/contingency/'
 
   const offLightbulbSlide: Slide = {
     id:"offLightbulb",
@@ -124,24 +121,26 @@ const Experiment: React.FC = () => {
     console.log(nonDrugProducts)
   }, [nonDrugProducts])
 
-  const transitionSlide = () => {
+  const transitionSlide = async () => {
     switch (currentSlide.type) {
       case 'offLightbulb':
         // Randomly select between blue and orange lightbulb
         setCurrentSlide(Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide);
         setPressedButton(false);
+
+        // If an item is received, show the receiveItem slide
+        const selectedItem = (currentSlide.id == 'blueLightbulb' ? nonDrugProducts : drugProducts)
+        [Math.floor(Math.random() * (currentSlide.id == 'blueLightbulb' ? nonDrugProducts.length : drugProducts.length))];
+      
+        const localImagePath = `${config.IMAGE_BASE_PATH}${selectedItem.category}/${selectedItem.image_name}`;
+        await preloadImage(localImagePath);
+        setImagePath(localImagePath);
+        break;
+
         break;
       case 'coloredLightbulb':
         // If the button was pressed during the coloredLightbulb slide
         if (pressedButton) {
-
-          // If an item is received, show the receiveItem slide
-          const selectedItem = (currentSlide.id == 'blueLightbulb' ? nonDrugProducts : drugProducts)
-            [Math.floor(Math.random() * (currentSlide.id == 'blueLightbulb' ? nonDrugProducts.length : drugProducts.length))];
-          
-          const imagePath = `${config.IMAGE_BASE_PATH}${selectedItem.category}/${selectedItem.image_name}`;
-
-          preloadImage(imagePath);
 
           if (calculateItemReceivingChance(currentBlock, true)) {
               

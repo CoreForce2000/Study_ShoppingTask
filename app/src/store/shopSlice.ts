@@ -88,7 +88,7 @@ export const selectShuffledCategories = (state: RootState): string[] => {
   return state.shop.shuffledCategories
 }
 
-export const selectProduct = (state: RootState, category: string, itemId: number): Product | undefined => {
+export const selectProduct = (state: RootState, category: string, itemId: number): Product => {
   return state.shop.products[category]?.[itemId.toString()];
 };
 

@@ -1,7 +1,8 @@
-
-export const preloadImage = (path:string) => {
-    console.log("Preloading image: " + path)
-    const img = new Image();
-    img.src = path;
-};
-
+export const preloadImage = (path: string) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = reject;
+      img.src = path;
+    });
+  };

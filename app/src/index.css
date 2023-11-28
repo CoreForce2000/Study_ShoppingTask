@@ -10,7 +10,7 @@
 
   --shadow-color: rgba(0, 0, 0, 0.8);
   --color: rgba(0, 0, 0, 1);
-  --background-color: #ffffff;
+  --background-color: #FFFFFF;
 
   
   color-scheme: light;
@@ -63,10 +63,10 @@ button {
   transition: border-color 0.25s;
 }
 
-button:hover {
+/* button:hover {
   border-color: #646cff;
   background-color: #646cff;
-}
+} */
 
 
 /* @media (prefers-color-scheme: light) {

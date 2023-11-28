@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './ShopButton.module.css'; // Import the CSS module
 
 // Define the props for the ShopButton component
 type ShopButtonProps = {

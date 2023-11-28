@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styles from './SlideShow.module.css';
 import SlideView from '../../components/SlideView/SlideView';
 import Checkbox from './components/Checkbox/Checkbox';
@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import nextButtonImg from '/src/assets/buttonNext.png'
 import { useNavigate } from 'react-router-dom';
+import { config } from '../../configs/config.ts';
 
 // Define a type for the survey responses
 interface SurveyResponse {
@@ -23,7 +24,6 @@ interface BaseSlides {
   children: React.ReactNode;
   transit?: string;
   variable?: SurveyResponseKey;
-
 }
 
 
@@ -32,7 +32,6 @@ const SlideShow: React.FC = () => {
 
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [valueChanged, setValueChanged] = useState(false);
-  const [numVasSlides, setNumVasSlides] = useState(0);
 
   const configData = useSelector((state: RootState) => state.config);
 
@@ -99,9 +98,9 @@ const SlideShow: React.FC = () => {
     return {slide:'',
           children:
           <>
-            <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`How much do you want to use ${drug} right now?`} </div>
-            <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-              <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
+            <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> {`How much do you want to use ${drug} right now?`} </div>
+            <div style={{width:"100%", padding:"1em", display:"flex", justifyContent:"left"}}>
+              <div style={{backgroundColor:"white", width:"100%", marginTop:"2em"}}>
                 <VAS key={drug}  minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />
               </div>
             </div>
@@ -144,40 +143,42 @@ const SlideShow: React.FC = () => {
     };
     if (currentSlide.transit === "SHOP") {
       navigate('/shop');
-
+    }
+    if (currentSlide.transit === "CONTINGENCY") {
+      navigate('/contingency');
     }
   }
+
 
   
   const baseSlides: BaseSlides[] = [
 
-    {slide:`/src/assets/slides/Phase1/Slide1.png`,
-    children: <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-                <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
-                <Checkbox key="online-shopping"
-                  initialOptions={[
+    {slide:`${config.SLIDE_PATH}phase1/Slide1.png`,
+    children: <div style={{marginTop:"3em", backgroundColor:"white", width:"100%", paddingLeft:"1.5em", display:"flex", justifyContent:"left"}}>
+                <div style={{backgroundColor:"white", width:"100%"}}> 
+                  <Checkbox key="online-shopping"
+                    initialOptions={[
+                      
+                      "several times a day",
+                      "once a day",
+                      "a few times a week",
+                      "once a week",
+                      "once a month or less",
+                      "very rarely / not at all"
                     
-                    "several times a day",
-                    "once a day",
-                    "a few times a week",
-                    "once a week",
-                    "once a month or less",
-                    "very rarely / not at all"
-                  
-                  ]} // Replace with actual options
-                  allowMultiple={false}
-                  columnLayout="single"
-                  onChange={setOnlineShoppingFrequency}
-                  fontSizeFactor={1}
-                />
+                    ]} // Replace with actual options
+                    allowMultiple={false}
+                    columnLayout="single"
+                    onChange={setOnlineShoppingFrequency}
+                  />
                 </div>
               </div>,
     variable:"onlineShoppingFrequency"
   },
 
-  {slide:`/src/assets/slides/Phase1/Slide2.png`,
-  children: <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-              <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}> 
+  {slide:`${config.SLIDE_PATH}phase1/Slide2.png`,
+  children: <div style={{marginTop:"3em", width:"100%", paddingLeft:"1.5em", display:"flex", justifyContent:"left"}}>
+              <div style={{backgroundColor:"white", width:"100%"}}> 
                 <Checkbox key="drugs"
                   initialOptions={[
 
@@ -202,31 +203,38 @@ const SlideShow: React.FC = () => {
                   allowMultiple={true}
                   columnLayout="double"
                   onChange={setSelectedDrugs}
-                  fontSizeFactor={0.8}
                 /> </div>
             </div>,
   transit:"VAS_FOLLOWUP",
   variable:"selectedDrugs"},
 
-  {slide:`/src/assets/slides/Phase1/Cover.png`, children: <></>},
-  {slide:`/src/assets/slides/Phase1/Slide3.png`, children: <></>},
-  {slide:`/src/assets/slides/Phase1/Slide4.png`, children: <></>},
-  {slide:`/src/assets/slides/Phase1/Slide5.png`, children: <></>},
-  {slide:`/src/assets/slides/Phase1/Slide6.png`, children: <></>, transit:"SHOP"},
+  {slide:`${config.SLIDE_PATH}phase1/Cover.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide3.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide4.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide5.png`, children: <></>},
+  // {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>, transit:"SHOP"},
+  {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>},
 
 
-  {slide:`/src/assets/slides/Phase2/Slide1.png`, children: <></>},
-  {slide:`/src/assets/slides/White.png`, children: 
+  {slide:`${config.SLIDE_PATH}phase2/Slide1.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}White.png`, children: 
     <>
-    <div style={{position:"absolute", textAlign:"center", top:"2rem", fontSize:"3rem", color:"black"}}> {`Please indicate on the line below how satisfied you are with your purchases`} </div>
-    <div style={{width:"100%", padding:"7%", display:"flex", justifyContent:"left"}}>
-      <div style={{backgroundColor:"white", width:"100%", marginTop:"20%"}}>
-        <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
+    <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> {`Please indicate on the line below how satisfied you are with your purchases`} </div>
+            <div style={{width:"100%", padding:"1em", display:"flex", justifyContent:"left"}}>
+              <div style={{backgroundColor:"white", width:"100%", marginTop:"2em"}}>
+                <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
       </div>
-    </div>
-    </>,
+     </div>
+     </>,
     variable:"shoppingSatisfaction"
   },
+  {slide:`${config.SLIDE_PATH}phase2/Slide3.PNG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide4.PNG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide5.PNG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide6.PNG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide7.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide8.PNG`, children: <></>, transit:"CONTINGENCY"},
+  
 ]
 
 
@@ -245,7 +253,7 @@ const SlideShow: React.FC = () => {
   // Render the current slide and selection state
   return (
     <div className={styles.slideShow}>
-      <SlideView backgroundImage={currentSlide.slide} >
+      <SlideView backgroundImage={currentSlide.slide} verticalAlign={true}>
 
         {currentSlide.children}
         <button className={styles.nextButton} onClick={goToNextSlide}>

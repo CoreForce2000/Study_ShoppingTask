@@ -15,7 +15,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({ name, options, value, setValue,
     return (
         <div className={styles.radioGroup}>
             <input
-                key={name}
+                key={option}
                 type="radio"
                 id={option}
                 name={name}

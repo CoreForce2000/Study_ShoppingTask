@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styles from './OnlineShop.module.css';
 import FullscreenView from '../../components/FullscreenView/FullscreenView';
 import BackButton from './components/BackButton/BackButton';
@@ -8,9 +8,9 @@ import CategoryPage from './pages/CategoryPage/CategoryPage';
 import ItemPage from './pages/ItemPage/ItemPage';
 import OverviewPage from './pages/OverviewPage/OverviewPage';
 import CartPage from './pages/CartPage/CartPage';
-import { useDispatch, useSelector } from 'react-redux';
-import { selectAllCategories, setShuffledCategories } from '../../store/shopSlice';
-import { pseudorandomize } from '../../util/randomize';
+
+
+
 
 interface OnlineShopProps {
 }
@@ -23,7 +23,7 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
     const category = searchParams.get('category') || '';
     const item = Number(searchParams.get('item')) || 0;
 
-    let visibility: string = "visible";
+    let visibility: any = "visible";
     if (category === '') {
         visibility = "hidden";
     }

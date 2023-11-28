@@ -4,13 +4,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import surveyReducer from './surveySlice';
 import configReducer from './configSlice';
 import shopReducer from './shopSlice';
+import slideReducer from './slideSlice';
 
 const store = configureStore({
   reducer: {
     survey: surveyReducer,
     config: configReducer,
     shop: shopReducer,
-    // shopState: shopStateReducer,
+    slide: slideReducer,
   },
 });
 
