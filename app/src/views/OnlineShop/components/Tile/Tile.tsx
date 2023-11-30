@@ -1,72 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Tile.module.css'; // Updated CSS module
 
+type TileState = 'none' | 'categoryClicked' | 'itemClicked';
+
 type TileProps = {
-    categoryName: string;
-    imageName?: string;
+    text: string;
+    imageUrl?: string;
     backgroundColor: string;
+    tileState: TileState;
     onClick: () => void;
-    type: 'category' | 'item'; // New prop to distinguish between category and item
 };
 
-const Tile: React.FC<TileProps> = ({ categoryName, imageName, backgroundColor, onClick, type }) => {
-  const [isActive, setIsActive] = useState(false);
+const Tile: React.FC<TileProps> = ({ text, imageUrl, backgroundColor, tileState, onClick }) => {
 
-  // Check sessionStorage for the clicked state of the tile
-  // const getInitialClickedState = () => {
-
-  //   const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
-  //   const savedState = sessionStorage.getItem(key);
-  //   console.log(`Loaded state for ${key}:`, savedState);
-  //   return savedState === 'true';
-  // };
-
-  const [clickedState, setClickedState] = useState(false);
-
-  // Update sessionStorage when the clickedState changes
-  // useEffect(() => {
-  //   const key = type === 'category' ? `afterShadow_${categoryName}` : `showImage_${imageName}`;
-  //   sessionStorage.setItem(key, clickedState.toString());
-  // }, [clickedState, categoryName, imageName, type]);
+  const [tileStyle, setTileStyle] = useState<React.CSSProperties>({backgroundColor: backgroundColor});
+  const [displayText, setDisplayText] = useState(text);
 
   useEffect(() => {
-    if (isActive) {
-      onClick();
+    
+    if (tileState === 'categoryClicked') {
+      setTileStyle(
+        {
+          textDecoration: "underline",
+          //color code for pink: #FFC0CB
+          backgroundColor: "#c157db"
+        } 
+      ) 
+
+    } else if (tileState === 'itemClicked') {
+
+      setTileStyle(
+        {
+          backgroundImage: `url('${imageUrl}')`,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundColor: 'white',
+          backgroundPosition: 'center center',
+        } 
+      )
+      setDisplayText("");
     }
-  }, [isActive, onClick]);
 
-  const handleClick = () => {
-    setClickedState(true);
-    setIsActive(true);
-  }
+  }, [tileState, imageUrl]);
 
-  let tileStyle = {};
-  if (type === 'category') {
-    tileStyle = clickedState ? {
-      textDecoration: "underline",
-      backgroundColor: backgroundColor,
-    } : {
-      backgroundColor: backgroundColor,
-    };
-  } else {
-    let imageUrl = `url('src/assets/categories/${categoryName}/${imageName}')`;
-    tileStyle = clickedState ? {
-      backgroundImage: imageUrl,
-      backgroundSize: 'contain',
-      backgroundRepeat: 'no-repeat',
-      backgroundColor: 'white',
-      backgroundPosition: 'center center',
-    } : {
-      backgroundColor: backgroundColor,
-    };
-  }
-
-  const displayText = type === 'category' ? categoryName : "";
-
+  
   return (
     <div
       className={styles.tile}
-      onClick={handleClick}
+      onClick={onClick}
       style={tileStyle}
     >
       <span>{displayText}</span>

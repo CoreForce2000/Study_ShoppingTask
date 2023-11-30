@@ -6,3 +6,7 @@ export const preloadImage = (path: string) => {
       img.src = path;
     });
   };
+
+export const getImagePath = (category: string, imageName: string) => {
+    return `assets/categories/${category}/${imageName}`
+}

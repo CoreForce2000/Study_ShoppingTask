@@ -1,3 +1,12 @@
+.cartImage {
+    height: 3.5vh;
+    width: auto;
+}
+
 .cartButton {
-    
+    background-color: black;
+}
+
+.cartButton:hover {
+    background-color: var(--blue);
 }

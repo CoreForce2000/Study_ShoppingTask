@@ -3,8 +3,6 @@
     cursor: pointer;
     padding: 10px 20px;
     font-size: 18px;
-    height:30px;
-    fit:cover;
 }
 
 .button:hover {

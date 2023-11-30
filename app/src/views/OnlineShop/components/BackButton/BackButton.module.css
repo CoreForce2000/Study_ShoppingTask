@@ -1,10 +1,14 @@
-
-.button {
-    cursor: pointer;
-    padding: 10px 20px;
-    font-size: 18px;
+.backImage {
+    height: 3.5vh;
+    width: auto;
 }
 
-.button:hover {
+.backButton {
+    height: 3.5vh;
+    background-color: white;
+    color: white;
+}
+
+.backButton:hover {
     background-color: var(--blue);
 }

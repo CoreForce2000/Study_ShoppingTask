@@ -10,8 +10,6 @@ import OverviewPage from './pages/OverviewPage/OverviewPage';
 import CartPage from './pages/CartPage/CartPage';
 
 
-
-
 interface OnlineShopProps {
 }
 
@@ -35,7 +33,7 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
             <div className={styles.onlineShop}>
                 <div className={styles.content}>
                     <div style={{flex: "0 0 auto"}}><TopbarIcons /></div>
-                    <div style={{flex:1, margin:"10px"}}><BackButton customStyle={{margin:"10px", flex:1, visibility:visibility}} /></div>
+                    <div style={{margin:"0.5vw"}}><BackButton customStyle={{flex:1, visibility:visibility}} /></div>
 
                     <div style={{overflowY:"auto"}}>
                         {

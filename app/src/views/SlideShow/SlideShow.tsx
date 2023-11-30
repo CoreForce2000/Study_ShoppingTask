@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './SlideShow.module.css';
 import SlideView from '../../components/SlideView/SlideView';
 import Checkbox from './components/Checkbox/Checkbox';
@@ -8,6 +8,7 @@ import { RootState } from '../../store/store';
 import nextButtonImg from '/src/assets/buttonNext.png'
 import { useNavigate } from 'react-router-dom';
 import { config } from '../../configs/config.ts';
+import { preloadImage } from '../../util/imageLoading.ts';
 
 // Define a type for the survey responses
 interface SurveyResponse {
@@ -149,6 +150,36 @@ const SlideShow: React.FC = () => {
     }
   }
 
+  useEffect(() => {
+    // Existing slide paths
+    const slideImagePaths = [
+      `${config.SLIDE_PATH}phase1/Slide1.png`,
+      `${config.SLIDE_PATH}phase1/Slide2.png`,
+      `${config.SLIDE_PATH}phase1/Slide3.png`,
+      `${config.SLIDE_PATH}phase1/Slide4.png`,
+      `${config.SLIDE_PATH}phase1/Slide5.png`,
+      `${config.SLIDE_PATH}phase1/Slide6.png`,
+      `${config.SLIDE_PATH}phase1/Cover.png`,
+      `${config.SLIDE_PATH}phase2/Slide1.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide2.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide3.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide4.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide5.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide6.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide7.png`,
+      `${config.SLIDE_PATH}phase2/Slide8.PNG`,
+
+      // Add paths for any other slides you need to preload
+    ];
+
+    // Preload all images
+    slideImagePaths.forEach(path => {
+      preloadImage(path);
+    });
+    
+  }, []); // Include drugProducts and nonDrugProducts in the dependency array
+  
+
 
   
   const baseSlides: BaseSlides[] = [
@@ -212,8 +243,8 @@ const SlideShow: React.FC = () => {
   {slide:`${config.SLIDE_PATH}phase1/Slide3.png`, children: <></>},
   {slide:`${config.SLIDE_PATH}phase1/Slide4.png`, children: <></>},
   {slide:`${config.SLIDE_PATH}phase1/Slide5.png`, children: <></>},
-  // {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>, transit:"SHOP"},
-  {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>, transit:"SHOP"},
+  // {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>},
 
 
   {slide:`${config.SLIDE_PATH}phase2/Slide1.png`, children: <></>},
@@ -243,6 +274,20 @@ const SlideShow: React.FC = () => {
 
   // When rendering, use the allSlides array
   const currentSlide = allSlides[currentSlideIndex];
+
+  const handleKeyPress = (event: KeyboardEvent) => {
+    if ((event.key === 'Enter') && !(event.target instanceof HTMLButtonElement))  {
+      goToNextSlide();
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [currentSlideIndex]); // Ensure listener is updated when currentSlideIndex changes
 
 
 

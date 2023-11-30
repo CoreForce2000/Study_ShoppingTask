@@ -1,6 +1,6 @@
 .slideShow {
     font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    text-shadow: 0.1em 0.1em 0px rgba(0, 0, 0, 0.3);
+    text-shadow: 0.07em 0.07em 0px rgba(0, 0, 0, 0.3);
     display:flex;
     justify-content: center;
 }
@@ -8,8 +8,8 @@
 
 .nextButton {
     position: absolute;
-    bottom: 10px; /* Adjust as needed */
-    right: 10px; /* Adjust as needed */
+    bottom: 0.5em; /* Adjust as needed */
+    right: 0.5em; /* Adjust as needed */
     background: none;
     border: none;
     cursor: pointer;
@@ -18,6 +18,6 @@
   
   .nextIcon {
     width: auto; /* Maintain aspect ratio */
-    height: 50px; /* Adjust as needed */
+    height: 1.2em; /* Adjust as needed */
     /* If you want to ensure the image is not stretched, set only one dimension, either width or height */
   }

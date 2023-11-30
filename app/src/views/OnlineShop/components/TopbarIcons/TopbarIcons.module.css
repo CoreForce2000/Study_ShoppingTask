@@ -2,8 +2,10 @@
     display:grid;
     width:100%;
     grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+    margin-bottom:2vh;
     
-    height:45px;   
+    height:8vh;   
     color:white;
 }
 

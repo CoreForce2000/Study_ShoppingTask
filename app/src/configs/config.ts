@@ -7,6 +7,12 @@ export const config = {
     server_mode: false
   };
 
+export const shopConfig = {
+    initialBudget: 1000,
+    repeatCategories: 10,
+    repeatItems: 10,
+};
+
 export const experimentConfig = {
 slideTimings: {
     offLightbulb: new TimingObject({ minValue: 300, maxValue: 500 }), // in milliseconds

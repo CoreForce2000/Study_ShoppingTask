@@ -3,10 +3,13 @@
     background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
     background-size: cover;
 
+    font-weight: 500;
+
     border: 0 none black;
-    margin: 10px;
-    width: 10vw;
-    height: 10vw;
+    margin: 0.5vw;
+    aspect-ratio: 1/1;
+    /* width: 10vw;
+    height: 10vw; */
     font-size: 1.5vw;
     text-align: center;
     cursor: pointer;
@@ -23,6 +26,7 @@
     height: 400px;
     margin-right: 20px;
     background-color: white;
+    color: #c157db;
     object-fit: contain;
 }
 

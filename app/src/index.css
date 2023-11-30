@@ -12,6 +12,17 @@
   --color: rgba(0, 0, 0, 1);
   --background-color: #FFFFFF;
 
+  --green: #00703C;
+  --lightgrey: #F3F2F1;
+  --blue: royalblue;
+  --black: #0B0C0C;
+
+  --darkblue: #131921;
+  --orange: #FEBD69;
+
+  --red: #f44336;
+  --grey: #808080;
+
   
   color-scheme: light;
   color: var(--color);

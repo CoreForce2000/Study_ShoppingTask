@@ -2,48 +2,59 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './CategoryPage.module.css';
 import Tile from '../../components/Tile/Tile';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../../../store/store';
-import { selectItemsByCategory } from '../../../../store/shopSlice';
+import { setItemClicked, selectClickedItems, selectShuffledItemsByCategory, selectItemsByCategory, setShuffledItems } from '../../../../store/shopSlice';
 import { shuffleArray } from '../../../../util/randomize';
+import { shopConfig } from '../../../../configs/config';
+import { getImagePath } from '../../../../util/imageLoading';
 
 interface CategoryPageProps {
     category: string;
 }
 
-const CategoryPage: React.FC<CategoryPageProps> = ( { category } ) => {
-    const navigate = useNavigate();    
-    const navigateToItemPage = (item_id: number) => {
-        navigate(`/shop?category=${category}&item=${item_id}`);
-    };
+const CategoryPage: React.FC<CategoryPageProps> = ({ category }) => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const clickedItems = useSelector((state: RootState) => selectClickedItems(state, category));
+    const allItems = useSelector((state: RootState) => selectItemsByCategory(state, category));
+    const storedShuffledItems = useSelector((state: RootState) => selectShuffledItemsByCategory(state, category));
 
-    const items: Product[] = Object.values(useSelector((state: RootState) => selectItemsByCategory(state, category)));
+    const [displayItems, setDisplayItems] = useState<Product[]>(storedShuffledItems);
 
-    const [shuffledItems, setshuffledItems] = useState<Product[]>([]);
+    const onItemTileClick = (category: string, item: Product, index: number) => {
+        dispatch(setItemClicked({category, item: [item, index]}));
+        navigate(`/shop?category=${category}&item=${item.item_id}`);
+    }
 
     useEffect(() => {
-        let newShuffledItems: Product[] = [...items];
-        // for (let i = 0; i < 10; i++) {
-        newShuffledItems = newShuffledItems.concat(shuffleArray(items));
-        // }
-        setshuffledItems(newShuffledItems);
-    }, [])
+
+        if (storedShuffledItems.length > 0) {
+            setDisplayItems(Array(shopConfig.repeatItems).fill(storedShuffledItems).flat());
+        } else {            
+            const shuffledItems = shuffleArray(allItems)
+            
+            dispatch(setShuffledItems({ category, item_id_list: shuffledItems }));
+            setDisplayItems(Array(shopConfig.repeatItems).fill(shuffledItems).flat());
+        }
+    }, [allItems, storedShuffledItems, dispatch, category]);
+
+    console.log(clickedItems);
 
     return (
         <div className={styles.grid}>
-            {shuffledItems.map((item: Product) => (
+            {displayItems.map((item, index) => (
                 <Tile
-                    key={item.image_name}
-                    categoryName={category}
-                    imageName={item.image_name}
-                    onClick={() => navigateToItemPage(Number(item.image_name))}
+                    key={`${item.image_name}-${index}`}
+                    text={""} // Assuming each item has a 'name'
+                    tileState={clickedItems.some(([clickedItem, clickedIndex]) => clickedItem === item && clickedIndex === index) ? 'itemClicked' : 'none'}
+                    onClick={() => onItemTileClick(category, item, index)}
                     backgroundColor='royalblue'
-                    type='item'
+                    imageUrl={getImagePath(category, item.image_name)}
                 />
             ))}
         </div>
     );
 };
-
 
 export default CategoryPage;

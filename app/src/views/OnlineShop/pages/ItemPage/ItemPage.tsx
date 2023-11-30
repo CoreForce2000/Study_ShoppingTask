@@ -6,6 +6,7 @@ import { createDispatchHandler } from '../../../../util/reduxUtils';
 import config from '../../../../config.json';
 import { addItem, selectProduct, setBudget } from '../../../../store/shopSlice';
 import { useNavigate } from 'react-router-dom';
+import { getImagePath } from '../../../../util/imageLoading';
 
 interface ItemPageProps {
     category: string;
@@ -35,7 +36,7 @@ const ItemPage: React.FC<ItemPageProps> = ( { category, item }) => {
 
     return (
         <div className={styles.component}>
-            <img className={styles.itemImage} src={`src/assets/categories/${category}/${product.image_name}`} alt={product.image_name} />
+            <img className={styles.itemImage} src={getImagePath(category, product.image_name)} alt={product.image_name} />
             <button className={styles.addToCartButton} onClick={purchaseItem}>Add to Cart</button>  
         </div>
     );
