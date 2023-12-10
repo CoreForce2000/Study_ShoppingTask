@@ -45,7 +45,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ category }) => {
         <div className={styles.grid}>
             {displayItems.map((item, index) => (
                 <Tile
-                    key={`${item.image_name}-${index}`}
+                    key={`${index}`}
                     text={""} // Assuming each item has a 'name'
                     tileState={clickedItems.some(([clickedItem, clickedIndex]) => clickedItem === item && clickedIndex === index) ? 'itemClicked' : 'none'}
                     onClick={() => onItemTileClick(category, item, index)}

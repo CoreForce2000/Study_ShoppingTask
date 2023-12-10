@@ -22,6 +22,7 @@ import FullscreenView from '../../components/FullscreenView/FullscreenView';
 
 import { config } from '../../configs/config.ts';
 
+
 const DataEntry: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -31,26 +32,38 @@ const DataEntry: React.FC = () => {
   const configData = useSelector((state: RootState) => state.config);
 
   const [configVisible, setConfigVisible] = useState(false);
-  const [groups, setGroups] = useState<string[]>(['Alcohol', 'Cocaine', 'Heroin', 'Control']);
-  
+  const [groups, setGroups] = useState<string[]>(['Select group', 'Alcohol', 'Cocaine', 'Heroin', 'Control']);
+  const [ageValid, setAgeValid] = useState<boolean>(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if(config.server_mode) {
+    // const age = useSelector((state: RootState) => state.survey.age);
 
-      // Call the save function with the participantData from the store
-      await saveParticipantData(
-        participantData.participantId,
-        participantData.age,
-        participantData.group,
-        participantData.gender,
-        participantData.handedness
-      );
+    if (ageValid) {
+      alert("Age needs to be 18 or above.");
+      return; // Prevent form submission
     }
+    if (participantData.group === 'Select group') {
+      alert("Please select a group.");
+      return; // Prevent form submission
+    }
+    else{
+      if(config.server_mode) {
 
-    // After saving data navigate to the Slide view
-    navigate('/slide');
+        // Call the save function with the participantData from the store
+        await saveParticipantData(
+          participantData.participantId,
+          participantData.age,
+          participantData.group,
+          participantData.gender,
+          participantData.handedness
+        );
+      }
+  
+      // After saving data navigate to the Slide view
+      navigate('/slide');
+    }
   };
 
 
@@ -92,7 +105,7 @@ const DataEntry: React.FC = () => {
             name="handedness"
             options={["left", "right"]}
             value={participantData.handedness}
-            setValue={createDispatchHandler(setHandedness, dispatch)}
+            setValue={(age) => {createDispatchHandler(setHandedness, dispatch)(age); setAgeValid( parseInt(age)>=18 )}}
           />
         </fieldset>
 
@@ -106,16 +119,15 @@ const DataEntry: React.FC = () => {
               <ValueSelector options={groups} setOptions={setGroups} />
               </fieldset>
 
-              {/* <Link to="shop">Jump to shop</Link> <br /> */}
-              <Link to="slide">Jump to Slides</Link> <br />
-              <Link to="contingency">Jump to Contingency</Link> <br />
+              <Link to="shop">Jump to phase 1</Link> <br /> 
+              <Link to="contingency">Jump to phase 2</Link> <br />
               <label>
                 <input
                 type="checkbox"
                 checked={configData.developerOptions}
                 onChange={(e) => createDispatchHandler(setDeveloperOptions, dispatch)(e.target.checked)}
                 />
-                Developer Options    
+                Allow blank fields (for development)
               </label>
             </div>
           )}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './AgeFreetext.module.css';
 
 interface AgeFreetextProps {
@@ -7,14 +7,18 @@ interface AgeFreetextProps {
 }
 
 const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge, required }) => {
+    const [ageError, setAgeError] = useState('');
 
     const handleAgeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        // Allow only up to 2 digits
-        if (value.match(/^\d{0,2}$/)) {
-            setAge(value);
+        setAge(value); // Update age regardless of its value
+
+        if (value && parseInt(value) < 18) {
+            setAgeError('Age must be 18 or above.');
+        } else {
+            setAgeError(''); // Clear error message if age is valid
         }
-        };
+    };
 
     return (
         <div className={styles.AgeFreetext}>
@@ -27,11 +31,9 @@ const AgeFreetext: React.FC<AgeFreetextProps> = ({ setAge, required }) => {
                 onChange={handleAgeChange}
                 required={required}
             />
+            {ageError && <div className={styles.ageError}>{ageError}</div>}
         </div>
     );
 };
 
 export default AgeFreetext;
-
-
-

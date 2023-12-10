@@ -56,12 +56,17 @@ const SlideShow: React.FC = () => {
   };
 
   const setSelectedDrugs = (selection: string[]) => {
-    setSurveyResponses((prev) => ({
+    // Filter out "None of these" from the selection
+    const filteredSelection = selection.filter(item => item !== "None of these");
+  
+    setSurveyResponses(prev => ({
       ...prev,
-      selectedDrugs: selection,
+      selectedDrugs: filteredSelection,
     }));
-    setValueChanged(true)
+  
+    setValueChanged(true);
   };
+  
 
   const setDrugDosage = (drug: string, dosage: number) => {
     setSurveyResponses((prev) => ({
@@ -99,7 +104,9 @@ const SlideShow: React.FC = () => {
     return {slide:'',
           children:
           <>
-            <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> {`How much do you want to use ${drug} right now?`} </div>
+            <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> 
+              {`How much do you want to use ${drug === 'LSD' ? 'LSD' : drug.toLowerCase()} right now?`} </div>
+              
             <div style={{width:"100%", padding:"1em", display:"flex", justifyContent:"left"}}>
               <div style={{backgroundColor:"white", width:"100%", marginTop:"2em"}}>
                 <VAS key={drug}  minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />

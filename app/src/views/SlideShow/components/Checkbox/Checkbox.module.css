@@ -13,6 +13,7 @@
     margin-bottom: 0.2em; /* spacing between checkboxes */
     cursor: pointer;
     user-select: none;
+    margin-left: 1em;
   }
   
   .checkboxInput {

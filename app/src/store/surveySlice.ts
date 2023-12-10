@@ -5,7 +5,7 @@ export const surveySlice = createSlice({
     initialState: {
         participantId: '',
         age: '',
-        group: '',
+        group: 'Select group',
         gender: '',
         handedness: '',
 

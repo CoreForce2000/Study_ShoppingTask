@@ -4,4 +4,10 @@ app/src/assets/*
 server/assets/*
 gameplan.ipynb
 
-
+*.jpg
+*.jpeg
+*.png
+*.PNG
+*.JPG
+*.xlsx
+*.zip

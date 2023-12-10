@@ -59,6 +59,7 @@ const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, allowMultiple, colu
             onChange={() => toggleCheckbox(index)}
             className={styles.checkboxInput}
           />
+          <span style={{color:"white", textShadow:"none"}}>-</span>
           <span className={styles.customCheckbox} style={{height:boxSize, width:boxSize}}></span>
           {option.label}
         </label>
