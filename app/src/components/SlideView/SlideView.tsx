@@ -11,9 +11,10 @@ interface SlideViewProps {
     children?: React.ReactNode;
     nextButton?: () => void;
     verticalAlign?: boolean;
+    backgroundColor?: string;
 }
 
-const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextButton }) => {
+const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextButton, backgroundColor = "white" }) => {
   const dispatch = useDispatch();
 
   const aspectRatio = 3 / 4; // Height / Width
@@ -61,7 +62,7 @@ const SlideView: React.FC<SlideViewProps> = ({ backgroundImage, children, nextBu
   }, [backgroundImage]);
 
   return (
-    <FullscreenView style={{background:"black", display:"flex", justifyContent:"center", alignItems:"center"}}>
+    <FullscreenView style={{background:backgroundColor, display:"flex", justifyContent:"center", alignItems:"center"}}>
       <div style={slideStyle} className={styles.slideContainer}>
         {children}
         {nextButton ? <button className={styles.nextButton} onClick={nextButton}>

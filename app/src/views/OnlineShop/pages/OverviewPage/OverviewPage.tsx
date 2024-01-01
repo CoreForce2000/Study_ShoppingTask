@@ -6,47 +6,13 @@ import Tile from '../../components/Tile/Tile';
 import { selectAllCategories, selectClickedCategories, selectShuffledCategories, setCategoryClicked, setShuffledCategories } from '../../../../store/shopSlice';
 import { pseudorandomize } from '../../../../util/randomize';
 import { shopConfig } from '../../../../configs/config';
+import {config} from '../../../../configs/config';
 
 // Define a type for the category, which is a simple string in this case
 type Category = string;
 
-const illicitDrugCategories = [
-    "Cannabis",
-    "Cannabis\nProducts",
-    "Cigarettes",
-    "Cigars",
-    "Ecstasy",
-    "Hashish",
-    "Hookah",
-    "Pipers",
-    "Rolling\nTobacco",
-    "Vapin"
-]
 
-const alcoholCategories = [
-    "Alcopops",
-    "Beer",
-    "Brandy",
-    "Champagne",
-    "Cider",
-    "Cocktails",
-    "Gin",
-    "Prosecco",
-    "Red\nWine",
-    "Vodka",
-    "Rum",
-    "Whisky",
-    "White Wine",
-]
-
-const initialScreenCategories = [
-    "Cocaine",
-    "Crack",
-    "Heroin",
-]
-
-const drugCategories = [...illicitDrugCategories, ...alcoholCategories, ...initialScreenCategories];
-        
+const drugCategories = [...config.illicitDrugCategories, ...config.alcoholCategories, ...config.initialScreenCategories];
 
 
 const OverviewPage: React.FC = ( ) => {
@@ -69,7 +35,7 @@ const OverviewPage: React.FC = ( ) => {
         setDisplayCategories(Array(shopConfig.repeatCategories).fill(storedShuffledCategories).flat());
     } else {
         const nonDrugCategories = allCategories.filter(category => !drugCategories.includes(category));
-        const shuffledCategories = pseudorandomize(nonDrugCategories, drugCategories, alcoholCategories, initialScreenCategories);
+        const shuffledCategories = pseudorandomize(nonDrugCategories, drugCategories, config.alcoholCategories, config.initialScreenCategories);
         
         dispatch(setShuffledCategories(shuffledCategories));
         setDisplayCategories(shuffledCategories);
@@ -85,7 +51,7 @@ const OverviewPage: React.FC = ( ) => {
                     text={category} 
                     tileState={getClickedCategories.includes(category) ? 'categoryClicked' : 'none'}
                     onClick={ ()=>onCategoryTileClick(category) }
-                    backgroundColor='royalblue'
+                    backgroundColor={shopConfig.categoryTileColor}
                 />
             ))}
         </div>

@@ -1,26 +1,51 @@
 // Cart.tsx
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import styles from './CartPage.module.css';
-import { RootState } from '../../../../store/store';
-import { removeItem } from '../../../../store/shopSlice';
+import { CartItem, selectItemsInCart } from '../../../../store/shopSlice';
+import Tile from '../../components/Tile/Tile';
+import { getImagePath } from '../../../../util/imageLoading';
 
-const CartPage: React.FC = () => {
-    const items = useSelector((state: RootState) => state.shop.items);
-    const dispatch = useDispatch();
+interface CartPageProps {
+    selectedItems: CartItem[];
+    setSelectedItems: (selectedItems: CartItem[]) => void;
+}
+
+const CartPage: React.FC<CartPageProps> = ({ selectedItems, setSelectedItems }) => {
+    const itemsInCart = useSelector(selectItemsInCart);
+
+    const onTileSelect = (item:CartItem) => {
+
+        console.log("Selecting", item.unique_id)
+
+        const isItemAlreadySelected = selectedItems.some(selectedItem => selectedItem === item);
+
+        if (isItemAlreadySelected) {
+            // If the item is already selected, remove it from the selected items list
+            const updatedSelectedItems = selectedItems.filter(selectedItem => selectedItem !== item);
+            setSelectedItems(updatedSelectedItems);
+        } else {
+            // If the item is not selected, add it to the selected items list
+            setSelectedItems([...selectedItems, item]);
+        }
+    };
+
 
     return (
         <div>
-            {items.map((item) => (
-                <div key={item.image_name} className={styles.cartItem}>
-                    <img src={item.image_name} alt="Item Image" className={styles.cartItemImage} />
-                    <p className={styles.cartItemPrice}>{item.minimum}</p>
-                    <button className={styles.removeButton} onClick={
-                        () => dispatch(removeItem(item.image_name))}>
-                        Remove
-                    </button>
-                </div>
-            ))}
+            <div className={styles.grid}>
+                {itemsInCart.map((cartItem: CartItem, index: number) => (
+                    <Tile 
+                        key={`${cartItem.unique_id}-${index}`}
+                        tileState={"itemClicked"}
+                        backgroundColor={"white"} 
+                        onClick={()=>onTileSelect(cartItem)}
+                        imageUrl={cartItem ? getImagePath(cartItem.product.category, cartItem.product.image_name) : ''}
+                        text={''}
+                        showCheckbox={true}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

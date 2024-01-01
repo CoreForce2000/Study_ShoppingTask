@@ -1,0 +1,25 @@
+Karen Shoppingtask
+
+- Change the topbar when in the cart
+•	Whenever participants open a tile or look into their trolley, the timer should pause. 
+- Fix timer lag when image loading issue 
+- Fix image loading speed online
+	If time is up, then phase 1 ends. There is a slide that needs to be shown. 
+	If the budget is exhausted before the end of phase 1, then participants will be given additional money . I think I provided a slide for this too. 
+•	In progress - Time should NO be minus. Time should be up after 15 minutes. We have to check if we 
+    introduce a rule that the items in the trolley need to reach a certain number, and only if this 
+    number has been reached, participants should not be given more time. If we allow more time, 
+    we need to explain this to participants, so I need another introduction slide, but the timer cannot 
+    be minus. It is not clear what this means. 
+
+Bugs:
+- Investigate sorting issue: Cocaine listed twice in two appending lines 
+- Investigate why proseccos first selection disappears after click
+•	In progress - Pipers is not spelt correctly. It should be: Pipes – which is a category that you have. So please delete Pipers. 
+
+Check:
+•	What happened to the price lists? Why are now prices picked up. Could you please check that items have prices and that these prices are picked up?
+
+Nice-to-Have:
+•	If ID number had been used previously, there should be a warning if an additional file should be written (previously data should not be overwritten)
+

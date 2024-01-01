@@ -86,8 +86,10 @@ def process_category(category_name: str, categories_path: str) -> Tuple[pd.DataF
     df_merged.drop(columns=['_merge'], inplace=True)
     
     df_merged['category'] = category_name  # Add a category column
+
+    highlight = "Err >>" if len(df_merged) > 5 or len(excel_files) > 1 else ""
     
-    print("images:", len(image_files), "excel files:", len(excel_files), "total:", len(df_merged), "unmatched images:", len(unmatched_images), "unmatched excel rows:", len(unmatched_excel_rows), category_name, sep="\t")
+    print(f"{highlight} images:", len(image_files), "excel files:", len(excel_files), "total:", len(df_merged), "unmatched images:", len(unmatched_images), "unmatched excel rows:", len(unmatched_excel_rows), category_name, sep="\t")
 
 
     return df_merged, unmatched_images, unmatched_excel_rows
@@ -176,7 +178,7 @@ combined_categories_df.sort_values(["category", "item"], inplace=True)
 combined_categories_df.to_excel("Items_to_be_priced_raw.xlsx")
 
 # Read the SQLite database to SQL file
-sql_file_path = './server/combined_categories.sql'
+sql_file_path = './combined_categories.sql'
 with open(sql_file_path, 'w') as f:
     for line in engine.raw_connection().iterdump():
         f.write('%s\n' % line)

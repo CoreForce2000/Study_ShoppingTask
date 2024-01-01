@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styles from './DataEntry.module.css';
 import logo from '/src/assets/logo.jpg';
 
@@ -17,10 +17,10 @@ import { setDeveloperOptions } from '../../store/configSlice'
 
 import saveParticipantData from '../../api/saveParticipantData';
 import { RootState } from '../../store/store';
-import { createDispatchHandler } from '../../util/reduxUtils';
 import FullscreenView from '../../components/FullscreenView/FullscreenView';
 
 import { config } from '../../configs/config.ts';
+import { createDispatchHandler } from '../../util/reduxUtils.ts';
 
 
 const DataEntry: React.FC = () => {
@@ -119,8 +119,6 @@ const DataEntry: React.FC = () => {
               <ValueSelector options={groups} setOptions={setGroups} />
               </fieldset>
 
-              <Link to="shop">Jump to phase 1</Link> <br /> 
-              <Link to="contingency">Jump to phase 2</Link> <br />
               <label>
                 <input
                 type="checkbox"

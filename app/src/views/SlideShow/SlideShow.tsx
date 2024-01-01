@@ -3,12 +3,14 @@ import styles from './SlideShow.module.css';
 import SlideView from '../../components/SlideView/SlideView';
 import Checkbox from './components/Checkbox/Checkbox';
 import VAS from './components/VAS/VAS';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import nextButtonImg from '/src/assets/buttonNext.png'
 import { useNavigate } from 'react-router-dom';
 import { config } from '../../configs/config.ts';
 import { preloadImage } from '../../util/imageLoading.ts';
+import { selectCurrentSlideIndex, setCurrentSlideIndex } from '../../store/slideSlice.ts';
+import { getVasSlides } from '../../util/specialSlides.tsx';
 
 // Define a type for the survey responses
 interface SurveyResponse {
@@ -20,7 +22,7 @@ interface SurveyResponse {
 
 type SurveyResponseKey = keyof SurveyResponse;
 
-interface BaseSlides {
+export interface BaseSlides {
   slide: string;
   children: React.ReactNode;
   transit?: string;
@@ -30,8 +32,12 @@ interface BaseSlides {
 
 const SlideShow: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  // Get currentSlideIndex from store
+  const currentSlideIndex = useSelector(selectCurrentSlideIndex);
+
+
   const [valueChanged, setValueChanged] = useState(false);
 
   const configData = useSelector((state: RootState) => state.config);
@@ -57,11 +63,14 @@ const SlideShow: React.FC = () => {
 
   const setSelectedDrugs = (selection: string[]) => {
     // Filter out "None of these" from the selection
-    const filteredSelection = selection.filter(item => item !== "None of these");
-  
+
+    if (selection.includes("None of these")) {
+      selection = [];
+    }
+
     setSurveyResponses(prev => ({
       ...prev,
-      selectedDrugs: filteredSelection,
+      selectedDrugs: selection
     }));
   
     setValueChanged(true);
@@ -100,21 +109,8 @@ const SlideShow: React.FC = () => {
     );
   };
 
-  const getVasSlides = (drug: string): BaseSlides => {
-    return {slide:'',
-          children:
-          <>
-            <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> 
-              {`How much do you want to use ${drug === 'LSD' ? 'LSD' : drug.toLowerCase()} right now?`} </div>
-              
-            <div style={{width:"100%", padding:"1em", display:"flex", justifyContent:"left"}}>
-              <div style={{backgroundColor:"white", width:"100%", marginTop:"2em"}}>
-                <VAS key={drug}  minLabel='Not at all' maxLabel='Very much' setValue={(dosage) => setDrugDosage(drug, dosage)} />
-              </div>
-            </div>
-          </>,
-          variable:"drugDosages"
-          }
+  const customSlideText = (drug:string) => {
+    return `How much do you want to use ${drug === 'LSD' ? 'LSD' : drug.toLowerCase()} right now?`
   }
 
   
@@ -129,11 +125,17 @@ const SlideShow: React.FC = () => {
     }
     setValueChanged(false)
     
-    setCurrentSlideIndex((prevIndex) => prevIndex + 1);
+    dispatch(setCurrentSlideIndex(currentSlideIndex + 1));
     if (currentSlide.transit === "VAS_FOLLOWUP") {
       // Generate VAS slides for each selected drug
-      const vasSlides: BaseSlides[] = surveyResponses.selectedDrugs.map((drug) => (
-        getVasSlides(drug)
+      const vasSlides: BaseSlides[] = surveyResponses.selectedDrugs.filter((drug)=> drug !== "Other").map((drug) => (
+        
+        {slide:'',
+          children:getVasSlides(customSlideText(drug), 'Not at all', 'Very much', (value: number) => setDrugDosage(drug, value))
+          ,
+          variable:"drugDosages"
+          }
+        
       ));
       
       console.log(vasSlides)
@@ -167,8 +169,8 @@ const SlideShow: React.FC = () => {
       `${config.SLIDE_PATH}phase1/Slide5.png`,
       `${config.SLIDE_PATH}phase1/Slide6.png`,
       `${config.SLIDE_PATH}phase1/Cover.png`,
-      `${config.SLIDE_PATH}phase2/Slide1.PNG`,
-      `${config.SLIDE_PATH}phase2/Slide2.PNG`,
+      `${config.SLIDE_PATH}phase2/Slide1.png`,
+      `${config.SLIDE_PATH}phase2/Slide2.png`,
       `${config.SLIDE_PATH}phase2/Slide3.PNG`,
       `${config.SLIDE_PATH}phase2/Slide4.PNG`,
       `${config.SLIDE_PATH}phase2/Slide5.PNG`,
@@ -235,9 +237,11 @@ const SlideShow: React.FC = () => {
                       "Spice",
                       "LSD",
                       "Other",
-                      "None of these"
                     ]
                   } // Replace with actual options
+                  exclusiveOptions={[
+                    "None of these"
+                  ]}
                   allowMultiple={true}
                   columnLayout="double"
                   onChange={setSelectedDrugs}
@@ -299,7 +303,7 @@ const SlideShow: React.FC = () => {
 
 
   const goToPreviousSlide = () => {
-    setCurrentSlideIndex((prevIndex) => prevIndex - 1);
+    dispatch(setCurrentSlideIndex(currentSlideIndex - 1));
   };
 
   // Render the current slide and selection state

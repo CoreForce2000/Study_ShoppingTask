@@ -6,12 +6,15 @@ import styles from './Experiment.module.css';
 
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import { selectItemsByCategory } from '../../store/shopSlice';
+import { selectClickedItems, selectItemsByCategory } from '../../store/shopSlice';
 
 // Experiment.tsx
 import { experimentConfig } from '../../configs/config';
 import { config } from '../../configs/config';
 import { preloadImage } from '../../util/imageLoading';
+import { useOtherCategories } from './ExperimentHooks';
+import { selectIsDeveloperOptions } from '../../store/configSlice';
+import { experimentConfigDev } from '../../configs/developerConfig';
 
 const { slideTimings, inputKey, probabilities } = experimentConfig;
 
@@ -37,22 +40,27 @@ type SlideType = 'offLightbulb' | 'coloredLightbulb' | 'receiveItem' | 'offLight
 
 
 const Experiment: React.FC = () => {
-  const [currentBlock] = useState<BlockType>('nonDegraded');
+  const isDeveloperMode = useSelector(selectIsDeveloperOptions)
+  
+  const [currentBlock] = useState<number>(0);
+  // const [currentTrial, setCurrentTrial] = useState<number>(0);
+
+  // const [isVasSlide, setIsVasSlide] = useState<boolean>(false);
+
   const [pressedButton, setPressedButton] = useState<boolean>(false);
 
-  const drugCategories = ["Beer"];
-  const nonDrugCategories = ["Yoga", "BBQ"];
+  const otherCategories = useOtherCategories();
 
-  const [drugProducts] = useState(useSelector((state: RootState) =>
-          drugCategories.flatMap(category => selectItemsByCategory(state, category))
-        ))
+  const [selfProducts] = useState(useSelector(selectClickedItems))
 
-  const [nonDrugProducts] = useState(useSelector((state: RootState) =>
-          nonDrugCategories.flatMap(category => selectItemsByCategory(state, category))
+  const [otherProducts] = useState(useSelector((state: RootState) =>
+          otherCategories.flatMap(category => selectItemsByCategory(state, category))
         ));
 
-  const [imagePath, setImagePath] = useState<string>("none");
+  console.log("Own Products", selfProducts)
 
+  const [imagePath, setImagePath] = useState<string>("none");
+ 
   // In Experiment.tsx or a separate slides data file
 
   const pathToSlides = '/assets/slides/contingency/'
@@ -109,10 +117,32 @@ const Experiment: React.FC = () => {
       preloadImage(path);
     });
     
-  }, []); // Include drugProducts and nonDrugProducts in the dependency array
+  }, []); // Include selfProducts and otherProducts in the dependency array
+  
+  // const vasSlide = getVasSlides("Please indicate on the line below how satisfied you are with the items that you successfully claimed. ", 'Not at all', 'Very much', (value: number) => console.log(value));
   
 
   const transitionSlide = async () => {
+
+    // // Increment the current trial
+    // setCurrentTrial(currentTrial + 1);
+
+    // // Retrieve the current block data
+    const currentBlockData = getBlockData(currentBlock);
+
+    // // Check if the current trial exceeds the number of trials in the current block
+    // const totalTrialsInCurrentBlock = currentBlockData.numberOfTrials.self + currentBlockData.numberOfTrials.other;
+    // if (currentTrial >= totalTrialsInCurrentBlock) {
+    //   // Move to the next block
+    //   setCurrentBlock(currentBlock + 1);
+    //   // Reset the trial count
+    //   setCurrentTrial(0);
+
+    //   // setIsVasSlide(true);
+    // } else {
+    //   // setIsVasSlide(false);
+    // }
+
     switch (currentSlide.type) {
       case 'offLightbulb':
         // Randomly select between blue and orange lightbulb
@@ -123,20 +153,19 @@ const Experiment: React.FC = () => {
         setPressedButton(false);
 
         // If an item is received, show the receiveItem slide
-        const selectedItem = (futureSlide.id === 'blueLightbulb' ? nonDrugProducts : drugProducts)
-        [Math.floor(Math.random() * (futureSlide.id === 'blueLightbulb' ? nonDrugProducts.length : drugProducts.length))];
+        const selectedItem = (futureSlide.id === 'blueLightbulb' ? otherProducts : selfProducts)
+        [Math.floor(Math.random() * (futureSlide.id === 'blueLightbulb' ? otherProducts.length : selfProducts.length))];
       
         const localImagePath = `${config.IMAGE_BASE_PATH}${selectedItem.category}/${selectedItem.image_name}`;
         await preloadImage(localImagePath);
         setImagePath(localImagePath);
         break;
 
-        break;
       case 'coloredLightbulb':
         // If the button was pressed during the coloredLightbulb slide
         if (pressedButton) {
 
-          if (calculateItemReceivingChance(currentBlock, true)) {
+          if (calculateItemReceivingChance(currentBlockData.trialType, true)) {
               
               setCurrentSlide({
               ...receiveItemSlide,
@@ -172,7 +201,11 @@ const Experiment: React.FC = () => {
   
     return Math.random() < probability;
   };
-  
+
+  const getBlockData = (blockNumber: number): any => {
+    return isDeveloperMode?experimentConfig.trialSequence[blockNumber]:experimentConfigDev.trialSequence[blockNumber];
+  };
+
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -185,9 +218,8 @@ const Experiment: React.FC = () => {
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [inputKey, currentSlide.allowKeyPress, pressedButton, currentBlock]);
+
   
-
-
 useEffect(() => {
   if (pressedButton) {
     // If the button is pressed, transition immediately
@@ -209,9 +241,11 @@ return (
     <SlideView
       backgroundImage={currentSlide.image}
     >
-      {currentSlide.type === 'receiveItem' && currentSlide.itemImage && (
+      {(currentSlide.type === 'receiveItem' && currentSlide.itemImage && (
         <img src={currentSlide.itemImage} alt="Item" className={styles.itemImage} />
-      )}
+      ))
+      
+      }
       {/* Include any other children or elements here */}
     </SlideView>
   </div>

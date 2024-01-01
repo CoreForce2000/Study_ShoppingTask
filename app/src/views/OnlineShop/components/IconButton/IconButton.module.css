@@ -1,0 +1,17 @@
+.buttonStyle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+  }
+  
+  .buttonStyle:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .iconStyle {
+    height: 1em; /* Scales icon to the height of the text */
+    margin-right: 5px;
+  }
+  
