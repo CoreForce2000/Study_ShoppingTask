@@ -19,20 +19,6 @@ const ItemPage: React.FC<ItemPageProps> = ( { category, item }) => {
     const product = useSelector((state: RootState )=>selectProduct(state, category, item));
 
 
-
-    const purchaseItem = () => {
-
-        // console.log(categoryClicks);
-
-        if(!dispatch(addItemToCart(product))) {
-            alert("You don't have enough money to buy this item!");
-            return;
-        }else{
-            dispatch(addItemToClickedItems(product));
-        }
-        navigate(-1)
-    };
-
     return (
         <div className={styles.component}>
             <img className={styles.itemImage} src={getImagePath(category, product.image_name)} alt={product.image_name} />

@@ -49,7 +49,7 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ category }) => {
     
     return (
         <div className={styles.grid}>
-            {Array.from({ length: shopConfig.maxItems }, (_, index) => {
+            {Array.from({ length: shopConfig.numberOfItemTiles }, (_, index) => {
                 // Find the order in which the tile was clicked
                 const clickOrder = clickedTiles.indexOf(index);
                 // If the tile was clicked, determine the corresponding item, otherwise set to null

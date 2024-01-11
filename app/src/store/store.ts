@@ -11,7 +11,7 @@ const store = configureStore({
     survey: surveyReducer,
     config: configReducer,
     shop: shopReducer,
-    slide: slideReducer,
+    slide: slideReducer
   },
 });
 

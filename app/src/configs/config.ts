@@ -76,11 +76,10 @@ export const shopConfig = {
 
     initialTime: 15*60,
 
-    initialBudget: 1000,
+    initialBudget: 150,
     useMinimumPriceBelow:100,
-    repeatCategories: 1,
-    repeatItems: 10,
-    maxItems: 300
+    repeatCategories: 1, 
+    numberOfItemTiles: 300
 };
 
 // ###############################################################################################

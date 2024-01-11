@@ -15,11 +15,15 @@ Karen Shoppingtask
 Bugs:
 - Investigate sorting issue: Cocaine listed twice in two appending lines 
 - Investigate why proseccos first selection disappears after click
-•	In progress - Pipers is not spelt correctly. It should be: Pipes – which is a category that you have. So please delete Pipers. 
 
 Check:
 •	What happened to the price lists? Why are now prices picked up. Could you please check that items have prices and that these prices are picked up?
 
 Nice-to-Have:
 •	If ID number had been used previously, there should be a warning if an additional file should be written (previously data should not be overwritten)
+
+
+Note:
+•	In progress - Pipers is not spelt correctly. It should be: Pipes – which is a category that you have. So please delete Pipers. 
+--> Solution was in the lists containing drugs of different categories. Those are not in synch with the rest of the categories (not ideal)
 

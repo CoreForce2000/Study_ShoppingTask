@@ -11,24 +11,15 @@ import { config } from '../../configs/config.ts';
 import { preloadImage } from '../../util/imageLoading.ts';
 import { selectCurrentSlideIndex, setCurrentSlideIndex } from '../../store/slideSlice.ts';
 import { getVasSlides } from '../../util/specialSlides.tsx';
-
-// Define a type for the survey responses
-interface SurveyResponse {
-  onlineShoppingFrequency: string[];
-  selectedDrugs: string[];
-  drugDosages: Record<string, number>; // This will store the dosage for each drug
-  shoppingSatisfaction: number;
-}
-
-type SurveyResponseKey = keyof SurveyResponse;
+import { createDispatchHandler } from '../../util/reduxUtils.ts';
+import { setDrugDosages, setOnlineShoppingFrequency, setSelectedDrugs, setShoppingSatisfaction } from '../../store/surveySlice.ts';
 
 export interface BaseSlides {
   slide: string;
   children: React.ReactNode;
   transit?: string;
-  variable?: SurveyResponseKey;
+  variable?: any;
 }
-
 
 const SlideShow: React.FC = () => {
   const navigate = useNavigate();
@@ -37,101 +28,35 @@ const SlideShow: React.FC = () => {
   // Get currentSlideIndex from store
   const currentSlideIndex = useSelector(selectCurrentSlideIndex);
 
-
-  const [valueChanged, setValueChanged] = useState(false);
-
   const configData = useSelector((state: RootState) => state.config);
 
-  // Initialize a single state object for all survey responses
-  const [surveyResponses, setSurveyResponses] = useState<SurveyResponse>({
-    onlineShoppingFrequency: [],
-    selectedDrugs: [],
-    drugDosages: {},
-    shoppingSatisfaction: 0,
-  });
+  const dataCollectionRecord = useSelector((state: RootState) => state.survey.);
+
+  const onlineShoppingFrequency = useSelector(selectOnlineShoppingFrequency);
+  const selectedDrugs:string[] = useSelector(selectSelectedDrugs);
+  const drugDosage = useSelector(selectDrugDosage);
+  const shoppingSatisfaction = useSelector(selectShoppingSatisfaction);
 
 
-
-  // Handlers for updating the survey responses
-  const setOnlineShoppingFrequency = (selection: string[]) => {
-    setSurveyResponses((prev) => ({
-      ...prev,
-      onlineShoppingFrequency: selection,
-    }));
-    setValueChanged(true)
-  };
-
-  const setSelectedDrugs = (selection: string[]) => {
-    // Filter out "None of these" from the selection
-
-    if (selection.includes("None of these")) {
-      selection = [];
-    }
-
-    setSurveyResponses(prev => ({
-      ...prev,
-      selectedDrugs: selection
-    }));
-  
-    setValueChanged(true);
-  };
-  
-
-  const setDrugDosage = (drug: string, dosage: number) => {
-    setSurveyResponses((prev) => ({
-      ...prev,
-      drugDosages: {
-        ...prev.drugDosages,
-        [drug]: dosage,
-      },
-    }));
-    setValueChanged(true)
-  };
-
-  const setShoppingSatisfaction = (satisfaction: number) => {
-    setSurveyResponses((prev) => ({
-      ...prev,
-      shoppingSatisfaction: satisfaction,
-    }));
-    setValueChanged(true)
-  };
-
-  // ... slides setup
-  
-  // Method to render the current selection
-  const renderCurrentSelection = () => {
-    return (
-      <div className={styles.selectionTracker}>
-        <p>Online Shopping Frequency: {surveyResponses.onlineShoppingFrequency.join(', ')}</p>
-        <p>Selected Drugs: {surveyResponses.selectedDrugs.join(', ')}</p>
-        <p>Drug Dosages: {JSON.stringify(surveyResponses.drugDosages)}</p>
-      </div>
-    );
-  };
-
-  const customSlideText = (drug:string) => {
-    return `How much do you want to use ${drug === 'LSD' ? 'LSD' : drug.toLowerCase()} right now?`
-  }
-
-  
   const goToNextSlide = () => {
     const currentSlide = allSlides[currentSlideIndex]
 
     console.log(currentSlide.variable)
     if(currentSlide.variable) {
-      if(!valueChanged) {
+      
+      // Current slide variable not empty
+      if(currentSlide.variable().length == 0) {
         return
       }
     }
-    setValueChanged(false)
     
     dispatch(setCurrentSlideIndex(currentSlideIndex + 1));
     if (currentSlide.transit === "VAS_FOLLOWUP") {
       // Generate VAS slides for each selected drug
-      const vasSlides: BaseSlides[] = surveyResponses.selectedDrugs.filter((drug)=> drug !== "Other").map((drug) => (
+      const vasSlides: BaseSlides[] = selectedDrugs.filter((drug: string)=> drug !== "Other").map((drug: string) => (
         
-        {slide:'',
-          children:getVasSlides(customSlideText(drug), 'Not at all', 'Very much', (value: number) => setDrugDosage(drug, value))
+        {slide:`${config.SLIDE_PATH}VasSlide.JPG`,
+          children:getVasSlides(customSlideText(drug), 'Not at all', 'Very much', (value: number) => createDispatchHandler(setDrugDosages, dispatch)({drug, value}))
           ,
           variable:"drugDosages"
           }
@@ -162,21 +87,23 @@ const SlideShow: React.FC = () => {
   useEffect(() => {
     // Existing slide paths
     const slideImagePaths = [
-      `${config.SLIDE_PATH}phase1/Slide1.png`,
-      `${config.SLIDE_PATH}phase1/Slide2.png`,
-      `${config.SLIDE_PATH}phase1/Slide3.png`,
-      `${config.SLIDE_PATH}phase1/Slide4.png`,
-      `${config.SLIDE_PATH}phase1/Slide5.png`,
-      `${config.SLIDE_PATH}phase1/Slide6.png`,
-      `${config.SLIDE_PATH}phase1/Cover.png`,
-      `${config.SLIDE_PATH}phase2/Slide1.png`,
-      `${config.SLIDE_PATH}phase2/Slide2.png`,
-      `${config.SLIDE_PATH}phase2/Slide3.PNG`,
-      `${config.SLIDE_PATH}phase2/Slide4.PNG`,
-      `${config.SLIDE_PATH}phase2/Slide5.PNG`,
-      `${config.SLIDE_PATH}phase2/Slide6.PNG`,
-      `${config.SLIDE_PATH}phase2/Slide7.png`,
-      `${config.SLIDE_PATH}phase2/Slide8.PNG`,
+      `${config.SLIDE_PATH}phase1/Slide1.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide2.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide6.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide7.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide8.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide9.JPG`,
+      `${config.SLIDE_PATH}phase1/Slide5.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide12.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide13.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide14.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide15.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide16.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide17.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide18.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide19.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide20.JPG`,
+      `${config.SLIDE_PATH}phase2/Slide21.JPG`,
 
       // Add paths for any other slides you need to preload
     ];
@@ -193,7 +120,7 @@ const SlideShow: React.FC = () => {
   
   const baseSlides: BaseSlides[] = [
 
-    {slide:`${config.SLIDE_PATH}phase1/Slide1.png`,
+    {slide:`${config.SLIDE_PATH}phase1/Slide1.JPG`,
     children: <div style={{marginTop:"3em", backgroundColor:"white", width:"100%", paddingLeft:"1.5em", display:"flex", justifyContent:"left"}}>
                 <div style={{backgroundColor:"white", width:"100%"}}> 
                   <Checkbox key="online-shopping"
@@ -209,14 +136,14 @@ const SlideShow: React.FC = () => {
                     ]} // Replace with actual options
                     allowMultiple={false}
                     columnLayout="single"
-                    onChange={setOnlineShoppingFrequency}
+                    onChange={createDispatchHandler(setOnlineShoppingFrequency, dispatch)}
                   />
                 </div>
               </div>,
-    variable:"onlineShoppingFrequency"
+    variable:()=>onlineShoppingFrequency,
   },
 
-  {slide:`${config.SLIDE_PATH}phase1/Slide2.png`,
+  {slide:`${config.SLIDE_PATH}phase1/Slide2.JPG`,
   children: <div style={{marginTop:"3em", width:"100%", paddingLeft:"1.5em", display:"flex", justifyContent:"left"}}>
               <div style={{backgroundColor:"white", width:"100%"}}> 
                 <Checkbox key="drugs"
@@ -244,38 +171,40 @@ const SlideShow: React.FC = () => {
                   ]}
                   allowMultiple={true}
                   columnLayout="double"
-                  onChange={setSelectedDrugs}
+                  onChange={createDispatchHandler(setSelectedDrugs, dispatch)}
                 /> </div>
             </div>,
   transit:"VAS_FOLLOWUP",
-  variable:"selectedDrugs"},
+  variable:()=>selectedDrugs},
 
-  {slide:`${config.SLIDE_PATH}phase1/Cover.png`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase1/Slide3.png`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase1/Slide4.png`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase1/Slide5.png`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>, transit:"SHOP"},
-  // {slide:`${config.SLIDE_PATH}phase1/Slide6.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide5.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide6.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide7.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide8.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase1/Slide9.JPG`, children: <></>, transit:"SHOP"},
 
 
-  {slide:`${config.SLIDE_PATH}phase2/Slide1.png`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide12.JPG`, children: <></>},
   {slide:`${config.SLIDE_PATH}White.png`, children: 
     <>
     <div style={{position:"absolute", textAlign:"center", top:"1em", fontSize:"1em", color:"black"}}> {`Please indicate on the line below how satisfied you are with your purchases`} </div>
             <div style={{width:"100%", padding:"1em", display:"flex", justifyContent:"left"}}>
               <div style={{backgroundColor:"white", width:"100%", marginTop:"2em"}}>
-                <VAS minLabel='Not at all' maxLabel='Very much' setValue={setShoppingSatisfaction} />
+                <VAS minLabel='Not at all' maxLabel='Very much' setValue={createDispatchHandler(setShoppingSatisfaction, dispatch)} />
       </div>
      </div>
      </>,
-    variable:"shoppingSatisfaction"
+    variable:()=>shoppingSatisfaction
   },
-  {slide:`${config.SLIDE_PATH}phase2/Slide3.PNG`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase2/Slide4.PNG`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase2/Slide5.PNG`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase2/Slide6.PNG`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase2/Slide7.png`, children: <></>},
-  {slide:`${config.SLIDE_PATH}phase2/Slide8.PNG`, children: <></>, transit:"CONTINGENCY"},
+  {slide:`${config.SLIDE_PATH}phase2/Slide13.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide14.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide15.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide16.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide17.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide18.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide19.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide20.JPG`, children: <></>},
+  {slide:`${config.SLIDE_PATH}phase2/Slide21.JPG`, children: <></>, transit:"CONTINGENCY"},
   
 ]
 

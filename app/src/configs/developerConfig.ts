@@ -4,7 +4,7 @@ export const dataEntryConfig = {
 
 export const shopConfigDev = {
 
-    initialTime: 0.15*60,
+    initialTime: 15*60,
 };
 
 export const experimentConfigDev = {
