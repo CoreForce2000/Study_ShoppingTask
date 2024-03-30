@@ -73,7 +73,7 @@ export const shopConfig = {
     backButtonColor: "#D9D9D9",
     addToCartButtonColor: "#D9D9D9",
 
-    initialTime: 15*60,
+    initialTime: 10*60, // 10 minutes (10*60 Seconds)
     secondTime: 5*60,
 
     initialBudget: 1000,

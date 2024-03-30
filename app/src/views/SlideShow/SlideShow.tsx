@@ -342,7 +342,6 @@ const SlideShow: React.FC = () => {
           (value: number) => {(createDispatchHandler(setDrugDosages, dispatch))({drug:"vasExperiment", value}); }  )
           ,
           variable:"drugDosages",
-          hideNext: true
         },
         {slide:`${config.SLIDE_PATH}/duringPhase2/SlideB2.PNG`, children: 
 

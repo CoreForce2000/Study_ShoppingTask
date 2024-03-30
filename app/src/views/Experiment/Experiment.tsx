@@ -69,7 +69,7 @@ const Experiment: React.FC = () => {
 
   const endOfPhase2Sound = new Audio(`${config.SOUND_PATH}End of phase2.mp3`);
   
-  if(block === 7) {
+  if(block === 6) {
     endOfPhase2Sound.play();
     navigate(`/slide`);
     dispatch(resetState());
@@ -151,7 +151,7 @@ const Experiment: React.FC = () => {
 
   const transitionSlide = async () => {
 
-
+    console.log("getBlockData(",block,")")
     const currentBlockData = getBlockData(block);
 
     const onFinishTrial = () => {

@@ -135,8 +135,8 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
                         secondChild={<></>}
                         lastChild={
                             <IconButton 
-                                iconUrl={config.BUTTON_PATH + "trash2.png"} 
-                                text={'Remove From Trolley'} 
+                                iconUrl={config.BUTTON_PATH + "checkbox.png"} 
+                                text={'Remove from Trolley'} 
                                 onClick={()=>removeFromCart(selectedItems) }
                                 visible={visibility.removeFromTrolley}
                             />

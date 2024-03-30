@@ -16,7 +16,6 @@ export const useScrollRestoration = (scrollKey: string, disable:boolean) => {
     if(!disable) {
         const handleScroll = () => {
             if (scrollRef.current) {
-                console.log("Setting scroll position", scrollRef.current.scrollTop, "for", scrollKey, ", stored is", scrollPosition)
                 if(scrollRef.current.scrollTop > 2) {
                     dispatch(setScrollPosition({ key: scrollKey, position: scrollRef.current.scrollTop }));
                 }
@@ -24,10 +23,8 @@ export const useScrollRestoration = (scrollKey: string, disable:boolean) => {
             };
             
             const scrollElement = scrollRef.current;
-            if (scrollElement) {
-                if(scrollPosition !== 3) {  
-                    scrollElement.scrollTop = scrollPosition;
-                }
+            if (scrollElement) { 
+                scrollElement.scrollTop = scrollPosition;
                 scrollElement.addEventListener('scroll', handleScroll);
             }
         
