@@ -1,42 +1,64 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectTimer, decrementTimer, selectItemsInCart, setTimer } from '../../../../store/shopSlice';
 import styles from './Timer.module.css';
+import { RootState } from '../../../../store/store';
 import { shopConfig } from '../../../../configs/config';
 import { shopConfigDev } from '../../../../configs/developerConfig';
-import { useSelector } from 'react-redux';
 import { selectIsDeveloperOptions } from '../../../../store/configSlice';
 
 interface TimerProps {
   onComplete: () => void;
+  setInterSlide: (slide: any) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ onComplete }) => {
+const Timer: React.FC<TimerProps> = ({ onComplete, setInterSlide }) => {
+  const dispatch = useDispatch();
+  const timer = useSelector(selectTimer);
+
+  const budget = useSelector((state: RootState )=>state.shop.budget);
+  const itemsInCart = useSelector(selectItemsInCart);
 
   const isDeveloperMode = useSelector(selectIsDeveloperOptions)
-
-  const [timeLeft, setTimeLeft] = useState(isDeveloperMode?shopConfig.initialTime:shopConfigDev.initialTime);
-  const timeLeftRef = useRef(timeLeft); // Create a ref to track timeLeft
+  const initialTime = isDeveloperMode? shopConfigDev.initialTime:shopConfig.initialTime
 
   useEffect(() => {
-    timeLeftRef.current = timeLeft; // Update ref value when timeLeft changes
-  }, [timeLeft]);
+    if(timer == shopConfig.initialTime) {
+      dispatch(setTimer(initialTime));
+    }
+    return () => {
+      // Cleanup logic here
+    };
+  }, []);
 
   useEffect(() => {
+
     const intervalId = setInterval(() => {
-      if (timeLeftRef.current <= 1) {
+      if (timer <= 1) {
         clearInterval(intervalId);
         onComplete();
       } else {
-        setTimeLeft((prevTimeLeft) => prevTimeLeft - 1);
-        timeLeftRef.current -= 1; // Update ref inside interval
+        dispatch(decrementTimer()); // Dispatch the decrementTimer action
       }
     }, 1000);
 
     return () => clearInterval(intervalId);
-  }, [onComplete]); // Add onComplete to the dependency array
+  }, [dispatch, timer, onComplete]);
 
   const formatTimeLeft = () => {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
+    const minutes = Math.floor(timer / 60);
+    const seconds = timer % 60;
+     
+
+    if ( 
+      (timer == initialTime / 2) && 
+      ((budget >= shopConfig.halfTimeNotificationWhenBudgetMoreThan) &&
+      (itemsInCart.length < shopConfig.halfTimeNotificationWhenItemsLessThan) )
+    ) {
+      setInterSlide(`timeIsRunningOut`)
+      dispatch(decrementTimer()); 
+    }
+
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 

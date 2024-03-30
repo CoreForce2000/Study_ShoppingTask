@@ -22,8 +22,12 @@
     height: 0;
     width: 0;
   }
-  
-  
+  .checkboxTableContainer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* Create four columns */
+    gap: 10px; /* Adjust gap between checkboxes as needed */
+    /* Add other styling as necessary */
+}
   .customCheckbox {
     position: absolute;
     top: 0;

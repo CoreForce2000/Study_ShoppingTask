@@ -8,9 +8,10 @@ interface CheckboxProps {
     allowMultiple: boolean;
     columnLayout: 'single' | 'double';
     onChange: (selectedOptions: string[]) => void;
+    allowedOption?: string;
 }
 
-const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, exclusiveOptions=[], allowMultiple, columnLayout, onChange }) => {
+const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, exclusiveOptions=[], allowMultiple, columnLayout, onChange, allowedOption }) => {
     const [options, setOptions] = useState<CheckboxOption[]>(
         [...initialOptions, ...exclusiveOptions].map(label => ({ label, checked: false }))
     );
@@ -30,7 +31,6 @@ const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, exclusiveOptions=[]
 
     const newOptions = options.map((option, i) => {
 
-
       if (allowMultiple && !isExclusive) {
         // For multiple selections and non-exclusive options, toggle the checked state of the clicked checkbox
 
@@ -43,7 +43,13 @@ const Checkbox: React.FC<CheckboxProps> = ({ initialOptions, exclusiveOptions=[]
     });
 
     // Update the internal state
-    setOptions(newOptions);
+    if(allowedOption){
+        if(newOptions.filter(option => option.checked).map(option => option.label).includes(allowedOption)){
+            setOptions(newOptions);
+        }
+    } else {
+      setOptions(newOptions);
+    }
 
     // Notify the parent component about the change
     onChange(newOptions.filter(option => option.checked).map(option => option.label));

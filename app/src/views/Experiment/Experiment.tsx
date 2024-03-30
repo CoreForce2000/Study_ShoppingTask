@@ -4,17 +4,20 @@ import SlideView from '../../components/SlideView/SlideView';
 
 import styles from './Experiment.module.css';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import { selectClickedItems, selectItemsByCategory } from '../../store/shopSlice';
+import { selectClickedItems, selectItemsByCategory, setTimer } from '../../store/shopSlice';
 
 // Experiment.tsx
-import { experimentConfig } from '../../configs/config';
+import { experimentConfig, shopConfig } from '../../configs/config';
 import { config } from '../../configs/config';
 import { preloadImage } from '../../util/imageLoading';
 import { useOtherCategories } from './ExperimentHooks';
 import { selectIsDeveloperOptions } from '../../store/configSlice';
 import { experimentConfigDev } from '../../configs/developerConfig';
+import { selectBlock, selectTrial, setBlock, setTrial } from '../../store/experimentSlice';
+import { useNavigate } from 'react-router-dom';
+import { resetState } from '../../store/shopSlice';
 
 const { slideTimings, inputKey, probabilities } = experimentConfig;
 
@@ -36,38 +39,60 @@ slideDuration: number;
 }
 
 type BlockType = 'nonDegraded' | 'partiallyDegraded' | 'fullyDegraded';
-type SlideType = 'offLightbulb' | 'coloredLightbulb' | 'receiveItem' | 'offLightbulbNoItem';
+type SlideType = 'offLightbulb' | 'coloredLightbulb' | 'receiveItem' | 'offLightbulbNoItem' | 'offLightbulb2';
 
 
 const Experiment: React.FC = () => {
   const isDeveloperMode = useSelector(selectIsDeveloperOptions)
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   
-  const [currentBlock] = useState<number>(0);
+  // const [currentBlock] = useState<number>(0);
   // const [currentTrial, setCurrentTrial] = useState<number>(0);
 
   // const [isVasSlide, setIsVasSlide] = useState<boolean>(false);
 
+  // const correctClaimSound = new Audio(`${config.SOUND_PATH}correct_claim_phase2.mp3`);
+  const ratingSound = new Audio(`${config.SOUND_PATH}rating_phase_2.mp3`);
+
   const [pressedButton, setPressedButton] = useState<boolean>(false);
 
   const otherCategories = useOtherCategories();
+  const block = useSelector(selectBlock);
+  const trial = useSelector(selectTrial);
 
   const [selfProducts] = useState(useSelector(selectClickedItems))
 
   const [otherProducts] = useState(useSelector((state: RootState) =>
           otherCategories.flatMap(category => selectItemsByCategory(state, category))
-        ));
+  ));
 
-  console.log("Own Products", selfProducts)
+  const endOfPhase2Sound = new Audio(`${config.SOUND_PATH}End of phase2.mp3`);
+  
+  if(block === 7) {
+    endOfPhase2Sound.play();
+    navigate(`/slide`);
+    dispatch(resetState());
+    dispatch(setTimer(shopConfig.secondTime));
+  }
+
 
   const [imagePath, setImagePath] = useState<string>("none");
  
   // In Experiment.tsx or a separate slides data file
 
-  const pathToSlides = '/assets/slides/contingency/'
+  const pathToSlides = '/assets/slides/duringPhase2/'
 
   const offLightbulbSlide: Slide = {
     id:"offLightbulb",
     type: 'offLightbulb',
+    image: pathToSlides + "Slide1.PNG", // Replace with the actual path
+    allowKeyPress: false
+  };
+
+  const offLightbulbSlide2: Slide = {
+    id:"offLightbulb2",
+    type: 'offLightbulb2',
     image: pathToSlides + "Slide1.PNG", // Replace with the actual path
     allowKeyPress: false
   };
@@ -101,6 +126,7 @@ const Experiment: React.FC = () => {
   };
 
   const [currentSlide, setCurrentSlide] = useState<Slide>(offLightbulbSlide);
+  const [futureSlide, setFutureSlide] = useState<Slide>(offLightbulbSlide);
 
   useEffect(() => {
     // Existing slide paths
@@ -122,73 +148,94 @@ const Experiment: React.FC = () => {
   // const vasSlide = getVasSlides("Please indicate on the line below how satisfied you are with the items that you successfully claimed. ", 'Not at all', 'Very much', (value: number) => console.log(value));
   
 
+
   const transitionSlide = async () => {
 
-    // // Increment the current trial
-    // setCurrentTrial(currentTrial + 1);
 
-    // // Retrieve the current block data
-    const currentBlockData = getBlockData(currentBlock);
+    const currentBlockData = getBlockData(block);
 
-    // // Check if the current trial exceeds the number of trials in the current block
-    // const totalTrialsInCurrentBlock = currentBlockData.numberOfTrials.self + currentBlockData.numberOfTrials.other;
-    // if (currentTrial >= totalTrialsInCurrentBlock) {
-    //   // Move to the next block
-    //   setCurrentBlock(currentBlock + 1);
-    //   // Reset the trial count
-    //   setCurrentTrial(0);
+    const onFinishTrial = () => {
 
-    //   // setIsVasSlide(true);
-    // } else {
-    //   // setIsVasSlide(false);
-    // }
+      setPressedButton(false);
+          
+      dispatch(setTrial(trial + 1))
+
+      // Check if the current trial exceeds the number of trials in the current block
+      const totalTrialsInCurrentBlock = currentBlockData.numberOfTrials.self + currentBlockData.numberOfTrials.other;
+      
+      console.log("Total Trials in Current Block", totalTrialsInCurrentBlock)
+      
+      if (trial >= totalTrialsInCurrentBlock) {
+        
+        ratingSound.play();
+
+        dispatch(setBlock(block + 1))
+
+        // Reset the trial count
+        dispatch(setTrial(1))
+
+        navigate(`/slide?interSlide=vasExperiment`);
+
+        // setIsVasSlide(true);
+      } else {
+        // setIsVasSlide(false);
+      }
+    }
+
 
     switch (currentSlide.type) {
       case 'offLightbulb':
-        // Randomly select between blue and orange lightbulb
 
-        const futureSlide = Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide;
+        setFutureSlide(Math.random() < 0.5 ? blueLightbulbSlide : orangeLightbulbSlide);
 
-        setCurrentSlide(futureSlide);
         setPressedButton(false);
-
+        setCurrentSlide(offLightbulbSlide2);
+  
         // If an item is received, show the receiveItem slide
         const selectedItem = (futureSlide.id === 'blueLightbulb' ? otherProducts : selfProducts)
         [Math.floor(Math.random() * (futureSlide.id === 'blueLightbulb' ? otherProducts.length : selfProducts.length))];
       
         const localImagePath = `${config.IMAGE_BASE_PATH}${selectedItem.category}/${selectedItem.image_name}`;
         await preloadImage(localImagePath);
+  
         setImagePath(localImagePath);
+        console.log("Image Path", imagePath)
+        break;
+
+      case 'offLightbulb2':
+
+        setCurrentSlide(futureSlide);
         break;
 
       case 'coloredLightbulb':
         // If the button was pressed during the coloredLightbulb slide
-        if (pressedButton) {
 
-          if (calculateItemReceivingChance(currentBlockData.trialType, true)) {
-              
-              setCurrentSlide({
-              ...receiveItemSlide,
-              itemImage: imagePath // Assuming each item has an 'imagePath'
-              });
-              
-              // Reset the button press state for the next trial
-              setPressedButton(false);
-          } else {
-            // If no item is received, transition back to offLightbulb
-            setCurrentSlide(offLightbulbNoItemSlide);
+
+
+        if (calculateItemReceivingChance(currentBlockData.trialType, pressedButton)) {
+            
+            setCurrentSlide({
+            ...receiveItemSlide, 
+            });
+            
+            // Reset the button press state for the next trial
             setPressedButton(false);
-          }
+            // correctClaimSound.play();
         } else {
-          // If no button press, transition back to offLightbulb
-          setCurrentSlide(offLightbulbSlide);
+          // If no item is received, transition back to offLightbulb
+          setCurrentSlide(offLightbulbNoItemSlide);
+
+          onFinishTrial()
         }
         break;
+
       case 'receiveItem':
         // After showing receiveItem, transition back to offLightbulb
         setCurrentSlide(offLightbulbSlide);
         // Reset the button press state for the next trial
-        setPressedButton(false);
+
+
+        onFinishTrial()
         break;
     }
   };
@@ -203,7 +250,7 @@ const Experiment: React.FC = () => {
   };
 
   const getBlockData = (blockNumber: number): any => {
-    return isDeveloperMode?experimentConfig.trialSequence[blockNumber]:experimentConfigDev.trialSequence[blockNumber];
+    return isDeveloperMode?experimentConfigDev.trialSequence[blockNumber-1]:experimentConfig.trialSequence[blockNumber-1]
   };
 
 
@@ -217,7 +264,7 @@ const Experiment: React.FC = () => {
   
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [inputKey, currentSlide.allowKeyPress, pressedButton, currentBlock]);
+  }, [inputKey, currentSlide.allowKeyPress, pressedButton, block]);
 
   
 useEffect(() => {
@@ -236,21 +283,19 @@ useEffect(() => {
 }, [currentSlide, slideTimings, pressedButton]);
 
 
+
 return (
   <div className={styles.experiment}>
     <SlideView
       backgroundImage={currentSlide.image}
     >
-      {(currentSlide.type === 'receiveItem' && currentSlide.itemImage && (
-        <img src={currentSlide.itemImage} alt="Item" className={styles.itemImage} />
-      ))
+      <img src={imagePath} alt="Item" className={styles.itemImage} style={{visibility:currentSlide.type === 'receiveItem' && imagePath?"visible":"hidden" }}/>
       
-      }
-      {/* Include any other children or elements here */}
+
+     {/* <span className={styles.debugText}>{`Trial: ${trial}, Block: ${block}`}</span> */}
     </SlideView>
   </div>
 );
-
 };
 
 export default Experiment;

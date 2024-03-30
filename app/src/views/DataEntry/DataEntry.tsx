@@ -125,7 +125,7 @@ const DataEntry: React.FC = () => {
                 checked={configData.developerOptions}
                 onChange={(e) => createDispatchHandler(setDeveloperOptions, dispatch)(e.target.checked)}
                 />
-                Allow blank fields (for development)
+                Quick mode
               </label>
             </div>
           )}

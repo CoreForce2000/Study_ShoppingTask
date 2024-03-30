@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './OnlineShop.module.css';
 import { useNavigate, useSearchParams} from 'react-router-dom';
 import CategoryPage from './pages/CategoryPage/CategoryPage';
@@ -11,8 +11,10 @@ import EvenlySpacedRow from './components/EvenlySpacedRow/EvenlySpacedRow';
 import Timer from './components/Timer/Timer';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import { CartItem, removeItemFromCart } from '../../store/shopSlice';
+import { CartItem, logAction, removeItemFromCart } from '../../store/shopSlice';
 import FixedRatioView from '../../components/FixedRatioView/FixedRatioView';
+import SlideView from '../../components/SlideView/SlideView';
+import { useScrollRestoration } from './OnlineShopHooks';
 
 
 interface OnlineShopProps {
@@ -24,12 +26,17 @@ interface buttonsVisible {
     goToTrolley: boolean;
 }
 
+const interSlides = {
+    "timeIsRunningOut": `${config.SLIDE_PATH}/shop/Slide10.JPG`,
+    "extraBudget":      `${config.SLIDE_PATH}/shop/Slide11.JPG`
+}
 
 const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     
     const [selectedItems, setSelectedItems] = useState<CartItem[]>([]);
+    const [interSlide, setInterSlide] = useState<keyof typeof interSlides>();
 
     const [searchParams] = useSearchParams();
 
@@ -37,12 +44,18 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
     const category = searchParams.get('category') || '';
     const item = Number(searchParams.get('item')) || 0;
 
+    const scrollRef = useScrollRestoration("category_"+category, item!==0);
+
     const budget: number = useSelector((state: RootState) => state.shop.budget);
     const numItemsInTrolley: number = useSelector((state: RootState) => state.shop.itemsInCart.length);
 
     let visibility: buttonsVisible = {back: true, removeFromTrolley: false, goToTrolley: true};
 
-    if ((category === '' && page !== "cart")) {
+    const timeIsRunningOutSound = new Audio(`${config.SOUND_PATH}Time's up.mp3`); 
+    const luckyCustomerSound = new Audio(`${config.SOUND_PATH}Lucky customer.mp3`); 
+    const endOfPhase1Sound = new Audio(`${config.SOUND_PATH}End of phase1.mp3`);
+
+    if ((category === '' && page !== "cart") || (category !== '' && item !== 0)) {
         visibility.back = false;
     }
     if (page==="cart") {
@@ -51,16 +64,40 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
     }
 
     const removeFromCart = (selectedItems: CartItem[]) => {
-        selectedItems.forEach((cartItem:CartItem) => {
+        selectedItems.forEach((cartItem: CartItem) => {
             dispatch(removeItemFromCart(cartItem));
+            dispatch(logAction({type: "remove_from_cart", item: cartItem.product.item_id, category: cartItem.product.category}));
         });
-
         setSelectedItems([]);
     };
 
+    useEffect(() => {
+        if (interSlide === "timeIsRunningOut") {
+            timeIsRunningOutSound.play();
+            const timer = setTimeout(() => {
+                setInterSlide(undefined); // Hide the SlideView after 5 seconds
+            }, shopConfig.shopSlidesDuration); 
     
+            return () => clearTimeout(timer); // Clean up the timer when the component unmounts or when interSlide changes
+        }
+        if (interSlide === "extraBudget") {
+            luckyCustomerSound.play()
+        }
+
+    }, [interSlide]);
+
 
     return (
+
+        interSlide==="timeIsRunningOut"?<SlideView backgroundImage={interSlides[interSlide]} verticalAlign={true} />:
+        interSlide==="extraBudget"?<SlideView backgroundImage={interSlides[interSlide]} verticalAlign={true}>
+         
+            <button className={styles.continueShoppingButton}onClick={()=>setInterSlide(undefined)}>
+                 
+            </button>
+            
+            </SlideView>
+        :
         <FixedRatioView>
             <div className={styles.onlineShop}>
 
@@ -70,8 +107,16 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
                     
                     <EvenlySpacedRow 
                         firstChild={<div>Budget : £{budget}</div>} 
-                        secondChild={<Timer onComplete={()=>navigate("/slide")}/>}
-                        lastChild={<div>Trolley : {numItemsInTrolley}</div>}
+                        secondChild={<Timer onComplete={ ()=>{navigate("/slide"); endOfPhase1Sound.play()} } setInterSlide={setInterSlide}/>}
+                        lastChild={
+                            <IconButton 
+                                preText={'Trolley\u00A0\u00A0'}
+                                iconUrl={config.BUTTON_PATH + "cart_white.png"} 
+                                text={`${numItemsInTrolley}`} 
+                                onClick={function (): void {dispatch(logAction({type: "to_trolley", item: -1, category: ""})); navigate("/shop?page=cart")} }
+                                visible={true}
+                            />
+                        }
                     />
                 </div>
                 
@@ -83,11 +128,12 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
                             <IconButton 
                                 iconUrl={config.BUTTON_PATH + "arrow.png"} 
                                 text={'Back'} 
-                                onClick={function (): void {navigate(-1)} }
+                                onClick={function (): void {setSelectedItems([]); navigate("/shop")} }
                                 visible={visibility.back}
                             />
                         }
-                        secondChild={
+                        secondChild={<></>}
+                        lastChild={
                             <IconButton 
                                 iconUrl={config.BUTTON_PATH + "trash2.png"} 
                                 text={'Remove From Trolley'} 
@@ -95,30 +141,22 @@ const OnlineShop: React.FC<OnlineShopProps> = ({ }) => {
                                 visible={visibility.removeFromTrolley}
                             />
                         }
-                        lastChild={
-                            <IconButton 
-                                iconUrl={config.BUTTON_PATH + "cart.png"} 
-                                text={'Go to Trolley'} 
-                                onClick={function (): void {navigate("/shop?page=cart")} }
-                                visible={visibility.goToTrolley}
-                            />
-                        } 
                     />
                 </div>
                 
 
                 <div className={styles.content}>
 
-                    <div style={{overflowY:"auto"}}>
+                    <div className={styles.scrollContent} ref={scrollRef}>
                         {
                             page === 'cart' ? (
-                                <CartPage selectedItems={selectedItems} setSelectedItems={setSelectedItems}></CartPage>    
+                                <CartPage selectedItems={selectedItems} setSelectedItems={setSelectedItems}></CartPage>
                             ) : category === '' ? (
                                 <OverviewPage />
                             ) : item === 0 ? (
                                 <CategoryPage category={category} />
                             ) : (
-                                <ItemPage category={category} item={item} />
+                                <ItemPage category={category} item={item} setInterSlide={setInterSlide}/>
                             )
                         }
                     </div>

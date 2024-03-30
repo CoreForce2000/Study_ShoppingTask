@@ -1,8 +1,8 @@
 // Cart.tsx
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './CartPage.module.css';
-import { CartItem, selectItemsInCart } from '../../../../store/shopSlice';
+import { CartItem, logAction, selectItemsInCart } from '../../../../store/shopSlice';
 import Tile from '../../components/Tile/Tile';
 import { getImagePath } from '../../../../util/imageLoading';
 
@@ -13,6 +13,7 @@ interface CartPageProps {
 
 const CartPage: React.FC<CartPageProps> = ({ selectedItems, setSelectedItems }) => {
     const itemsInCart = useSelector(selectItemsInCart);
+    const dispatch = useDispatch();
 
     const onTileSelect = (item:CartItem) => {
 
@@ -24,9 +25,11 @@ const CartPage: React.FC<CartPageProps> = ({ selectedItems, setSelectedItems }) 
             // If the item is already selected, remove it from the selected items list
             const updatedSelectedItems = selectedItems.filter(selectedItem => selectedItem !== item);
             setSelectedItems(updatedSelectedItems);
+            dispatch(logAction({type: "deselect_trolley_item", item: item.product.item_id, category: item.product.category}));
         } else {
             // If the item is not selected, add it to the selected items list
             setSelectedItems([...selectedItems, item]);
+            dispatch(logAction({type: "select_trolley_item", item: item.product.item_id, category: item.product.category}));
         }
     };
 

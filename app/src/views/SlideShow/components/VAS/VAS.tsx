@@ -5,12 +5,15 @@ interface VASProps {
   minLabel: string;
   maxLabel: string;
   setValue: (value: number) => void; // Function to set the value in the parent state
+  onClick?: () => void;
 }
 
 const VAS: React.FC<VASProps> = ({ minLabel, maxLabel, setValue }) => {
     const [indicatorPosition, setIndicatorPosition] = useState<number | null>(null);
 
     const handleVASClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+
+        console.log("CLICKED", minLabel, maxLabel)
         const rect = e.currentTarget.getBoundingClientRect();
         const x = e.clientX - rect.left; // Click position relative to the line
         const width = rect.width; // Width of the line container

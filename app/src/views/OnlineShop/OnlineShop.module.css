@@ -29,3 +29,29 @@
     width:15em;
     height:calc(5/7 * (15em + 0.4em));
 }
+
+.scrollContent {
+    overflow-y: auto;
+}
+
+.scrollContent::-webkit-scrollbar {
+    display: none;
+  }
+
+.continueShoppingButton {
+    position: absolute;
+    font-size: 0.5em;
+    top: 86%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding-left: 4em;
+    padding-right: 4em;
+}
+
+.continueShoppingIcon {
+width: auto;
+height: 1.2em;
+}

@@ -18,3 +18,12 @@
   grid-template-columns: 1fr 1fr;
   font-size: 0.5em;
 }
+
+.button {
+    filter: brightness(100%);
+    transition: filter 0.2s ease;
+}
+
+.button:hover {
+    filter: brightness(85%);
+}

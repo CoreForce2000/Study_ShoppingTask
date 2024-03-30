@@ -3,21 +3,20 @@ import styles from './OverviewPage.module.css';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import Tile from '../../components/Tile/Tile';
-import { selectAllCategories, selectClickedCategories, selectShuffledCategories, setCategoryClicked, setShuffledCategories } from '../../../../store/shopSlice';
+import { logAction, selectAllCategories, selectClickedCategories, selectShuffledCategories, setCategoryClicked, setShuffledCategories } from '../../../../store/shopSlice';
 import { pseudorandomize } from '../../../../util/randomize';
 import { shopConfig } from '../../../../configs/config';
 import {config} from '../../../../configs/config';
+import { delayAfterClick } from '../../../../util/delayAfterClick';
 
 // Define a type for the category, which is a simple string in this case
 type Category = string;
 
-
 const drugCategories = [...config.illicitDrugCategories, ...config.alcoholCategories, ...config.initialScreenCategories];
-
 
 const OverviewPage: React.FC = ( ) => {
     const dispatch = useDispatch();
-    const navigate = useNavigate();
+    const navigate = useNavigate() 
 
     const [displayCategories, setDisplayCategories] = useState<string[]>([]);
 
@@ -27,6 +26,7 @@ const OverviewPage: React.FC = ( ) => {
 
     const onCategoryTileClick = (category: string) => {
         dispatch(setCategoryClicked(category));
+        dispatch(logAction({type: "click_category", item: -1, category: category}));
         navigate(`/shop?category=${category}`);
     }
 
@@ -50,7 +50,10 @@ const OverviewPage: React.FC = ( ) => {
                     key={`${category}-${index}`} 
                     text={category} 
                     tileState={getClickedCategories.includes(category) ? 'categoryClicked' : 'none'}
-                    onClick={ ()=>onCategoryTileClick(category) }
+                    // onClick={ ()=>onCategoryTileClick(category) }
+                    onClick={() => {
+                        delayAfterClick(() => onCategoryTileClick(category));
+                      }}
                     backgroundColor={shopConfig.categoryTileColor}
                 />
             ))}

@@ -4,20 +4,19 @@ export const config = {
     IMAGE_BASE_PATH: '/assets/categories/',
     SLIDE_PATH: '/assets/slides/',
     BUTTON_PATH: '/assets/buttons/',
+    SOUND_PATH: '/assets/sounds/',
 
     server_mode: false,
 
     illicitDrugCategories : [
-        "Cannabis",
         "Cannabis Products",
         "Cigarettes",
         "Cigars",
         "Ecstasy",
-        "Hashish",
+        // "Hashish",
         "Hookah",
         "Pipes",
-        "Rolling Tobacco",
-        "Vapin"
+        "Rolling Tobacco"
     ],
 
     alcoholCategories : [
@@ -75,11 +74,16 @@ export const shopConfig = {
     addToCartButtonColor: "#D9D9D9",
 
     initialTime: 15*60,
+    secondTime: 5*60,
 
-    initialBudget: 150,
+    initialBudget: 1000,
+
+    halfTimeNotificationWhenBudgetMoreThan: 500,
+    halfTimeNotificationWhenItemsLessThan: 15,
     useMinimumPriceBelow:100,
-    repeatCategories: 1, 
-    numberOfItemTiles: 300
+    repeatCategories: 1,
+    numberOfItemTiles: 301,
+    shopSlidesDuration: 5000,
 };
 
 // ###############################################################################################
@@ -102,7 +106,8 @@ export const experimentConfig = {
     ],
 
     slideTimings: {
-        offLightbulb: new RandomValueRange({ minValue: 500, maxValue: 700 }), // in milliseconds
+        offLightbulb: new RandomValueRange({ minValue: 0, maxValue: 0 }), // in milliseconds
+        offLightbulb2: new RandomValueRange({ minValue: 1000, maxValue: 1200 }), // in milliseconds
         coloredLightbulb: new RandomValueRange({ minValue: 1000, maxValue: 1000 }),
         receiveItem: new RandomValueRange({ minValue: 1000, maxValue: 1000 }),
         offLightbulbNoItem: new RandomValueRange({ minValue: 500, maxValue: 700 }),

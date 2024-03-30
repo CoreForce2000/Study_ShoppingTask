@@ -17,6 +17,12 @@
     justify-content: center;
     align-items: center;
     position:relative;
+    filter: brightness(100%);
+    transition: filter 0.1s ease;
+}
+
+.tile:hover {
+    filter: brightness(85%);
 }
 
 .tickBox {

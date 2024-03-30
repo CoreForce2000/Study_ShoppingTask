@@ -24,8 +24,19 @@ export interface CartItem {
   selected: boolean;
 }
 
+type Action = "click_category" | "click_item" | "add_to_cart" | "not_add_to_cart" | "back_to_category_page" | "to_trolley" | "select_trolley_item" | "deselect_trolley_item" | "remove_from_cart";
+
+export interface ShopAction {
+  type: Action;
+  timestamp: number;
+  category: string;
+  item: number;
+  budget: number;
+}
+
 interface ShopState {
   budget: number;
+  timer: number;
   items: Product[];
   products: ProductCategories;
   shuffledItems: Record<string, Product[]>;
@@ -34,10 +45,13 @@ interface ShopState {
   clickedItemTiles: Record<string, number[]>;
   itemsInCart: CartItem[];
   itemsClicked: Product[];
+  actions: ShopAction[];
+  scrollPositions: Record<string, number>;
 }
 
 const initialState: ShopState = {
   budget: shopConfig.initialBudget,
+  timer: shopConfig.initialTime,
   items: [],
   products: jsonData as ProductCategories,
   shuffledItems: {},
@@ -46,6 +60,8 @@ const initialState: ShopState = {
   clickedItemTiles: {},
   itemsInCart: [],
   itemsClicked: [],
+  actions:[],
+  scrollPositions: {},
 };
 
 
@@ -54,9 +70,23 @@ export const shopSlice = createSlice({
     initialState,
     reducers: {
 
+        resetState: (state) => {
+          Object.assign(state, initialState);
+        },
+
         setBudget: (state, action: PayloadAction<number>) => {
             state.budget = action.payload;
         },
+        decrementTimer: (state) => {
+          if (state.timer > 0) {
+            state.timer -= 1;
+          }
+        },
+
+        setTimer: (state, action: PayloadAction<number>) => {
+          state.timer = action.payload;
+        },
+
         setShuffledItems: (state, action: PayloadAction<{ category: string, item_id_list: Product[]}>) => {
           const { category, item_id_list } = action.payload;
           if (!state.shuffledItems[category]) {
@@ -90,12 +120,9 @@ export const shopSlice = createSlice({
 
           const price = state.budget < shopConfig.useMinimumPriceBelow ? product.minimum : product.maximum;
 
-          if (state.budget < price) {
-            return;
-          }else {
-            state.budget -= price;
-            state.itemsInCart.push({unique_id: generateUniqueID(10), product: product, price: price, selected: false});
-          }
+          state.budget -= price;
+          state.itemsInCart.push({unique_id: generateUniqueID(10), product: product, price: price, selected: false});
+          
         },
 
         // Remove item from the cart
@@ -120,6 +147,33 @@ export const shopSlice = createSlice({
             state.itemsClicked.push(product);
           }
         },
+
+        logAction: (state, action: PayloadAction<{ type: Action; category: string; item: number }>) => {
+          const { type, category, item } = action.payload;
+    
+          // Automatically include budget and timer from the current state
+          const { budget, timer } = state;
+
+          const timestamp = shopConfig.initialTime - timer;
+    
+          // Create the ShopAction object with budget, timer, and other parameters
+          const shopAction: ShopAction = {
+            type,
+            timestamp,
+            category,
+            item,
+            budget,
+          };
+    
+          state.actions.push(shopAction);
+
+          console.log("Action logged", shopAction);
+        },
+
+        setScrollPosition: (state, action: PayloadAction<{ key: string; position: number }>) => {
+          const { key, position } = action.payload;
+          state.scrollPositions[key] = position;
+        },
     },
 });
 
@@ -130,7 +184,8 @@ export const selectShuffledCategories = (state: RootState) => state.shop.shuffle
 export const selectClickedCategories = (state: RootState) => state.shop.clickedCategories;
 export const selectItemsInCart = (state: RootState) => state.shop.itemsInCart;
 export const selectClickedItems = (state: RootState) => state.shop.itemsClicked;
-
+export const selectTimer = (state: RootState) => state.shop.timer;
+export const selectShopActions = (state: RootState) => state.shop.actions;
 
 export const selectProduct = (state: RootState, category: string, itemId: number): Product => {
   return state.shop.products[category]?.[itemId.toString()];
@@ -154,7 +209,6 @@ export const selectShuffledItemsByCategory = createSelector(
   (shuffledItems, category) => shuffledItems[category] ?? []
 );
 
-// Selector to get clicked items for a specific category
 export const selectClickedItemTiles = createSelector(
   (state: RootState, category: string) => state.shop.clickedItemTiles[category] ?? [],
   (clickedItemTiles) => clickedItemTiles
@@ -179,9 +233,7 @@ export const selectCategoryClickCount = createSelector(
   }
 );
 
-
-
 export const { setBudget,addItemToCart,removeItemFromCart, setShuffledItems, setShuffledCategories, 
-  setItemTileClicked, setCategoryClicked, addItemToClickedItems
+  setItemTileClicked, setCategoryClicked, addItemToClickedItems, decrementTimer, logAction, resetState, setTimer, setScrollPosition
  } = shopSlice.actions;
 export default shopSlice.reducer;

@@ -5,13 +5,15 @@ import surveyReducer from './surveySlice';
 import configReducer from './configSlice';
 import shopReducer from './shopSlice';
 import slideReducer from './slideSlice';
+import experimentReducer from './experimentSlice';
 
 const store = configureStore({
   reducer: {
     survey: surveyReducer,
     config: configReducer,
     shop: shopReducer,
-    slide: slideReducer
+    slide: slideReducer,
+    experiment: experimentReducer,
   },
 });
 

@@ -15,6 +15,7 @@ export const slideSlice = createSlice({
         },
 
         setCurrentSlideIndex: (state, action) => {
+            console.log("Setting current slide index to " + action.payload)
             state.currentSlideIndex = action.payload;
         },
     },

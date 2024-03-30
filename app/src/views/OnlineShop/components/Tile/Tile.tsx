@@ -13,13 +13,14 @@ type TileProps = {
     backgroundIsBlack?: boolean;
     showCheckbox?: boolean;
     onTileSelect?: (tileName: string, isSelected: boolean) => void; // Callback for managing selected tiles
+    setChecked?: boolean; 
 };
 
 const Tile: React.FC<TileProps> = ({ text, imageUrl, backgroundColor, tileState, onClick, 
-                                    backgroundIsBlack, showCheckbox = false, onTileSelect= ()=> {} }) => {
+                                    backgroundIsBlack, showCheckbox = false, onTileSelect= ()=> {}, setChecked= false }) => {
   const [tileStyle, setTileStyle] = useState<React.CSSProperties>({ backgroundColor: backgroundColor });
   const [displayText, setDisplayText] = useState(text);
-  const [isChecked, setIsChecked] = useState(false); // New state for checkbox
+  const [isChecked, setIsChecked] = useState(setChecked); // New state for checkbox
 
   useEffect(() => {
     if (tileState === 'categoryClicked') {
@@ -44,7 +45,7 @@ const Tile: React.FC<TileProps> = ({ text, imageUrl, backgroundColor, tileState,
   return (
     <div
       className={styles.tile}
-      onClick={showCheckbox? ()=>{handleCheckboxClick(); onClick()}:onClick}
+      onClick={showCheckbox? ()=>{handleCheckboxClick(); onClick()}:()=>{onClick(); setTileStyle({...tileStyle, border: "2px solid black"})} }
       style={tileStyle}
     >
       <div 
