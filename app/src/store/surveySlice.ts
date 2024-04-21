@@ -75,7 +75,6 @@ export const surveySlice = createSlice({
         },
 
         setOnlineShoppingFrequency: (state, action) => {
-            console.log("Shopping freq. Set", action.payload)
             state.onlineShoppingFrequency = action.payload;
         },
         setSelectedDrugs: (state, action) => {

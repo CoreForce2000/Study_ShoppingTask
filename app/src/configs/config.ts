@@ -13,7 +13,8 @@ export const config = {
         "Cigarettes",
         "Cigars",
         "Ecstasy",
-        // "Hashish",
+        "Hashish",
+        "Marijuana",
         "Hookah",
         "Pipes",
         "Rolling Tobacco"
@@ -84,6 +85,21 @@ export const shopConfig = {
     repeatCategories: 1,
     numberOfItemTiles: 301,
     shopSlidesDuration: 5000,
+
+    phase3ShoppingListOptions: [
+        ["Perfume", "Flower", "Umbrella", "Make-up", "Handbag"],
+        ["Sunglasses", "Wine", "Chocolate", "Penknife", "Wallet"],
+        ["Lego", "Playmobile", "Barbie", "Chocolate", "Cuddly Toy"],
+        ["BBQ", "Binoculars", "Book", "Plants", "Mug"]
+    ],
+
+    phase3ShoppingList: [
+        "Flower",
+        "Chocolate",
+        "Cuddly Toy", 
+        "Book"
+    ]
+
 };
 
 // ###############################################################################################

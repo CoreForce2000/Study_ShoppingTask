@@ -56,3 +56,26 @@ export function pseudorandomize(nonDrugCategories: string[], drugCategories: str
     
     return mixedList;
 }
+
+
+export function shuffleExtendArray(originalArray: any[], targetLength: number) {
+    let resultArray = shuffleArray([...originalArray]);
+
+    if (targetLength <= resultArray.length) {
+        return resultArray.slice(0, targetLength);
+    }
+
+    while (resultArray.length < targetLength) {
+        let remainingNeeded = targetLength - resultArray.length;
+        let itemsToAdd = shuffleArray([...originalArray]);
+
+        if (itemsToAdd.length > remainingNeeded) {
+            itemsToAdd = itemsToAdd.slice(0, remainingNeeded);
+        }
+
+        resultArray = resultArray.concat(itemsToAdd);
+    }
+
+    return resultArray;
+}
+

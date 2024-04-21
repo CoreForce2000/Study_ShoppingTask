@@ -8,6 +8,7 @@ export const experimentSlice = createSlice({
         currentSlideIndex: 0,
         block: 1,  // Add block field with initial value
         trial: 1,  // Add trial field with initial value
+        experimentSequence: [],  // Add experimentSequence field with initial value
     },
     
     reducers: {
@@ -26,18 +27,26 @@ export const experimentSlice = createSlice({
         setTrial: (state, action) => {  // Add a new reducer action for setting the trial
             state.trial = action.payload;
         },
+
+        setExperimentSequence: (state, action) => {  // Add a new reducer action for setting the trial
+            state.experimentSequence = action.payload;
+        },
+
+
     },
 });
 
 export const selectCurrentSlideIndex = (state: RootState) => state.slide.currentSlideIndex;
 export const selectBlock = (state: RootState) => state.experiment.block;  // Add selector for block
 export const selectTrial = (state: RootState) => state.experiment.trial;  // Add selector for trial
+export const selectExperimentSequence = (state: RootState) => state.experiment.experimentSequence;  // Add selector for trial
 
 export const { 
     setSlideWidth, 
     setCurrentSlideIndex,
     setBlock,  // Export the new reducer action for setting the block
     setTrial,  // Export the new reducer action for setting the trial
+    setExperimentSequence,  // Export the new reducer action for setting the trial
 } = experimentSlice.actions;
 
 export default experimentSlice.reducer;

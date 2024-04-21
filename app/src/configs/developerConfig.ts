@@ -6,7 +6,7 @@ export const shopConfigDev = {
 
     // initialTime: 3*60,
     initialTime: 0.2*60,
-    secondTime: 0.2*60
+    secondTime: 5*60
 };
 
 export const experimentConfigDev = {

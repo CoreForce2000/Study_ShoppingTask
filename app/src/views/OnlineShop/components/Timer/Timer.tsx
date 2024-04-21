@@ -1,70 +1,99 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectTimer, decrementTimer, selectItemsInCart, setTimer } from '../../../../store/shopSlice';
-import styles from './Timer.module.css';
-import { RootState } from '../../../../store/store';
-import { shopConfig } from '../../../../configs/config';
-import { shopConfigDev } from '../../../../configs/developerConfig';
-import { selectIsDeveloperOptions } from '../../../../store/configSlice';
+import React, { useEffect, useCallback } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  selectTimer,
+  decrementTimer,
+  selectItemsInCart,
+  setTimer,
+} from "../../../../store/shopSlice";
+import styles from "./Timer.module.css";
+import { RootState } from "../../../../store/store";
+import { shopConfig } from "../../../../configs/config";
+import { shopConfigDev } from "../../../../configs/developerConfig";
+import { selectIsDeveloperOptions } from "../../../../store/configSlice";
+import { useTimer } from "react-use-precision-timer";
 
 interface TimerProps {
+  page: string;
   onComplete: () => void;
   setInterSlide: (slide: any) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ onComplete, setInterSlide }) => {
+const Timer: React.FC<TimerProps> = ({ page, onComplete, setInterSlide }) => {
   const dispatch = useDispatch();
   const timer = useSelector(selectTimer);
-
-  const budget = useSelector((state: RootState )=>state.shop.budget);
   const itemsInCart = useSelector(selectItemsInCart);
+  const budget = useSelector((state: RootState) => state.shop.budget);
+  const isDeveloperMode = useSelector(selectIsDeveloperOptions);
+  const isPhase3 = useSelector((state: RootState) => state.shop.isPhase3);
+  const initialTime = isDeveloperMode
+    ? shopConfigDev.initialTime
+    : shopConfig.initialTime;
 
-  const isDeveloperMode = useSelector(selectIsDeveloperOptions)
-  const initialTime = isDeveloperMode? shopConfigDev.initialTime:shopConfig.initialTime
-
+  // Set initial timer on mount
   useEffect(() => {
-    if(timer == shopConfig.initialTime) {
+    if (timer === shopConfig.initialTime) {
       dispatch(setTimer(initialTime));
     }
-    return () => {
-      // Cleanup logic here
-    };
-  }, []);
+  }, [dispatch, initialTime]);
+
+  // Timer tick function memoized
+  const timerFunction = useCallback(() => {
+    if (timer <= 1) {
+      timerObject.stop();
+      onComplete();
+    } else {
+      if (page != "cart") {
+        dispatch(decrementTimer());
+        if (!isPhase3) {
+          if (
+            (timer === 5 * 60 && itemsInCart.length === 0) ||
+            (timer === 2 * 60 && itemsInCart.length < 10)
+          ) {
+            timerObject.pause();
+            setInterSlide("timeIsRunningOut");
+            timerObject.pause();
+          }
+        } else {
+          if (timer === 2.5 * 60 && itemsInCart.length === 0) {
+            timerObject.pause();
+            setInterSlide("timeIsRunningOut");
+            timerObject.pause();
+          }
+        }
+      }
+    }
+  }, [
+    timer,
+    dispatch,
+    onComplete,
+    budget,
+    itemsInCart.length,
+    initialTime,
+    setInterSlide,
+  ]);
+
+  // Define the timer object
+  const timerObject = useTimer({ delay: 1000 }, timerFunction);
 
   useEffect(() => {
+    timerObject.start();
+    return () => timerObject.stop();
+  }, [timerObject]);
 
-    const intervalId = setInterval(() => {
-      if (timer <= 1) {
-        clearInterval(intervalId);
-        onComplete();
-      } else {
-        dispatch(decrementTimer()); // Dispatch the decrementTimer action
-      }
-    }, 1000);
-
-    return () => clearInterval(intervalId);
-  }, [dispatch, timer, onComplete]);
-
+  // Format the remaining time
   const formatTimeLeft = () => {
     const minutes = Math.floor(timer / 60);
     const seconds = timer % 60;
-     
-
-    if ( 
-      (timer == initialTime / 2) && 
-      ((budget >= shopConfig.halfTimeNotificationWhenBudgetMoreThan) &&
-      (itemsInCart.length < shopConfig.halfTimeNotificationWhenItemsLessThan) )
-    ) {
-      setInterSlide(`timeIsRunningOut`)
-      dispatch(decrementTimer()); 
-    }
-
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   return (
-    <div className={styles.timer}>
-      Timer : {formatTimeLeft()}
+    <div
+      className={styles.timer}
+      style={{ display: page === "cart" ? "none" : "block" }}
+    >
+      Timer: {formatTimeLeft()}
     </div>
   );
 };

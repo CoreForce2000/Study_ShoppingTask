@@ -6,3 +6,11 @@
 .removeFromCartButton {
     justify-content: right;
 }
+
+.warningBox {
+    text-align: center;
+    background-color: yellow;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px;
+}

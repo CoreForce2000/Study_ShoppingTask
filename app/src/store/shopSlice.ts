@@ -47,6 +47,7 @@ interface ShopState {
   itemsClicked: Product[];
   actions: ShopAction[];
   scrollPositions: Record<string, number>;
+  isPhase3: boolean;
 }
 
 const initialState: ShopState = {
@@ -62,6 +63,7 @@ const initialState: ShopState = {
   itemsClicked: [],
   actions:[],
   scrollPositions: {},
+  isPhase3: false,
 };
 
 
@@ -174,6 +176,10 @@ export const shopSlice = createSlice({
           const { key, position } = action.payload;
           state.scrollPositions[key] = position;
         },
+
+        setIsPhase3: (state, action: PayloadAction<boolean>) => {
+          state.isPhase3 = action.payload;
+        }
     },
 });
 
@@ -186,10 +192,14 @@ export const selectItemsInCart = (state: RootState) => state.shop.itemsInCart;
 export const selectClickedItems = (state: RootState) => state.shop.itemsClicked;
 export const selectTimer = (state: RootState) => state.shop.timer;
 export const selectShopActions = (state: RootState) => state.shop.actions;
+export const selectBudget = (state: RootState) => state.shop.budget;
+export const selectScrollPosition = (state: RootState, key: string) => state.shop.scrollPositions[key];
+export const selectIsPhase3 = (state: RootState) => state.shop.isPhase3;
 
 export const selectProduct = (state: RootState, category: string, itemId: number): Product => {
   return state.shop.products[category]?.[itemId.toString()];
 };
+
 
 export const selectAllCategories = createSelector(
   [selectShopProducts],
@@ -219,13 +229,12 @@ export const selectCategoryClickCount = createSelector(
   [selectAllCategories, selectClickedCategories, (state) => state],
   (allCategories, clickedCategories, state) => {
     return allCategories.reduce((acc: { [key: string]: number }, category) => {
-      // Check if the category has been clicked
+
       if (clickedCategories.includes(category)) {
-        // If clicked, use selectClickedItemTiles to get tiles
+
         const tiles = selectClickedItemTiles(state, category);
         acc[category] = Array.isArray(tiles) ? tiles.length : 0;
       } else {
-        // If not clicked, set count to -1
         acc[category] = -1;
       }
       return acc;
@@ -233,7 +242,15 @@ export const selectCategoryClickCount = createSelector(
   }
 );
 
+export const selectPhase3Complete = createSelector(
+  [selectAllCategories, selectClickedCategories],
+  (allCategories, clickedCategories) => {
+    return shopConfig.phase3ShoppingList.every((category) => clickedCategories.includes(category));
+  }
+);
+
+
 export const { setBudget,addItemToCart,removeItemFromCart, setShuffledItems, setShuffledCategories, 
-  setItemTileClicked, setCategoryClicked, addItemToClickedItems, decrementTimer, logAction, resetState, setTimer, setScrollPosition
+  setItemTileClicked, setCategoryClicked, addItemToClickedItems, decrementTimer, logAction, resetState, setTimer, setScrollPosition, setIsPhase3
  } = shopSlice.actions;
 export default shopSlice.reducer;
