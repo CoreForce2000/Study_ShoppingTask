@@ -1,6 +1,5 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { selectShopActions } from "../../../../store/shopSlice";
 import styles from "./ToCsvButton.module.css";
 import {
   selectAge,
@@ -10,9 +9,10 @@ import {
   selectOnlineShoppingFrequency,
   selectParticipantId,
 } from "../../../../store/surveySlice";
+import { RootState } from "../../../../store/store";
 
 const CsvExportButton: React.FC = () => {
-  const shopActions = useSelector(selectShopActions);
+  const rows = useSelector((state: RootState) => state.data.rows);
 
   // Define the demographics data
   const participantId = useSelector(selectParticipantId);
@@ -25,7 +25,31 @@ const CsvExportButton: React.FC = () => {
 
   const handleExportCsv = () => {
     // Define column names for the shop actions
-    const shopColumns = ["Type", "Timestamp (s)", "Category", "Item", "Budget"];
+    const columns: string[] = [
+      "Phase",
+      "Phase_name",
+      "Block_num",
+      "Block_name",
+      "Shopping_event",
+      "Shopping_category",
+      "Shopping_item",
+      "Shopping_time_stamp",
+      "Shopping_time_action",
+      "Shopping_price",
+      "Shopping_budget",
+      "CoDe_cue",
+      "CoDe_stimuli_type",
+      "CoDe_response",
+      "CoDe_outcome",
+      "CoDe_item",
+      "CoDe_RT",
+      "CoDe_VAS",
+      "Control_qs_person",
+      "Control_qs_item",
+      "Control_qs_correct",
+      "Control_qs_attempts",
+      "Control_qs_RT",
+    ];
 
     // Create a row for demographics
     const demographicsRow = [
@@ -44,7 +68,7 @@ const CsvExportButton: React.FC = () => {
     ];
 
     // Create the header row for shop actions
-    const shopHeaderRow = shopColumns.join(",");
+    const shopHeaderRow = columns.join(",");
 
     // Create the CSV content by combining the demographics row, shop actions header, and data rows
     const csvContent =
@@ -54,7 +78,7 @@ const CsvExportButton: React.FC = () => {
       "\n" +
       shopHeaderRow +
       "\n" +
-      shopActions.map((row) => Object.values(row).join(",")).join("\n");
+      rows.map((row) => Object.values(row).join(",")).join("\n");
 
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");

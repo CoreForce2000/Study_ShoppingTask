@@ -4,11 +4,12 @@ import { useDispatch, useSelector } from "react-redux";
 import styles from "./CartPage.module.css";
 import {
   CartItem,
-  logAction,
+  selectBudget,
   selectItemsInCart,
 } from "../../../../store/shopSlice";
 import Tile from "../../components/Tile/Tile";
 import { getImagePath } from "../../../../util/imageLoading";
+import { logShopAction } from "../../../../store/dataSlice";
 
 interface CartPageProps {
   selectedItems: CartItem[];
@@ -20,6 +21,7 @@ const CartPage: React.FC<CartPageProps> = ({
   setSelectedItems,
 }) => {
   const itemsInCart = useSelector(selectItemsInCart);
+  const budget = useSelector(selectBudget);
   const dispatch = useDispatch();
 
   const onTileSelect = (item: CartItem) => {
@@ -36,20 +38,24 @@ const CartPage: React.FC<CartPageProps> = ({
       );
       setSelectedItems(updatedSelectedItems);
       dispatch(
-        logAction({
-          type: "deselect_trolley_item",
-          item: item.product.item_id,
-          category: item.product.category,
+        logShopAction({
+          Shopping_budget: budget,
+          Shopping_event: "deselect_trolley_item",
+          Shopping_item: item.product.image_name,
+          Shopping_category: item.product.category,
+          Shopping_price: item.price,
         })
       );
     } else {
       // If the item is not selected, add it to the selected items list
       setSelectedItems([...selectedItems, item]);
       dispatch(
-        logAction({
-          type: "select_trolley_item",
-          item: item.product.item_id,
-          category: item.product.category,
+        logShopAction({
+          Shopping_budget: budget,
+          Shopping_event: "select_trolley_item",
+          Shopping_item: item.product.image_name,
+          Shopping_category: item.product.category,
+          Shopping_price: item.price,
         })
       );
     }

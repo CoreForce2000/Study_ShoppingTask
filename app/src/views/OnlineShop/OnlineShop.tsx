@@ -11,10 +11,11 @@ import EvenlySpacedRow from "./components/EvenlySpacedRow/EvenlySpacedRow";
 import Timer from "./components/Timer/Timer";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { CartItem, logAction, removeItemFromCart } from "../../store/shopSlice";
+import { CartItem, removeItemFromCart } from "../../store/shopSlice";
 import FixedRatioView from "../../components/FixedRatioView/FixedRatioView";
 import SlideView from "../../components/SlideView/SlideView";
 import { useScrollRestoration } from "./OnlineShopHooks";
+import { logShopAction } from "../../store/dataSlice";
 
 interface OnlineShopProps {}
 
@@ -72,11 +73,14 @@ const OnlineShop: React.FC<OnlineShopProps> = ({}) => {
   const removeFromCart = (selectedItems: CartItem[]) => {
     selectedItems.forEach((cartItem: CartItem) => {
       dispatch(removeItemFromCart(cartItem));
+
       dispatch(
-        logAction({
-          type: "remove_from_cart",
-          item: cartItem.product.item_id,
-          category: cartItem.product.category,
+        logShopAction({
+          Shopping_budget: budget,
+          Shopping_event: "remove_from_cart",
+          Shopping_item: cartItem.product.image_name,
+          Shopping_category: cartItem.product.category,
+          Shopping_price: cartItem.price,
         })
       );
     });
@@ -131,9 +135,14 @@ const OnlineShop: React.FC<OnlineShopProps> = ({}) => {
                 iconUrl={config.BUTTON_PATH + "cart_white.png"}
                 text={`${numItemsInTrolley}`}
                 onClick={function (): void {
-                  dispatch(
-                    logAction({ type: "to_trolley", item: -1, category: "" })
-                  );
+                  // dispatch(
+                  //   logShopAction({
+                  //     Shopping_budget: budget,
+                  //     Shopping_event: "not_add_to_cart",
+                  //     Shopping_item: undefined,
+                  //     Shopping_category: undefined,
+                  //     Shopping_price: undefined,
+                  // );
                   navigate("/shop?page=cart");
                 }}
                 visible={true}

@@ -26,6 +26,7 @@ import { shuffleExtendArray } from "../../util/randomize";
 import { preloadImage } from "../../util/imageLoading";
 import { experimentConfigDev } from "../../configs/developerConfig";
 import SlideView from "../../components/SlideView/SlideView";
+import { logExperimentAction, setBlockName } from "../../store/dataSlice";
 
 type BlockType = "nonDegraded" | "partiallyDegraded" | "fullyDegraded";
 type SlideType =
@@ -65,14 +66,14 @@ const offLightbulbSlide2: Slide = {
 };
 
 const blueLightbulbSlide: Slide = {
-  id: "blueLightbulb",
+  id: "blue",
   type: "coloredLightbulb",
   image: pathToSlides + "Slide3.PNG",
   allowKeyPress: true,
 };
 
 const orangeLightbulbSlide: Slide = {
-  id: "orangeLightbulb",
+  id: "orange",
   type: "coloredLightbulb",
   image: pathToSlides + "Slide2.PNG",
   allowKeyPress: true,
@@ -142,6 +143,7 @@ const Experiment: React.FC = () => {
   const [pressedButton, setPressedButton] = useState<boolean>(false);
   const [currentSlide, setCurrentSlide] = useState<Slide>(offLightbulbSlide);
   const [imagePath, setImagePath] = useState<string>("none");
+  const [reactionStartTime, setReactionStartTime] = useState<number>(0);
 
   const totalTrials =
     experimentConfig.trialSequence.length *
@@ -247,6 +249,18 @@ const Experiment: React.FC = () => {
   const block = useSelector(selectBlock);
   const trial = useSelector(selectTrial);
 
+  dispatch(setBlock(block));
+
+  const blockNames = [
+    "p(0|-A)=0",
+    "p(0|-A)=0",
+    "p(0|-A)=0",
+    "p(0|-A)=0.3",
+    "p(0|-A)=0.6",
+    "p(0|-A)=0",
+  ];
+  dispatch(setBlockName(blockNames[block - 1]));
+
   if (block === 6) {
     endOfPhase2Sound.play();
     navigate(`/slide`);
@@ -264,7 +278,21 @@ const Experiment: React.FC = () => {
 
     const index = (block - 1) * totalTrialsInCurrentBlock + trial - 1;
 
-    const onFinishTrial = () => {
+    const onFinishTrial = (receivedItem = false) => {
+      dispatch(
+        logExperimentAction({
+          CoDe_cue: currentSlide.id == "orange" ? "orange" : "blue",
+          CoDe_stimuli_type:
+            experimentSequence[index].product.category == "self"
+              ? "own"
+              : "others",
+          CoDe_outcome: receivedItem ? "TRUE" : "FALSE",
+          CoDe_response: pressedButton ? "TRUE" : "FALSE",
+          CoDe_item: experimentSequence[index].product.image_name,
+          CoDe_RT: Date.now() - reactionStartTime,
+          CoDe_VAS: undefined,
+        })
+      );
       setPressedButton(false);
 
       dispatch(setTrial(trial + 1));
@@ -275,6 +303,7 @@ const Experiment: React.FC = () => {
         }
 
         dispatch(setBlock(block + 1));
+        dispatch(setBlockName("Questions"));
 
         dispatch(setTrial(1));
 
@@ -299,6 +328,7 @@ const Experiment: React.FC = () => {
 
       case "offLightbulb2":
         setCurrentSlide(experimentSequence[index].slide);
+        setReactionStartTime(Date.now());
         break;
 
       case "coloredLightbulb":
@@ -316,14 +346,14 @@ const Experiment: React.FC = () => {
         } else {
           setCurrentSlide(offLightbulbNoItemSlide);
 
-          onFinishTrial();
+          onFinishTrial(false);
         }
         break;
 
       case "receiveItem":
         setCurrentSlide(offLightbulbSlide);
 
-        onFinishTrial();
+        onFinishTrial(true);
         break;
     }
   };

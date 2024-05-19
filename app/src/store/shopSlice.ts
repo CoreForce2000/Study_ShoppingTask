@@ -24,15 +24,6 @@ export interface CartItem {
   selected: boolean;
 }
 
-type Action = "click_category" | "click_item" | "add_to_cart" | "not_add_to_cart" | "back_to_category_page" | "to_trolley" | "select_trolley_item" | "deselect_trolley_item" | "remove_from_cart";
-
-export interface ShopAction {
-  type: Action;
-  timestamp: number;
-  category: string;
-  item: number;
-  budget: number;
-}
 
 interface ShopState {
   budget: number;
@@ -45,7 +36,6 @@ interface ShopState {
   clickedItemTiles: Record<string, number[]>;
   itemsInCart: CartItem[];
   itemsClicked: Product[];
-  actions: ShopAction[];
   scrollPositions: Record<string, number>;
   isPhase3: boolean;
 }
@@ -61,7 +51,6 @@ const initialState: ShopState = {
   clickedItemTiles: {},
   itemsInCart: [],
   itemsClicked: [],
-  actions:[],
   scrollPositions: {},
   isPhase3: false,
 };
@@ -150,28 +139,6 @@ export const shopSlice = createSlice({
           }
         },
 
-        logAction: (state, action: PayloadAction<{ type: Action; category: string; item: number }>) => {
-          const { type, category, item } = action.payload;
-    
-          // Automatically include budget and timer from the current state
-          const { budget, timer } = state;
-
-          const timestamp = shopConfig.initialTime - timer;
-    
-          // Create the ShopAction object with budget, timer, and other parameters
-          const shopAction: ShopAction = {
-            type,
-            timestamp,
-            category,
-            item,
-            budget,
-          };
-    
-          state.actions.push(shopAction);
-
-          console.log("Action logged", shopAction);
-        },
-
         setScrollPosition: (state, action: PayloadAction<{ key: string; position: number }>) => {
           const { key, position } = action.payload;
           state.scrollPositions[key] = position;
@@ -191,7 +158,6 @@ export const selectClickedCategories = (state: RootState) => state.shop.clickedC
 export const selectItemsInCart = (state: RootState) => state.shop.itemsInCart;
 export const selectClickedItems = (state: RootState) => state.shop.itemsClicked;
 export const selectTimer = (state: RootState) => state.shop.timer;
-export const selectShopActions = (state: RootState) => state.shop.actions;
 export const selectBudget = (state: RootState) => state.shop.budget;
 export const selectScrollPosition = (state: RootState, key: string) => state.shop.scrollPositions[key];
 export const selectIsPhase3 = (state: RootState) => state.shop.isPhase3;
@@ -244,13 +210,13 @@ export const selectCategoryClickCount = createSelector(
 
 export const selectPhase3Complete = createSelector(
   [selectAllCategories, selectClickedCategories],
-  (allCategories, clickedCategories) => {
+  (clickedCategories) => {
     return shopConfig.phase3ShoppingList.every((category) => clickedCategories.includes(category));
   }
 );
 
 
 export const { setBudget,addItemToCart,removeItemFromCart, setShuffledItems, setShuffledCategories, 
-  setItemTileClicked, setCategoryClicked, addItemToClickedItems, decrementTimer, logAction, resetState, setTimer, setScrollPosition, setIsPhase3
+  setItemTileClicked, setCategoryClicked, addItemToClickedItems, decrementTimer, resetState, setTimer, setScrollPosition, setIsPhase3
  } = shopSlice.actions;
 export default shopSlice.reducer;

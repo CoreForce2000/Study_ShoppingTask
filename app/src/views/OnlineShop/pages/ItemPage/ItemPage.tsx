@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../../store/store";
 import {
   addItemToCart,
-  logAction,
   selectProduct,
   setBudget,
   setTimer,
 } from "../../../../store/shopSlice";
+import { logShopAction } from "../../../../store/dataSlice";
 import { useLocation, useNavigate } from "react-router-dom";
 import { getImagePath } from "../../../../util/imageLoading";
 import { shopConfig } from "../../../../configs/config";
@@ -91,10 +91,15 @@ const ItemPage: React.FC<ItemPageProps> = ({
       dispatch(addItemToCart(product));
     }
     dispatch(
-      logAction({
-        type: "add_to_cart",
-        item: product.item_id,
-        category: product.category,
+      logShopAction({
+        Shopping_budget: budget,
+        Shopping_event: "add_to_cart",
+        Shopping_item: product.image_name,
+        Shopping_category: product.category,
+        Shopping_price:
+          budget < shopConfig.useMinimumPriceBelow
+            ? product.minimum
+            : product.maximum,
       })
     );
     navigate(-1);
@@ -102,10 +107,15 @@ const ItemPage: React.FC<ItemPageProps> = ({
 
   const backClicked = () => {
     dispatch(
-      logAction({
-        type: "not_add_to_cart",
-        item: product.item_id,
-        category: product.category,
+      logShopAction({
+        Shopping_budget: budget,
+        Shopping_event: "not_add_to_cart",
+        Shopping_item: product.image_name,
+        Shopping_category: product.category,
+        Shopping_price:
+          budget < shopConfig.useMinimumPriceBelow
+            ? product.minimum
+            : product.maximum,
       })
     );
     navigate(-1);

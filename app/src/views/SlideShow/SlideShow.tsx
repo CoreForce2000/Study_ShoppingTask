@@ -31,6 +31,13 @@ import {
 import { customSlideText } from "./SlideShowUtil.tsx";
 import { shopConfig } from "../../configs/config.ts";
 import { setIsPhase3 } from "../../store/shopSlice.ts";
+import CsvExportButton from "../OnlineShop/components/ToCsvButton/ToCsvButton.tsx";
+import {
+  logControlAction,
+  setBlockName,
+  setPhase,
+  setPhaseName,
+} from "../../store/dataSlice.ts";
 
 type SkipNextIf = "GROUP_CONTROL";
 
@@ -42,7 +49,9 @@ export interface BaseSlides {
   hideNext?: boolean;
   timeout?: number;
   skipNextIf?: SkipNextIf;
+  transitPhase?: number;
   transitDelay?: number;
+  initializeTimer?: boolean;
 }
 
 const SlideShow: React.FC = () => {
@@ -54,6 +63,10 @@ const SlideShow: React.FC = () => {
   const data = useSelector((state: RootState) => state.survey);
   const dataEntryGroup = useSelector(selectGroup);
   const [initState, setInitState] = useState(initialState());
+  const [reactionStartTime, setReactionStartTime] = useState<number>(0);
+  const [controlAttempts, setControlAttempts] = useState<number[]>([
+    0, 0, 0, 0,
+  ]);
 
   const [interSlideIndex, setInterSlideIndex] = useState(0);
   const [_, setMemoryCorrect] = useState<string[]>([]);
@@ -88,8 +101,10 @@ const SlideShow: React.FC = () => {
 
         return newMemoryCorrect;
       });
+      return true;
     } else {
       memoryWrongSound.play();
+      return false;
     }
   };
 
@@ -402,9 +417,22 @@ const SlideShow: React.FC = () => {
                   columnLayout="single"
                   allowMultiple={false}
                   onChange={(itemsSelected) => {
-                    checkIfCorrect(
+                    const correct = checkIfCorrect(
                       itemsSelected[0],
                       shopConfig.phase3ShoppingList[index]
+                    );
+                    setControlAttempts((controlAttempts) => {
+                      controlAttempts[index] = controlAttempts[index] + 1;
+                      return controlAttempts;
+                    });
+                    dispatch(
+                      logControlAction({
+                        Control_qs_person: shopConfig.phase3Person[index],
+                        Control_qs_item: itemsSelected[0],
+                        Control_qs_correct: correct ? "TRUE" : "FALSE",
+                        Control_qs_attempts: controlAttempts[index],
+                        Control_qs_RT: Date.now() - reactionStartTime,
+                      })
                     );
                   }}
                 />
@@ -414,6 +442,7 @@ const SlideShow: React.FC = () => {
         </div>
       ),
       hideNext: true,
+      initializeTimer: true,
     },
     { slide: `${config.SLIDE_PATH}phase3/Slide29.JPG`, children: <></> },
     {
@@ -434,6 +463,10 @@ const SlideShow: React.FC = () => {
     currentSlide = allSlides[currentSlideIndex];
 
     const transitDelay = forceTransitDelay || currentSlide.transitDelay || 0;
+
+    if (currentSlide.initializeTimer) {
+      setReactionStartTime(Date.now());
+    }
 
     setTimeout(() => {
       if (currentSlide.variable) {
@@ -500,6 +533,9 @@ const SlideShow: React.FC = () => {
         navigate("/shop");
       }
       if (currentSlide.transit === "CONTINGENCY") {
+        dispatch(setPhase(2));
+        dispatch(setPhaseName("CoDe"));
+        dispatch(setBlockName("p(0|-A)=0"));
         navigate("/contingency");
       }
     }, transitDelay);
@@ -718,6 +754,8 @@ const SlideShow: React.FC = () => {
           <img src={nextButtonImg} alt="Next" className={styles.nextIcon} />
         </button>
       </SlideView>
+
+      <CsvExportButton />
     </div>
   );
 };

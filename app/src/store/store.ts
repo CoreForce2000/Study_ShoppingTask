@@ -6,6 +6,7 @@ import configReducer from './configSlice';
 import shopReducer from './shopSlice';
 import slideReducer from './slideSlice';
 import experimentReducer from './experimentSlice';
+import dataReducer from './dataSlice';
 
 const store = configureStore({
   reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
     shop: shopReducer,
     slide: slideReducer,
     experiment: experimentReducer,
+    data: dataReducer,
   },
 });
 

@@ -86,6 +86,13 @@ export const shopConfig = {
     numberOfItemTiles: 301,
     shopSlidesDuration: 5000,
 
+    phase3Person: [
+        "Mother",
+        "Neighbour",
+        "Girl",
+        "Friend"
+    ],
+
     phase3ShoppingListOptions: [
         ["Perfume", "Flower", "Umbrella", "Make-up", "Handbag"],
         ["Sunglasses", "Wine", "Chocolate", "Penknife", "Wallet"],
