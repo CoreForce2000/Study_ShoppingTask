@@ -1,4 +1,4 @@
-import VAS from "../views/SlideShow/components/VAS/VAS"
+import VAS from "../components/vas"
 
 export const getVasSlides = (text:string, minLabel:string, maxLabel:string, setValue:(value:number)=>void): React.ReactNode => {
 

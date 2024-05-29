@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CategoryPage.module.css";
-import Tile from "../../components/Tile/Tile";
+import Tile from "../../../../components/tile";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../../../store/store";
 import {
@@ -16,7 +16,7 @@ import {
 } from "../../../../store/shopSlice";
 import { shuffleArray } from "../../../../util/randomize";
 import { shopConfig } from "../../../../configs/config";
-import { getImagePath, preloadImage } from "../../../../util/imageLoading";
+import { getImagePath, preloadImage } from "../../../../util/preloading";
 import { delayAfterClick } from "../../../../util/delayAfterClick";
 import { logShopAction } from "../../../../store/dataSlice";
 

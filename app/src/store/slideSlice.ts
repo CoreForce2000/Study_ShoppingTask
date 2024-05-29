@@ -15,7 +15,16 @@ export const slideSlice = createSlice({
         },
 
         setCurrentSlideIndex: (state, action) => {
+            console.log("Changed the current slide index to ", action.payload)
             state.currentSlideIndex = action.payload;
+        },
+        incrementCurrentSlideIndex: (state) => {
+            console.log("Incremented slide index")
+            state.currentSlideIndex = state.currentSlideIndex+1;
+        },
+        decrementCurrentSlideIndex: (state) => {
+            console.log("Back one slide")
+            state.currentSlideIndex = state.currentSlideIndex-1;
         },
     },
 });
@@ -24,7 +33,9 @@ export const selectCurrentSlideIndex = (state: RootState) => state.slide.current
 
 export const { 
     setSlideWidth, 
-    setCurrentSlideIndex
+    setCurrentSlideIndex,
+    incrementCurrentSlideIndex,
+    decrementCurrentSlideIndex
 
 } = slideSlice.actions;
 

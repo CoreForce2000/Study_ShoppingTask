@@ -110,8 +110,8 @@ def process_category(
 
     highlight = "Err >>" if len(df_merged) > 5 or len(excel_files) > 1 else ""
 
-    print(category_name, sep="\t")
-    # print(f"{highlight} images:", len(image_files), "excel files:", len(excel_files), "total:", len(df_merged), "unmatched images:", len(unmatched_images), "unmatched excel rows:", len(unmatched_excel_rows), category_name, sep="\t")
+    # print(category_name, sep="\t")
+    print(f"{highlight} images:", len(image_files), "excel files:", len(excel_files), "total:", len(df_merged), "unmatched images:", len(unmatched_images), "unmatched excel rows:", len(unmatched_excel_rows), category_name, sep="\t")
 
     return df_merged, unmatched_images, unmatched_excel_rows
 

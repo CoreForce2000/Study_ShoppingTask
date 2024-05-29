@@ -10,7 +10,7 @@ import {
 } from "../../../../store/shopSlice";
 import { logShopAction } from "../../../../store/dataSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getImagePath } from "../../../../util/imageLoading";
+import { getImagePath } from "../../../../util/preloading";
 import { shopConfig } from "../../../../configs/config";
 import { setCurrentSlideIndex } from "../../../../store/slideSlice";
 

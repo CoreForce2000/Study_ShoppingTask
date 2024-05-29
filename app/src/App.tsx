@@ -1,11 +1,11 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import DataEntry from "./views/DataEntry/DataEntry";
-import SlideShow from "./views/SlideShow/SlideShow";
+import DataEntry from "./views/data-entry";
+import SlideShow from "./views/experiment-sequence";
 import { Provider } from "react-redux";
 import store from "./store/store";
-import OnlineShop from "./views/OnlineShop/OnlineShop";
-import Experiment from "./views/Experiment/Experiment";
+import OnlineShop from "./views/OnlineShop/online-shop";
+import Experiment from "./views/OnlineShop/pages/experiment";
 
 const App: React.FC = () => {
   return (

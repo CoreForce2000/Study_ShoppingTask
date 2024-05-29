@@ -9,15 +9,16 @@ export const config = {
     server_mode: false,
 
     illicitDrugCategories : [
-        "Cannabis Products",
+        "Cannabis",
+        "Cannabis products",
         "Cigarettes",
         "Cigars",
         "Ecstasy",
         "Hashish",
-        "Marijuana",
         "Hookah",
-        "Pipes",
-        "Rolling Tobacco"
+        "Pipers",
+        "Rolling Tobacco",
+        "Vaping",
     ],
 
     alcoholCategories : [
@@ -29,11 +30,11 @@ export const config = {
         "Cocktails",
         "Gin",
         "Prosecco",
-        "Red wine",
-        "Vodka",
+        "Red Wine",
         "Rum",
+        "Vodka",
         "Whisky",
-        "White wine",
+        "White Wine"
     ],
 
     initialScreenCategories : [
@@ -41,6 +42,34 @@ export const config = {
         "Crack",
         "Heroin",
     ],
+
+    onlineShoppingOptions: [
+        "several times a day",
+        "once a day",
+        "a few times a week",
+        "once a week",
+        "once a month or less",
+        "very rarely / not at all",
+    ],
+      
+    drugsOptions: [
+        "Tobacco",
+        "Cannabis",
+        "Mushrooms",
+        "Ecstasy",
+        "Amphetamines",
+        "Methamphetamine",
+        "Cocaine",
+        "Crack-cocaine",
+        "Heroin",
+        "Benzodiazepines",
+        "Ketamine",
+        "Inhalants",
+        "Spice",
+        "LSD",
+        "Other",
+    ],
+      
   };
 
 

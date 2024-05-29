@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./OverviewPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import Tile from "../../components/Tile/Tile";
+import Tile from "../../../../components/tile";
 import {
   selectAllCategories,
   selectBudget,

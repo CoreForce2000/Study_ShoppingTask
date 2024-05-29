@@ -10,6 +10,8 @@ export interface InitialState {
 
     onlineShoppingFrequency: string[];
     selectedDrugs: string[];
+    othersLightbulbColor: string,
+    ownLightbulbColor: string,
     drugDosages: Record<string, number>;
     drugDosages2: Record<string, number>;
     purchaseSatisfaction: number;
@@ -28,6 +30,8 @@ export const initialState = ()=> ({
     selectedDrugs: [],
     drugDosages: {},
     drugDosages2: {},
+    othersLightbulbColor: '',
+    ownLightbulbColor: '',
     purchaseSatisfaction: 0,
     claimSatisfaction: 0,
     desireContinueShopping: 0
@@ -94,7 +98,14 @@ export const surveySlice = createSlice({
         },
         setDesireContinueShopping: (state, action) => {
             state.desireContinueShopping = action.payload;
+        },
+        setOthersLightbulbColor: (state, action) => {
+            state.othersLightbulbColor = action.payload;
+        },
+        setOwnLightbulbColor: (state, action) => {
+            state.ownLightbulbColor = action.payload;
         }
+        
     },
 });
 
@@ -111,7 +122,9 @@ export const {
     setDrugDosages2,
     setPurchaseSatisfaction,
     setClaimSatisfaction,
-    setDesireContinueShopping
+    setDesireContinueShopping,
+    setOthersLightbulbColor,
+    setOwnLightbulbColor
     
 } = surveySlice.actions;
 
@@ -127,5 +140,8 @@ export const selectDrugDosages2 = (state: RootState) => state.survey.drugDosages
 export const selectPurchaseSatisfaction = (state: RootState) => state.survey.purchaseSatisfaction;
 export const selectClaimSatisfaction = (state: RootState) => state.survey.claimSatisfaction;
 export const selectDesireContinueShopping = (state: RootState) => state.survey.desireContinueShopping;
+export const selectOthersLightbulbColor = (state: RootState) => state.survey.othersLightbulbColor;
+export const selectOwnLightbulbColor = (state: RootState) => state.survey.ownLightbulbColor;
+
 
 export default surveySlice.reducer;

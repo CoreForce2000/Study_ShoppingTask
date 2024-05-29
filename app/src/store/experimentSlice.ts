@@ -16,7 +16,7 @@ export const experimentSlice = createSlice({
             state.slideWidth = action.payload;
         },
         
-        setCurrentSlideIndex: (state, action) => {
+        setCurrentExperimentSlideIndex: (state, action) => {
             state.currentSlideIndex = action.payload;
         },
         
@@ -43,7 +43,7 @@ export const selectExperimentSequence = (state: RootState) => state.experiment.e
 
 export const { 
     setSlideWidth, 
-    setCurrentSlideIndex,
+    setCurrentExperimentSlideIndex,
     setBlock,  // Export the new reducer action for setting the block
     setTrial,  // Export the new reducer action for setting the trial
     setExperimentSequence,  // Export the new reducer action for setting the trial

@@ -1,0 +1,5 @@
+export const IMAGE_BASE_PATH= '/assets/categories/'
+export const SLIDE_PATH= '/assets/slides/'
+export const BUTTON_PATH= '/assets/buttons/'
+export const SOUND_PATH= '/assets/sounds/'
+export const ASSETS_PATH = '/assets/'

@@ -7,8 +7,8 @@ import {
   selectBudget,
   selectItemsInCart,
 } from "../../../../store/shopSlice";
-import Tile from "../../components/Tile/Tile";
-import { getImagePath } from "../../../../util/imageLoading";
+import Tile from "../../../../components/tile";
+import { getImagePath } from "../../../../util/preloading";
 import { logShopAction } from "../../../../store/dataSlice";
 
 interface CartPageProps {
@@ -63,15 +63,6 @@ const CartPage: React.FC<CartPageProps> = ({
 
   return (
     <div>
-      <div
-        className={styles.warningBox}
-        style={{
-          display: selectedItems.length > 0 ? "block" : "none",
-          fontSize: 22,
-        }}
-      >
-        Press the "Remove from Trolley" button to remove all selected items
-      </div>
       <div className={styles.grid}>
         {itemsInCart.map((cartItem: CartItem, index: number) => (
           <Tile
