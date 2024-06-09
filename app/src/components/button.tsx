@@ -29,10 +29,10 @@ const Button: React.FC<ButtonProps> = ({
   prefixText,
   suffixText,
   color,
-  visible
+  visible = true
 }) => {
   const buttonClass = classNames(
-    "border-none text-center text-decoration-none inline-flex items-center m-1 cursor-pointer rounded-lg py-1.5 px-3 text-base font-medium transition duration-250 ease-in-out",
+    "border-none text-center text-decoration-none  inline-flex flex justify-center items-center m-1 cursor-pointer rounded-lg py-1.5 px-3 text-base font-medium transition duration-250 ease-in-out",
     {
       "bg-gray-600 text-white": variant === "secondary",
       "bg-green-500 text-white": variant === "primary",

@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setSlideWidth } from '../store/slideSlice';
-import { SLIDE_PATH } from '../util/paths';
+import React, { useEffect, useState } from "react";
+import { SLIDE_PATH } from "../util/path";
 
 interface TaskViewportProps {
   backgroundImage?: string;
@@ -10,12 +8,11 @@ interface TaskViewportProps {
   backgroundColor?: string;
 }
 
-const TaskViewport: React.FC<TaskViewportProps> = ({ 
-  backgroundImage, 
-  children, 
-  backgroundColor = "black" 
+const TaskViewport: React.FC<TaskViewportProps> = ({
+  backgroundImage,
+  children,
+  backgroundColor = "black",
 }) => {
-  const dispatch = useDispatch();
   const aspectRatio = 3 / 4; // Height / Width
   const [slideStyle, setSlideStyle] = useState<React.CSSProperties>({});
 
@@ -24,7 +21,7 @@ const TaskViewport: React.FC<TaskViewportProps> = ({
     const windowHeight = window.innerHeight;
     const windowRatio = windowHeight / windowWidth;
     let newWidth, newHeight;
-  
+
     if (windowRatio >= aspectRatio) {
       newWidth = windowWidth;
       newHeight = windowWidth * aspectRatio;
@@ -32,36 +29,44 @@ const TaskViewport: React.FC<TaskViewportProps> = ({
       newHeight = windowHeight;
       newWidth = windowHeight / aspectRatio;
     }
-  
+
     const fontSize = newWidth * 0.05; // Example: 5% of the width
-  
-    const backgroundStyle = { backgroundImage: `url(${backgroundImage?backgroundImage:SLIDE_PATH+"White.png"})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat', backgroundPosition: 'center center' }
-  
+
+    const backgroundStyle = {
+      backgroundImage: `url(${
+        backgroundImage ? backgroundImage : SLIDE_PATH + "White.png"
+      })`,
+      backgroundSize: "cover",
+      backgroundRepeat: "no-repeat",
+      backgroundPosition: "center center",
+    };
+
     setSlideStyle({
       width: `${newWidth}px`,
       height: `${newHeight}px`,
       fontSize: `${fontSize}px`,
-      ...backgroundStyle
+      ...backgroundStyle,
     });
-  
-    dispatch(setSlideWidth(`${newWidth}px`));
   };
 
   useEffect(() => {
-    window.addEventListener('resize', updateDimensions);
+    window.addEventListener("resize", updateDimensions);
     updateDimensions(); // Also update dimensions on mount
 
     return () => {
-      window.removeEventListener('resize', updateDimensions);
+      window.removeEventListener("resize", updateDimensions);
     };
   }, [backgroundImage]);
 
   return (
     <div
       className="w-screen h-screen box-border flex justify-center items-center"
-      style={ {background: backgroundColor} }
+      style={{ background: backgroundColor }}
     >
-      <div style={slideStyle} className="box-border flex justify-center items-center overflow-hidden relative">
+      <div
+        style={slideStyle}
+        className="box-border flex justify-center items-center overflow-hidden relative"
+      >
         {children}
       </div>
     </div>

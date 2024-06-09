@@ -1,38 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { config, shopConfig, experimentConfig } from "../../../configs/config";
-import { selectIsDeveloperOptions } from "../../../store/configSlice";
+import config from "../assets/configs/config.json";
 
-import {
-  selectBlock,
-  selectExperimentSequence,
-  selectTrial,
-  setBlock,
-  setExperimentSequence,
-  setTrial,
-} from "../../../store/experimentSlice";
-import {
-  Product,
-  selectItemsInCart,
-  selectItemsByCategory,
-  resetState,
-  setTimer,
-  selectCategoryClickCount,
-} from "../../../store/shopSlice";
-import { RootState } from "../../../store/store";
-import { shuffleExtendArray } from "../../../util/randomize";
-import { preloadImage } from "../../../util/preloading";
-import { experimentConfigDev } from "../../../configs/developerConfig";
-import TaskViewport from "../../../components/task-viewport";
-import {
-  logExperimentAction,
-  setBlockName,
-  setPhase,
-  setPhaseName,
-  setTrialNum,
-} from "../../../store/dataSlice";
-
+import TaskViewport from "../components/task-viewport";
+import { SLIDE_PATH } from "../util/path";
+import { preloadImage } from "../util/preload";
+import { shuffleExtendArray } from "../util/randomize";
 type BlockType = "nonDegraded" | "partiallyDegraded" | "fullyDegraded";
 type SlideType =
   | "offLightbulb"
@@ -54,7 +28,7 @@ interface TrialData {
   product: Product;
 }
 
-const pathToSlides = config.SLIDE_PATH + "duringPhase2/";
+const pathToSlides = SLIDE_PATH + "duringPhase2/";
 
 const offLightbulbSlide: Slide = {
   id: "offLightbulb",
@@ -321,7 +295,7 @@ const Experiment: React.FC = () => {
         dispatch(setTrial(1));
 
         navigate(`/slide`);
-      } 
+      }
     };
 
     switch (currentSlide.type) {
@@ -389,7 +363,6 @@ const Experiment: React.FC = () => {
       ? experimentConfigDev.trialSequence[blockNumber - 1]
       : experimentConfig.trialSequence[blockNumber - 1];
   };
-
 
   return (
     <div className="experiment">

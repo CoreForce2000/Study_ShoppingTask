@@ -1,4 +1,4 @@
-import { SLIDE_PATH } from "./paths";
+import { SLIDE_PATH } from "./path";
 
 export const preloadImage = (path: string) => {
     return new Promise((resolve, reject) => {

@@ -1,10 +1,10 @@
-import React, { ChangeEvent, ChangeEventHandler } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { ChangeEvent, ChangeEventHandler } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { atom, useAtom } from 'jotai';
-import { entryDataAtom } from '../sharedAtoms.ts';
-import Button from '../components/button.tsx';
-import { ASSETS_PATH } from '../util/paths.ts';
+import { atom, useAtom } from "jotai";
+import Button from "../components/button.tsx";
+import { useAtomStore } from "../store.ts";
+import { ASSETS_PATH } from "../util/path.ts";
 
 interface RadioGroupProps {
   name: string;
@@ -21,10 +21,10 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
   value,
   onChange,
   required,
-  labels
+  labels,
 }) => {
   if (!labels) {
-    labels = values.map(value=>value.toString());
+    labels = values.map((value) => value.toString());
   }
   const radioButtons = values.map((option, index) => {
     return (
@@ -58,62 +58,67 @@ interface DropdownProps {
   options: string[];
   value: string;
   onChange: ChangeEventHandler | undefined;
-  required?: boolean
+  required?: boolean;
 }
 
-const Dropdown: React.FC<DropdownProps> = ({ options, value, onChange, required }) => {
-
+const Dropdown: React.FC<DropdownProps> = ({
+  options,
+  value,
+  onChange,
+  required,
+}) => {
   return (
-      <select
-          className='border'
-          value={value}
-          required={required}
-          onChange={onChange}
-      >
-          {options.map((option) => (
-              <option key={option} value={option}>
-              {option}
-              </option>
-          ))}
-      </select>
+    <select
+      className="border"
+      value={value}
+      required={required}
+      onChange={onChange}
+    >
+      {options.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+    </select>
   );
 };
 
-const participantIdErrorAtom = atom("")
-const ageErrorAtom = atom("")
-const configVisibleAtom = atom(false)
+const participantIdErrorAtom = atom("");
+const ageErrorAtom = atom("");
+const configVisibleAtom = atom(false);
 
 const DataEntry: React.FC = () => {
   const navigate = useNavigate();
 
-  const [entryData, setEntryData] = useAtom(entryDataAtom)
-  const [participantIdError, setParticipantIdError] = useAtom(participantIdErrorAtom)
-  const [ageError, setAgeError] = useAtom(ageErrorAtom)
-  const [configVisible, setConfigVisible] = useAtom(configVisibleAtom)
-  
-  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>): void => {
+  const [structuredData, setStructuredData, updateStructuredData] =
+    useAtomStore();
+  const [participantIdError, setParticipantIdError] = useAtom(
+    participantIdErrorAtom
+  );
+  const [ageError, setAgeError] = useAtom(ageErrorAtom);
+  const [configVisible, setConfigVisible] = useAtom(configVisibleAtom);
+
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ): void => {
     const { name, value } = e.target;
 
-    
-    setEntryData((prevEntryData) => ({
-      ...prevEntryData,
-      [name]: value,
-    }));
+    updateStructuredData(name, value);
 
-    if(name==="participantId") {
+    if (name === "participantId") {
       if (value.match(/^\d{0,4}$/)) {
-        setParticipantIdError('Participant ID must be exactly 4 digits');
+        setParticipantIdError("Participant ID must be exactly 4 digits");
       } else {
         setParticipantIdError("");
       }
     }
-    if(name==="age") {
+    if (name === "age") {
       if (value && parseInt(value) < 18) {
-          setAgeError('Age must be 18 or above.');
+        setAgeError("Age must be 18 or above.");
       } else {
-          setAgeError("");
+        setAgeError("");
       }
-    }   
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -125,20 +130,26 @@ const DataEntry: React.FC = () => {
       alert("Age needs to be 18 or above.");
       return; // Prevent form submission
     }
-    if (entryData.group === 'Select group') {
+    if (structuredData.group === "Select group") {
       alert("Please select a group.");
       return; // Prevent form submission
     }
 
-      // After saving data navigate to the Slide view
-      navigate('/slide');
-    }
-
+    // After saving data navigate to the Slide view
+    navigate("/slide");
+  };
 
   return (
     <div className="w-screen h-screen box-border flex justify-center items-center">
-      <form onSubmit={handleSubmit} className="w-[300px] shadow-md border border-gray-400 p-4">
-      <img src={ASSETS_PATH+"logo.jpg"} className="w-full max-w-xs mb-5" alt="Cambridge Logo" />
+      <form
+        onSubmit={handleSubmit}
+        className="w-[300px] shadow-md border border-gray-400 p-4"
+      >
+        <img
+          src={ASSETS_PATH + "logo.jpg"}
+          className="w-full max-w-xs mb-5"
+          alt="Cambridge Logo"
+        />
 
         <div className="flex justify-between w-full font-sans">
           <label htmlFor="participantId">Participant ID</label>
@@ -152,7 +163,11 @@ const DataEntry: React.FC = () => {
             pattern="\d{4}"
             required
           />
-            {participantIdError && <div className="text-red-500 text-sm mt-1">{participantIdError}</div>}
+          {participantIdError && (
+            <div className="text-red-500 text-sm mt-1">
+              {participantIdError}
+            </div>
+          )}
         </div>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
@@ -161,7 +176,7 @@ const DataEntry: React.FC = () => {
             required
             name="gender"
             values={["male", "female"]}
-            value={entryData.gender}
+            value={structuredData.gender}
             onChange={handleChange}
           />
         </fieldset>
@@ -170,8 +185,14 @@ const DataEntry: React.FC = () => {
           <legend className="text-sm">Group</legend>
           <Dropdown
             required
-            options={['Select group', 'Alcohol', 'Cocaine', 'Heroin', 'Control']}
-            value={entryData.group}
+            options={[
+              "Select group",
+              "Alcohol",
+              "Cocaine",
+              "Heroin",
+              "Control",
+            ]}
+            value={structuredData.group}
             onChange={handleChange}
           />
         </fieldset>
@@ -188,7 +209,9 @@ const DataEntry: React.FC = () => {
               onChange={handleChange}
               required
             />
-            {ageError && <div className="text-red-500 text-sm mt-1">{ageError}</div>}
+            {ageError && (
+              <div className="text-red-500 text-sm mt-1">{ageError}</div>
+            )}
           </div>
         </fieldset>
 
@@ -198,7 +221,7 @@ const DataEntry: React.FC = () => {
             required
             name="handedness"
             values={["left", "right"]}
-            value={entryData.handedness}
+            value={structuredData.handedness}
             onChange={handleChange}
           />
         </fieldset>
@@ -207,32 +230,34 @@ const DataEntry: React.FC = () => {
 
         <div className="mx-auto w-fit">
           {configVisible && (
-            
             <div>
-                      <fieldset className="border border-gray-300 p-2 mb-4">
-          <legend className="text-sm">Shopping time</legend>
-          <RadioGroup
-            required
-            name="shopTime"
-            values={["10", "15"]}
-            labels={["10 min", "15 min"]}
-            value={entryData.shopTime}
-            onChange={handleChange}
-          />
-        </fieldset>
+              <fieldset className="border border-gray-300 p-2 mb-4">
+                <legend className="text-sm">Shopping time</legend>
+                <RadioGroup
+                  required
+                  name="shopTime"
+                  values={["10", "15"]}
+                  labels={["10 min", "15 min"]}
+                  value={structuredData.shopTime}
+                  onChange={handleChange}
+                />
+              </fieldset>
               <label>
                 <input
                   type="checkbox"
                   name="quickMode"
-                  checked={entryData.quickMode}
+                  checked={structuredData.quickMode}
                   onChange={handleChange}
                 />
                 Quick mode
               </label>
             </div>
           )}
-          <Button type="button" onClick={() => setConfigVisible(!configVisible)}>
-            {configVisible ? 'Hide Config' : 'Show Config'}
+          <Button
+            type="button"
+            onClick={() => setConfigVisible(!configVisible)}
+          >
+            {configVisible ? "Hide Config" : "Show Config"}
           </Button>
           <Button type="submit" variant="primary">
             Run Task

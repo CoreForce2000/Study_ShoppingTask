@@ -8,7 +8,7 @@ import { RootState } from "../store/store.ts";
 import nextButtonImg from "/src/assets/buttonNext.png";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { config } from "../configs/config.ts";
-import { preloadImage, preloadSlides } from "../util/preloading.ts";
+import { preloadImage, preloadSlides } from "../util/preload.ts";
 import {
   decrementCurrentSlideIndex,
   incrementCurrentSlideIndex,
