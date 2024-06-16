@@ -1,4 +1,3 @@
-import { atom, useAtom } from "jotai";
 import { ArrowLeftIcon, ListTodoIcon, Trash2Icon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,60 +7,10 @@ import EvenlySpacedRow from "../components/evenly-spaced-row";
 import TaskViewport from "../components/task-viewport";
 import Tile from "../components/tile";
 import Timer from "../components/timer";
-import { useAtomConfig, useAtomStore } from "../store";
+import useTaskStore from "../store/store";
+import { useScrollRestoration } from "../util/hooks";
 import { getImagePath, preloadImage } from "../util/preload";
-import { shuffleArray } from "../util/randomize";
-import { useScrollRestoration } from "../util/scrollRestoration";
 import { Slide } from "./slide";
-
-const shopTimeAtom = atom(10 * 60);
-const budgetAtom = atom<number>(0);
-const isPhase3Atom = atom<boolean>(false);
-const trolleyItemsAtom = atom<TrolleyItem[]>([]);
-const clickedItemsAtom = atom<Tile[]>([]);
-const clickedCategoriesAtom = atom<string[]>([]);
-const allItemsAtom = atom<Product[]>([]);
-const shuffledItemsAtom = atom<Record<string, Product[]>>({});
-
-const useAtomShop = () => {
-  const [budget, setBudget] = useAtom(budgetAtom);
-  const [isPhase3, setIsPhase3] = useAtom(isPhase3Atom);
-  const [trolleyItems, setTrolleyItems] = useAtom(trolleyItemsAtom);
-  const [clickedItems, setClickedItems] = useAtom(clickedItemsAtom);
-  const [clickedCategories, setClickedCategories] = useAtom(
-    clickedCategoriesAtom
-  );
-  const [allItems, setAllItems] = useAtom(allItemsAtom);
-  const [shuffledItems, setShuffledItems] = useAtom(shuffledItemsAtom);
-
-  const updateShuffledItems = (category: string) => {
-    const shuffledItems = shuffleArray(allItems);
-    setShuffledItems((prev) => ({ ...prev, [category]: shuffledItems }));
-  };
-
-  const updateClickedItems = (category: string, tile: number) => {
-    setClickedItems((prev) => [...prev, { category, tile }]);
-  };
-
-  return {
-    budget,
-    setBudget,
-    isPhase3,
-    setIsPhase3,
-    trolleyItems,
-    setTrolleyItems,
-    clickedItems,
-    setClickedItems,
-    updateClickedItems,
-    clickedCategories,
-    setClickedCategories,
-    allItems,
-    setAllItems,
-    shuffledItems,
-    setShuffledItems,
-    updateShuffledItems,
-  };
-};
 
 interface ItemPageProps {
   category: string;
@@ -74,33 +23,18 @@ export interface Tile {
   tile: number;
 }
 
-export interface Product {
-  item_id: number;
-  category: string;
-  image_name: string;
-  minimum: number;
-  maximum: number;
-}
-
-export interface TrolleyItem {
-  unique_id: string;
-  item: Product;
-  price: number;
-  selected: boolean;
-}
-
 const TrolleyPage = () => {
-  const [trolleyItems, setTrolleyItems] = useAtom(trolleyItemsAtom);
+  const store = useTaskStore();
 
   return (
     <div>
       <div className="grid grid-cols-7">
-        {trolleyItems.map((trolleyItem, index) => (
+        {store.trolley.map((trolleyItem, index) => (
           <Tile
-            key={`${trolleyItem.unique_id}-${index}`}
+            key={`${trolleyItem.index}-${index}`}
             tileState={"itemClicked"}
             backgroundColor={"white"}
-            onClick={() => onTileSelect(trolleyItem)}
+            onClick={() => store.removeItemFromCart(trolleyItem)}
             imageUrl={
               trolleyItem
                 ? getImagePath(
@@ -131,14 +65,6 @@ interface CategoryPageProps {
 }
 
 const CategoryPage: React.FC<CategoryPageProps> = ({ category }) => {
-  const navigate = useNavigate();
-
-  const store = useAtomStore();
-  const config = useAtomConfig();
-  const shop = useAtomShop();
-
-  const shuffledItems = shop.shuffledItems[category];
-
   const onItemTileClick = (index: number, item: Product | null) => {
     shop.updateClickedItems(category, index);
 
@@ -148,16 +74,6 @@ const CategoryPage: React.FC<CategoryPageProps> = ({ category }) => {
       const currentItem: Product =
         shuffledItems[shop.clickedItems.length % shuffledItems.length];
 
-      store.logShopAction({
-        Shopping_budget: shop.budget,
-        Shopping_event: "click_item",
-        Shopping_item: currentItem.image_name,
-        Shopping_category: currentItem.category,
-        Shopping_price:
-          shop.budget < config.data.shop.general.useMinimumPriceBelow
-            ? currentItem.minimum
-            : currentItem.maximum,
-      });
       shop.updateClickedItems(category, index);
       // Preload next image and navigate to the current item
       if (shop.clickedItems.length < shuffledItems.length - 1) {
@@ -219,12 +135,13 @@ const ItemPage: React.FC<ItemPageProps> = ({
 
   const store = useAtomStore();
   const config = useAtomConfig();
+  const shop = useAtomShop();
 
   const purchaseItem = () => {
     const price =
-      budget < config.data.shop.general.useMinimumPriceBelow
-        ? product.minimum
-        : product.maximum;
+      shop.budget < config.data.shop.general.useMinimumPriceBelow
+        ? item.minimum
+        : item.maximum;
 
     if (isPhase3) {
       const shoppingList = shopConfig.phase3ShoppingList;

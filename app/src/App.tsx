@@ -1,9 +1,9 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import DataEntry from "./views/data-entry";
-import SlideShow from "./views/slide";
-import OnlineShop from "./views/online-shop";
+import { Route, Routes } from "react-router-dom";
 import Experiment from "./views/contingency-degradation";
+import DataEntry from "./views/data-entry";
+import OnlineShop from "./views/online-shop";
+import SlideShow from "./views/slide";
 
 const App: React.FC = () => {
   return (

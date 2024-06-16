@@ -159,7 +159,7 @@ combined_categories_df = combined_categories_df.astype(
 import json
 
 # Define a dictionary to hold the data
-data = {}
+data = []
 
 combined_categories_df = combined_categories_df.dropna()
 
@@ -167,9 +167,6 @@ combined_categories_df = combined_categories_df.dropna()
 for category in combined_categories_df["category"].unique():
     # Filter the dataframe to only include rows for the current category
     category_df = combined_categories_df[combined_categories_df["category"] == category]
-
-    # Create a dictionary to hold the item data for the current category
-    category_data = {}
 
     # Loop through each row in the filtered dataframe
     for index, row in category_df.iterrows():
@@ -181,10 +178,8 @@ for category in combined_categories_df["category"].unique():
             "minimum": row["minimum"],
             "maximum": row["maximum"],
         }
-        category_data[row["item"]] = item_data
+        data.append(item_data) 
 
-    # Add the dictionary of item data to the dictionary under the current category
-    data[category] = category_data
 
 # Write the dictionary to a JSON file
 with open("image_data.json", "w") as f:

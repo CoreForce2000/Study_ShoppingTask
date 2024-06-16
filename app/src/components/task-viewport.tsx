@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { SLIDE_PATH } from "../util/path";
+import { SLIDE_PATH } from "../util/constants";
 
 interface TaskViewportProps {
   backgroundImage?: string;
