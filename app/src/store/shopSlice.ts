@@ -29,9 +29,7 @@ export interface ShopSlice {
   items: Item[];
   categories: string[];
   currentCategory: string | null;
-  setCurrentCategory: (category: string) => void;
-  currentItem: Item | null;
-  setCurrentItem: (item: Item) => void;
+  currentItem: TileItem | TrolleyItem | null;
   budget: number;
   trolley: TrolleyItem[];
   trolleyCounter: number;
@@ -40,7 +38,7 @@ export interface ShopSlice {
   clickedCategories: string[];
   clickCategory: (category: string) => void;
   clickedItemTiles: TileItem[];
-  clickItemTile: (tile_id: number, item: Item) => void;
+  clickItemTile: (tile_id: number) => void;
 }
 
 const createShopSlice: StateCreator<
@@ -55,9 +53,7 @@ const createShopSlice: StateCreator<
   ]),
 
   currentCategory: null,
-  setCurrentCategory: (category: string) => set({ currentCategory: category }),
   currentItem: null,
-  setCurrentItem: (item: Item) => set({ currentItem: item }),
 
   budget: 0,
   trolley: [],
@@ -100,17 +96,24 @@ const createShopSlice: StateCreator<
   clickCategory: (category) =>
     set((state) => ({
       clickedCategories: addUnique(state.clickedCategories, category),
+      currentCategory: category,
     })),
 
   clickedItemTiles: [],
-  clickItemTile: (tile_id: number, item: Item) => {
-    set((state) => ({
-      clickedItemTiles: addUnique(state.clickedItemTiles, {
-        tile_id: tile_id,
-        item: item,
-      }),
-    }));
-  },
+  clickItemTile: (tile_id: number) =>
+    set((state) => {
+      const item = state.items.filter(
+        (item) => item.category === state.currentCategory
+      )[tile_id];
+
+      return {
+        clickedItemTiles: addUnique(state.clickedItemTiles, {
+          tile_id: tile_id,
+          item: item,
+        }),
+        currentItem: { tile_id: tile_id, item: item },
+      };
+    }),
 });
 
 export default createShopSlice;
@@ -133,6 +136,22 @@ export default createShopSlice;
             ? currentItem.minimum
             : currentItem.maximum,
       });
+
+              logShopAction({
+          Shopping_budget: budget,
+          Shopping_event: "remove_from_Trolley",
+          Shopping_item: TrolleyItem.product.image_name,
+          Shopping_category: TrolleyItem.product.category,
+          Shopping_price: TrolleyItem.price,
+        })
+
+        dispatch(logShopAction({
+      Shopping_budget: budget,
+      Shopping_event: "click_item",
+      Shopping_item: undefined,
+      Shopping_category: category,
+      Shopping_price: undefined,
+    }));
 */
 
 /* 

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import config from "../assets/configs/config.json";
 import styles from "./tile.module.css"; // Updated CSS module
 
 type TileState = "none" | "categoryClicked" | "itemClicked";
@@ -34,7 +35,7 @@ const Tile: React.FC<TileProps> = ({
 
   useEffect(() => {
     if (tileState === "categoryClicked") {
-      setTileStyle({ backgroundColor: shopConfig.clickedCategoryTileColor });
+      setTileStyle({ backgroundColor: config.colors.clickedCategoryTileColor });
     } else if (tileState === "itemClicked") {
       setTileStyle({
         backgroundImage: `url('${imageUrl}')`,
@@ -71,7 +72,7 @@ const Tile: React.FC<TileProps> = ({
       <div
         className={styles.tickBox}
         style={{
-          backgroundColor: shopConfig.checkboxColorInCart,
+          backgroundColor: config.colors.checkboxColorInCart,
           visibility: showCheckbox ? "visible" : "hidden",
         }}
       >

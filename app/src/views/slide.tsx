@@ -8,8 +8,7 @@ import { preloadSlides } from "../util/preload.ts";
 
 import { atom, useAtom } from "jotai";
 import Button from "../components/button.tsx";
-import { useAtomStore } from "../store.ts";
-import { SLIDE_PATH } from "../util/path.ts";
+import useDataStore from "../store/store.ts";
 
 const getVasSlides = (
   text: string,
@@ -66,12 +65,20 @@ const SlideShow: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const [
+  const {
     structuredData,
     setStructuredData,
     updateStructuredData,
     updateDrugCraving,
-  ] = useAtomStore();
+  } = useDataStore((state) => ({
+    setStructuredData: state.setStructured,
+  }));
+
+  const { config, updateConfig, getPhaseValue } = useConfigStore((state) => ({
+    config: state.config,
+    updateConfig: state.updateConfig,
+    getPhaseValue: state.getPhaseValue,
+  }));
 
   const [slideIndex, setSlideIndex] = useAtom(slideIndexAtom);
 
