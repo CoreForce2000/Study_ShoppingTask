@@ -4,9 +4,9 @@ import { useNavigate } from "react-router-dom";
 import config from "../assets/configs/config.json";
 
 import TaskViewport from "../components/task-viewport";
+import { shuffleExtendArray } from "../util/functions";
 import { SLIDE_PATH } from "../util/path";
 import { preloadImage } from "../util/preload";
-import { shuffleExtendArray } from "../util/randomize";
 type BlockType = "nonDegraded" | "partiallyDegraded" | "fullyDegraded";
 type SlideType =
   | "offLightbulb"

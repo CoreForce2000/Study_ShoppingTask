@@ -10,6 +10,7 @@ import Timer from "../components/timer";
 import { TileItem, TrolleyItem } from "../store/shopSlice";
 import useTaskStore from "../store/store";
 import {
+  END_SHOPPING_SOUND,
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
@@ -210,7 +211,7 @@ const OnlineShop: React.FC<OnlineShopProps> = ({}) => {
                     page={page}
                     onComplete={() => {
                       navigate("/slide");
-                      endOfPhase1Sound.play();
+                      END_SHOPPING_SOUND.play();
                     }}
                     setInterSlide={setInterSlide}
                   />

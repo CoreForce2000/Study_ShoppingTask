@@ -4,7 +4,7 @@
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  
+
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,20 +14,19 @@
 
   --shadow-color: rgba(0, 0, 0, 0.8);
   --color: rgba(0, 0, 0, 1);
-  --background-color: #FFFFFF;
+  --background-color: #ffffff;
 
-  --green: #00703C;
-  --lightgrey: #F3F2F1;
+  --green: #00703c;
+  --lightgrey: #f3f2f1;
   --blue: royalblue;
-  --black: #0B0C0C;
+  --black: #0b0c0c;
 
   --darkblue: #131921;
-  --orange: #FEBD69;
+  --orange: #febd69;
 
   --red: #f44336;
   --grey: #808080;
 
-  
   color-scheme: light;
   color: var(--color);
   background-color: var(--background-color);
@@ -61,12 +60,10 @@ h1 {
   line-height: 1.1;
 }
 
-
 /* button:hover {
   border-color: #646cff;
   background-color: #646cff;
 } */
-
 
 /* @media (prefers-color-scheme: light) {
   :root {
