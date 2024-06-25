@@ -2,6 +2,8 @@ import { ArrowLeftIcon, ListTodoIcon, ShoppingCartIcon } from "lucide-react";
 import React, { useEffect } from "react";
 import config from "../assets/configs/config.json";
 
+import classNames from "classnames";
+import { useNavigate } from "react-router-dom";
 import { useTimer } from "react-use-precision-timer";
 import Button from "../components/button";
 import EvenlySpacedRow from "../components/evenly-spaced-row";
@@ -53,9 +55,9 @@ const GridPage: React.FC<{
         Array.from(
           { length: config.shop.randomization.numberOfItemTiles },
           (_, index) => {
-            const tileItem = store.clickedItemTiles.find(
-              (itemTile) => itemTile.tile_id === index
-            );
+            const tileItem = (
+              store.clickedItemTiles[store.currentCategory] || []
+            ).find((itemTile) => itemTile.tile_id === index);
 
             return (
               <Tile
@@ -147,8 +149,14 @@ const ItemPage: React.FC<{
 
 const Timer: React.FC<{}> = ({}) => {
   const store = useTaskStore();
+  const navigate = useNavigate();
 
-  const timerObject = useTimer({ delay: 1000 }, store.tickTimer);
+  const timerObject = useTimer({ delay: 1000 }, () => {
+    if (store.time === 1) {
+      navigate(`slide/${store.slide}`);
+    }
+    store.tickTimer();
+  });
 
   useEffect(() => {
     timerObject.start();
@@ -156,7 +164,7 @@ const Timer: React.FC<{}> = ({}) => {
   }, [timerObject]);
 
   return (
-    <div>
+    <div className={classNames(store.page === "trolley" ? "hidden" : "")}>
       {"Timer:  "}
       {Math.floor(store.time / 60)}:{store.time % 60 < 10 ? "0" : ""}
       {store.time % 60}
@@ -167,11 +175,23 @@ const Timer: React.FC<{}> = ({}) => {
 // Main OnlineShop Component
 const OnlineShop: React.FC<{}> = () => {
   const store = useTaskStore();
+  const navigate = useNavigate();
 
   const scrollRef = useScrollRestoration(
     "category_" + store.currentCategory,
     false
   );
+
+  // get page variable "time" from url
+  const urlParams = new URLSearchParams(window.location.search);
+  const time = urlParams.get("time");
+
+  if (time) {
+    if (time !== "") {
+      store.setTime(parseInt(time));
+      navigate(``);
+    }
+  }
 
   return (
     <div className="w-full h-full flex flex-col items-center">

@@ -1,5 +1,5 @@
 import { StateCreator } from "zustand";
-import { ShopSlice } from "./shop-slice";
+import { TaskStore } from "./store";
 
 export interface DataSlice {
   taskOptions: {
@@ -19,12 +19,7 @@ export interface DataSlice {
   setDrugCraving: (drug: string, value?: number) => void;
 }
 
-const createDataSlice: StateCreator<
-  ShopSlice & DataSlice,
-  [],
-  [],
-  DataSlice
-> = (set) => ({
+const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (set) => ({
   taskOptions: {
     group: "",
     time: "",

@@ -6,7 +6,7 @@ import {
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
 import { addUnique, shuffleArray } from "../util/functions";
-import { DataSlice } from "./data-slice";
+import { TaskStore } from "./store";
 
 export type Category = keyof typeof imageData;
 
@@ -30,12 +30,11 @@ export interface TileItem {
 }
 
 export interface ShopSlice {
-  slide: number;
   items: Item[];
   categories: string[];
   page: "categories" | "items" | "trolley" | "item" | "trolleyItem";
   navigateTo: (page: ShopSlice["page"]) => void;
-  currentCategory: string | undefined;
+  currentCategory: string;
   currentItem: TileItem | TrolleyItem | undefined;
   budget: number;
   trolley: TrolleyItem[];
@@ -45,21 +44,16 @@ export interface ShopSlice {
   backPressed: () => void;
   clickedCategories: string[];
   clickCategory: (category: string) => void;
-  clickedItemTiles: TileItem[];
+  clickedItemTiles: Record<string, TileItem[]>;
   clickItemTile: (tile_id: number) => void;
   tickTimer: () => void;
   interSlide: string;
   isPhase3: boolean;
   time: number;
+  setTime: (time: number) => void;
 }
 
-const createShopSlice: StateCreator<
-  ShopSlice & DataSlice,
-  [],
-  [],
-  ShopSlice
-> = (set) => ({
-  slide: 0,
+const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   items: shuffleArray(imageData),
   categories: shuffleArray([
     ...new Set(imageData.map((item) => item.category)),
@@ -70,8 +64,12 @@ const createShopSlice: StateCreator<
       page: page,
     })),
   time: config.shop.general.time.phase1,
+  setTime: (time: number) =>
+    set(() => ({
+      time: time,
+    })),
 
-  currentCategory: undefined,
+  currentCategory: "",
   currentItem: undefined,
 
   budget: config.shop.general.initialBudget,
@@ -138,11 +136,16 @@ const createShopSlice: StateCreator<
   clickedCategories: [],
   clickCategory: (category) =>
     set((state) => ({
+      clickedItemTiles: {
+        ...state.clickedItemTiles,
+        [category]: [...(state.clickedItemTiles[category] || [])],
+      },
       clickedCategories: addUnique(state.clickedCategories, category),
       currentCategory: category,
     })),
 
-  clickedItemTiles: [],
+  clickedItemTiles: {},
+
   clickItemTile: (tile_id: number) =>
     set((state) => {
       const item = state.items.filter(
@@ -150,10 +153,16 @@ const createShopSlice: StateCreator<
       )[tile_id];
 
       return {
-        clickedItemTiles: addUnique(state.clickedItemTiles, {
-          tile_id: tile_id,
-          item: item,
-        }),
+        clickedItemTiles: {
+          ...state.clickedItemTiles,
+          [state.currentCategory]: addUnique(
+            state.clickedItemTiles[state.currentCategory] || [],
+            {
+              tile_id: tile_id,
+              item: item,
+            }
+          ),
+        },
         currentItem: { tile_id: tile_id, item: item },
       };
     }),

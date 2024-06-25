@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Checkbox from "../components/checkbox.tsx";
 import TaskViewport from "../components/task-viewport.tsx";
-import { preloadSlides } from "../util/preload.ts";
 
 import Button from "../components/button.tsx";
 import VASSlide from "../components/slide-vas.tsx";
@@ -22,6 +21,9 @@ const SlideShow: React.FC = () => {
   const navigate = useNavigate();
 
   const store = useTaskStore();
+  const [buttonVisible, setButtonVisible] = useState(false);
+
+  let timeoutId: number = 0;
 
   const slideNumber = parseInt(
     useParams<{ slideNumber: string }>().slideNumber ?? "1"
@@ -40,8 +42,6 @@ const SlideShow: React.FC = () => {
     }
   };
 
-  const [buttonVisible, setButtonVisible] = useState(false);
-
   const customSlideText = (drug: string) => {
     return `How much do you want to use ${
       drug === "LSD" ? "LSD" : drug.toLowerCase()
@@ -52,24 +52,30 @@ const SlideShow: React.FC = () => {
   const backOneSlide = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "b") {
       event.preventDefault();
+      if (timeoutId !== 0) {
+        clearTimeout(timeoutId);
+        timeoutId = 0;
+      }
       decrementslideIndex();
     }
   };
 
   const waitTimeout = (timeout: number) => {
-    setTimeout(() => {
+    timeoutId = setTimeout(() => {
       incrementSlideIndex();
     }, timeout);
   };
 
-  // On Component mount (only once)
   useEffect(() => {
-    preloadSlides();
     document.addEventListener("keydown", backOneSlide);
     document.addEventListener("keydown", () => waitKeyPress("Enter"));
 
     return () => {
       document.removeEventListener("keydown", backOneSlide);
+      if (timeoutId !== 0) {
+        clearTimeout(timeoutId);
+        timeoutId = 0;
+      }
     };
   }, []);
 
@@ -178,6 +184,7 @@ const SlideShow: React.FC = () => {
     { children: <OnlineShop></OnlineShop>, slide: `White.png` },
     { slide: `phase2/Slide12.JPG`, execute: () => waitTimeout(5000) },
     {
+      slide: `phase2/Slide13.JPG`,
       children: (
         <VASSlide
           key="purchaseSatisfaction"
@@ -185,13 +192,15 @@ const SlideShow: React.FC = () => {
           maxLabel="very satisfied"
           setValue={(value) => {
             store.setSurveyResponse("purchaseSatisfaction", value);
+            waitTimeout(1000);
           }}
-          text={`Please mark on the line below how satisfied you are with your
-            purchases.`}
+          text={``}
         />
       ),
+      execute: () => setButtonVisible(false),
     },
     {
+      slide: `phase2/Slide14.JPG`,
       children: (
         <VASSlide
           key="desireContinueShopping"
@@ -199,27 +208,29 @@ const SlideShow: React.FC = () => {
           maxLabel="very much"
           setValue={(value) => {
             store.setSurveyResponse("desireContinueShopping", value);
+            waitTimeout(1000);
           }}
-          text={"Would you have liked to continue shopping?"}
+          text={""}
         />
       ),
     },
     ...drugCravingSlides(),
-    { slide: `phase2/Slide16.JPG` },
+    { slide: `phase2/Slide16.JPG`, execute: () => setButtonVisible(true) },
     { slide: `phase2/Slide17.JPG` },
     { slide: `phase2/Slide18.jpg` },
     { slide: `phase2/Slide19.JPG` },
     { slide: `phase2/Slide20.JPG` },
     { slide: `phase2/Slide21.JPG` },
-    { execute: () => navigate("/contingency") },
     {
+      slide: `duringPhase2/Slide22.jpg`,
       children: (
         <VASSlide
-          text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+          text="" //"Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
           minLabel="not at all"
           maxLabel="very much"
           setValue={(value) => {
             store.setSurveyResponse("CoDe_VAS", value);
+            waitTimeout(1000);
           }}
         />
       ),
@@ -233,14 +244,18 @@ const SlideShow: React.FC = () => {
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={incrementSlideIndex}
+            onChange={() => {
+              waitTimeout(1000);
+            }}
           />
           <Checkbox
             key="column9"
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={incrementSlideIndex}
+            onChange={() => {
+              waitTimeout(1000);
+            }}
           />
         </div>
       ),
@@ -254,30 +269,38 @@ const SlideShow: React.FC = () => {
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={incrementSlideIndex}
+            onChange={() => {
+              waitTimeout(1000);
+            }}
           />
           <Checkbox
             key="column11"
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={incrementSlideIndex}
+            onChange={() => {
+              waitTimeout(1000);
+            }}
           />
         </div>
       ),
     },
-    ...Array(4).fill({
-      children: (
-        <VASSlide
-          text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
-          minLabel="not at all"
-          maxLabel="very much"
-          setValue={(value) => {
-            store.setSurveyResponse("CoDe_VAS", value);
-          }}
-        />
-      ),
-    }),
+    ...Array(4)
+      .fill(0)
+      .map((_, index) => ({
+        children: (
+          <VASSlide
+            key={"CoDe_VAS" + index}
+            text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+            minLabel="not at all"
+            maxLabel="very much"
+            setValue={(value) => {
+              store.setSurveyResponse("CoDe_VAS", value);
+              waitTimeout(1000);
+            }}
+          />
+        ),
+      })),
     { slide: `phase3/Slide25.JPG`, execute: () => waitTimeout(3000) },
     {
       children: (
@@ -287,6 +310,7 @@ const SlideShow: React.FC = () => {
           maxLabel="very satisfied"
           setValue={(value) => {
             store.setSurveyResponse("claimSatisfaction", value);
+            waitTimeout(1000);
           }}
           text={`Please mark on the line below how satisfied you are with the items
             that you successfully claimed.`}
@@ -294,7 +318,7 @@ const SlideShow: React.FC = () => {
       ),
       variable: "claimSatisfaction",
     },
-    { slide: `phase3/Slide27.JPG` },
+    { slide: `phase3/Slide27.JPG`, execute: () => setButtonVisible(true) },
     {
       slide: `phase3/Slide28.JPG`,
       children: (
@@ -342,7 +366,7 @@ const SlideShow: React.FC = () => {
       >
         {slideSequence[slideNumber].children}
         <Button
-          className="absolute cursor-pointer p-0 bottom-0 right-0"
+          className="absolute cursor-pointer p-0 bottom-[1em] right-[1em] text-base"
           onClick={incrementSlideIndex}
           visible={buttonVisible}
         >

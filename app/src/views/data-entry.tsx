@@ -158,14 +158,14 @@ const DataEntry: React.FC = () => {
             required
           />
           {participantIdError && (
-            <div className="text-red-500 text-sm mt-1">
+            <div className="text-red-500 text-xl mt-1">
               {participantIdError}
             </div>
           )}
         </div>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
-          <legend className="text-sm">Gender</legend>
+          <legend className="text-xl">Gender</legend>
           <RadioGroup
             required
             name="gender"
@@ -176,7 +176,7 @@ const DataEntry: React.FC = () => {
         </fieldset>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
-          <legend className="text-sm">Group</legend>
+          <legend className="text-xl">Group</legend>
           <Dropdown
             required
             options={[
@@ -192,7 +192,7 @@ const DataEntry: React.FC = () => {
         </fieldset>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
-          <legend className="text-sm">Age</legend>
+          <legend className="text-xl">Age</legend>
           <div className="flex flex-col">
             <input
               id="age"
@@ -204,13 +204,13 @@ const DataEntry: React.FC = () => {
               required
             />
             {ageError && (
-              <div className="text-red-500 text-sm mt-1">{ageError}</div>
+              <div className="text-red-500 text-xl mt-1">{ageError}</div>
             )}
           </div>
         </fieldset>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
-          <legend className="text-sm">Handedness</legend>
+          <legend className="text-xl">Handedness</legend>
           <RadioGroup
             required
             name="handedness"
@@ -222,7 +222,7 @@ const DataEntry: React.FC = () => {
 
         <div>
           <fieldset className="border border-gray-300 p-2 mb-4">
-            <legend className="text-sm">Shopping time</legend>
+            <legend className="text-xl">Shopping time</legend>
             <RadioGroup
               required
               name="time"
