@@ -1,4 +1,4 @@
-import { SLIDE_PATH } from "./constants.ts";
+import { IMAGE_BASE_PATH, SLIDE_PATH } from "./constants.ts";
 
 export const preloadImage = (path: string) => {
   return new Promise((resolve, reject) => {
@@ -10,7 +10,7 @@ export const preloadImage = (path: string) => {
 };
 
 export const getImagePath = (category: string, imageName: string) => {
-  return `assets/categories/${category}/${imageName}`;
+  return IMAGE_BASE_PATH + category + "/" + imageName;
 };
 
 export const preloadSlides = () => {

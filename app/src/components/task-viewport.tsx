@@ -51,7 +51,7 @@ const TaskViewport: React.FC<TaskViewportProps> = ({
 
   useEffect(() => {
     window.addEventListener("resize", updateDimensions);
-    updateDimensions(); // Also update dimensions on mount
+    updateDimensions();
 
     return () => {
       window.removeEventListener("resize", updateDimensions);

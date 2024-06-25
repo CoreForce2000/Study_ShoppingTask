@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import styles from "./Checkbox.module.css";
 import { CheckboxOption } from "../../SlideShowInterface";
+import styles from "./Checkbox.module.css";
 
 interface CheckboxProps {
   initialOptions: string[];

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import styles from "./vas.module.css";
+import styles from "./slide-vas.module.css";
 
 interface VASProps {
   minLabel: string;
@@ -42,4 +42,29 @@ const VAS: React.FC<VASProps> = ({ minLabel, maxLabel, setValue }) => {
   );
 };
 
-export default VAS;
+interface VASSlideProps {
+  text: string;
+  minLabel: string;
+  maxLabel: string;
+  setValue: (value: number) => void;
+}
+
+const VASSlide: React.FC<VASSlideProps> = ({
+  text,
+  minLabel,
+  maxLabel,
+  setValue,
+}) => (
+  <>
+    <div className="absolute text-center top-4 text-black text-1em m-4 text-wrap">
+      {text}
+    </div>
+    <div className="w-full p-4 flex justify-start">
+      <div className="bg-white w-full mt-8">
+        <VAS minLabel={minLabel} maxLabel={maxLabel} setValue={setValue} />
+      </div>
+    </div>
+  </>
+);
+
+export default VASSlide;

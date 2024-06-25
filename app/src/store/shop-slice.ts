@@ -1,8 +1,12 @@
 import { StateCreator } from "zustand";
 import imageData from "../assets/categories/image_data.json";
 import config from "../assets/configs/config.json";
+import {
+  LUCKY_CUSTOMER_SOUND,
+  TIME_IS_RUNNING_OUT_SOUND,
+} from "../util/constants";
 import { addUnique, shuffleArray } from "../util/functions";
-import { DataSlice } from "./dataSlice";
+import { DataSlice } from "./data-slice";
 
 export type Category = keyof typeof imageData;
 
@@ -26,19 +30,27 @@ export interface TileItem {
 }
 
 export interface ShopSlice {
+  slide: number;
   items: Item[];
   categories: string[];
-  currentCategory: string | null;
-  currentItem: TileItem | TrolleyItem | null;
+  page: "categories" | "items" | "trolley" | "item" | "trolleyItem";
+  navigateTo: (page: ShopSlice["page"]) => void;
+  currentCategory: string | undefined;
+  currentItem: TileItem | TrolleyItem | undefined;
   budget: number;
   trolley: TrolleyItem[];
   trolleyCounter: number;
   addItemToCart: (item: Item) => void;
   removeItemFromCart: (trolleyItem: TrolleyItem) => void;
+  backPressed: () => void;
   clickedCategories: string[];
   clickCategory: (category: string) => void;
   clickedItemTiles: TileItem[];
   clickItemTile: (tile_id: number) => void;
+  tickTimer: () => void;
+  interSlide: string;
+  isPhase3: boolean;
+  time: number;
 }
 
 const createShopSlice: StateCreator<
@@ -47,41 +59,58 @@ const createShopSlice: StateCreator<
   [],
   ShopSlice
 > = (set) => ({
+  slide: 0,
   items: shuffleArray(imageData),
   categories: shuffleArray([
     ...new Set(imageData.map((item) => item.category)),
   ]),
+  page: "categories",
+  navigateTo: (page: ShopSlice["page"]) =>
+    set(() => ({
+      page: page,
+    })),
+  time: config.shop.general.time.phase1,
 
-  currentCategory: null,
-  currentItem: null,
+  currentCategory: undefined,
+  currentItem: undefined,
 
-  budget: 0,
+  budget: config.shop.general.initialBudget,
   trolley: [],
   trolleyCounter: 0,
 
   addItemToCart: (item: Item) =>
     set((state) => {
+      state.backPressed();
       const price =
         state.budget < config.shop.general.minimumPriceThreshold
           ? item.minimum
           : item.maximum;
 
-      const newBudget =
-        price < state.budget
-          ? state.budget - price
-          : config.shop.general.initialBudget - price;
-
-      return {
+      const newState = {
         trolleyCounter: state.trolleyCounter + 1,
-        budget: newBudget,
         trolley: [
           ...state.trolley,
           { index: state.trolleyCounter, item: item, price: price },
         ],
       };
+
+      if (state.budget < price) {
+        LUCKY_CUSTOMER_SOUND.play();
+        return {
+          ...newState,
+          budget: config.shop.general.initialBudget - price,
+          interSlide: "extraBudget",
+        };
+      } else {
+        return {
+          ...newState,
+          budget: state.budget - price,
+        };
+      }
     }),
   removeItemFromCart: (trolleyItem: TrolleyItem) =>
     set((state) => {
+      state.backPressed();
       const newBudget = state.budget + trolleyItem.price;
 
       return {
@@ -92,6 +121,20 @@ const createShopSlice: StateCreator<
       };
     }),
 
+  backPressed: () =>
+    set((state) => {
+      if (state.page === "items") {
+        return { page: "categories" };
+      } else if (state.page === "trolley") {
+        return { page: "categories" };
+      } else if (state.page === "item") {
+        return { page: "items" };
+      } else if (state.page === "trolleyItem") {
+        return { page: "trolley" };
+      } else {
+        return {};
+      }
+    }),
   clickedCategories: [],
   clickCategory: (category) =>
     set((state) => ({
@@ -114,6 +157,43 @@ const createShopSlice: StateCreator<
         currentItem: { tile_id: tile_id, item: item },
       };
     }),
+
+  tickTimer: () =>
+    set((state) => {
+      if (state.time <= 1) {
+        return { time: config.shop.general.time.phase3 };
+      } else {
+        if (state.page === "trolley" || state.interSlide !== "") {
+          return {};
+        } else {
+          const newInterSlide = !state.isPhase3
+            ? (state.time === 5 * 60 && state.trolley.length === 0) ||
+              (state.time === 2 * 60 && state.trolley.length < 10)
+              ? "timeIsRunningOut"
+              : ""
+            : state.isPhase3
+            ? state.time === 2.5 * 60 && state.trolley.length === 0
+              ? "timeIsRunningOut"
+              : ""
+            : "";
+
+          if (newInterSlide === "timeIsRunningOut") {
+            TIME_IS_RUNNING_OUT_SOUND.play();
+            setTimeout(() => {
+              set(() => ({ interSlide: "" }));
+            }, config.shop.general.alarmBellDuration);
+          }
+
+          return {
+            time: state.time - 1,
+            interSlide: newInterSlide,
+          };
+        }
+      }
+    }),
+
+  interSlide: "",
+  isPhase3: false,
 });
 
 export default createShopSlice;

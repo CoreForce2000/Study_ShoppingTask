@@ -1,49 +1,48 @@
 import React, { useEffect, useState } from "react";
-import styles from "./SlideShow.module.css";
-import TaskViewport from "./task-viewport.tsx";
-import Checkbox from "./checkbox.tsx";
-import VAS from "./vas.tsx";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../store/store.ts";
-import nextButtonImg from "/src/assets/buttonNext.png";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { config } from "../configs/config.ts";
-import { preloadImage, preloadSlides } from "../util/preload.ts";
 import {
   decrementCurrentSlideIndex,
   incrementCurrentSlideIndex,
   selectCurrentSlideIndex,
 } from "../store/slideSlice.ts";
-import { getVasSlides } from "../util/specialSlides.tsx";
+import { RootState } from "../store/store.ts";
+import { preloadSlides } from "../util/preload.ts";
 import { createDispatchHandler } from "../util/reduxUtils.ts";
+import { getVasSlides } from "../util/specialSlides.tsx";
+import styles from "./SlideShow.module.css";
+import Checkbox from "./checkbox.tsx";
+import VAS from "./slide-vas.tsx";
+import TaskViewport from "./task-viewport.tsx";
+import nextButtonImg from "/src/assets/buttonNext.png";
 
-import {
-  InitialState,
-  initialState,
-  setDrugDosages,
-  setOnlineShoppingFrequency,
-  setSelectedDrugs,
-  setPurchaseSatisfaction,
-  areObjectsEqual,
-  setDesireContinueShopping,
-  setDrugDosages2,
-  selectGroup,
-  setClaimSatisfaction,
-  setOthersLightbulbColor,
-  setOwnLightbulbColor,
-} from "../store/surveySlice.ts";
-import { customSlideText } from "./SlideShowUtil.tsx";
 import { shopConfig } from "../configs/config.ts";
-import { setIsPhase3 } from "../store/shopSlice.ts";
-import CsvExportButton from "./ToCsvButton/ToCsvButton.tsx";
 import {
   logControlAction,
+  logExperimentVas,
   setBlockName,
   setPhase,
   setPhaseName,
-  logExperimentVas
 } from "../store/dataSlice.ts";
 import { setTrial } from "../store/experimentSlice.ts";
+import { setIsPhase3 } from "../store/shop-slice.ts";
+import {
+  InitialState,
+  areObjectsEqual,
+  selectGroup,
+  setClaimSatisfaction,
+  setDesireContinueShopping,
+  setDrugDosages,
+  setDrugDosages2,
+  setOnlineShoppingFrequency,
+  setOthersLightbulbColor,
+  setOwnLightbulbColor,
+  setPurchaseSatisfaction,
+  setSelectedDrugs,
+} from "../store/surveySlice.ts";
+import { customSlideText } from "./SlideShowUtil.tsx";
+import CsvExportButton from "./ToCsvButton/ToCsvButton.tsx";
 
 type SkipNextIf = "GROUP_CONTROL";
 
@@ -64,52 +63,54 @@ const SlideShow: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const currentSlideIndex = useSelector(selectCurrentSlideIndex);
-  const currentSlide = allSlides[currentSlideIndex]
+  const currentSlide = allSlides[currentSlideIndex];
 
   console.log("currentSlideIndex", currentSlideIndex);
-  
+
   const configData = useSelector((state: RootState) => state.config);
   const dataEntryGroup = useSelector(selectGroup);
-
 
   const backOneSlide = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "b") {
       event.preventDefault();
       dispatch(decrementCurrentSlideIndex());
     }
-  }
+  };
 
   const forwardWithEnter = (event: KeyboardEvent) => {
     if (event.key === "Enter" && !(event.target instanceof HTMLButtonElement)) {
-      dispatch(incrementCurrentSlideIndex())
+      dispatch(incrementCurrentSlideIndex());
     }
-  }
+  };
 
   const waitKeyPress = (key?: string) => {
-    window.addEventListener("keydown", (event: KeyboardEvent)=> {
-      if(!key || event.key === key) {
-        dispatch(incrementCurrentSlideIndex())
-      }
-    },{ once: true });
-  }
+    window.addEventListener(
+      "keydown",
+      (event: KeyboardEvent) => {
+        if (!key || event.key === key) {
+          dispatch(incrementCurrentSlideIndex());
+        }
+      },
+      { once: true }
+    );
+  };
 
   const waitTimeout = (timeout: number) => {
     setTimeout(() => {
-      dispatch(incrementCurrentSlideIndex())
+      dispatch(incrementCurrentSlideIndex());
     }, timeout);
-  } 
+  };
 
-  // On Component mount (only once)  
+  // On Component mount (only once)
   useEffect(() => {
     preloadSlides();
-    document.addEventListener("keydown",backOneSlide)
-    document.addEventListener("keydown",forwardWithEnter)
+    document.addEventListener("keydown", backOneSlide);
+    document.addEventListener("keydown", forwardWithEnter);
 
     return () => {
       document.removeEventListener("keydown", backOneSlide);
     };
   }, []);
-
 
   // Store VAS and Checkbox responses in an object
   // Set Memory Correct in a different way to setState
@@ -124,7 +125,7 @@ const SlideShow: React.FC = () => {
           setTimeout(() => {
             renderSlide(true);
             dispatch(setIsPhase3(true));
-            dispatch(setBlockName("Shopping"))
+            dispatch(setBlockName("Shopping"));
             navigate("/shop");
           }, 3000);
         } else {
@@ -140,7 +141,6 @@ const SlideShow: React.FC = () => {
     }
   };
 
-  
   const baseSlides: BaseSlides[] = [
     {
       slide: `${config.SLIDE_PATH}phase1/Slide1.JPG`,
@@ -239,7 +239,10 @@ const SlideShow: React.FC = () => {
       hideNext: true,
     },
     { slide: `${config.SLIDE_PATH}phase1/Slide6.JPG`, children: <></> },
-    { slide: `${config.SLIDE_PATH}phase1/Slide7_${configData.shopTime}.JPG`, children: <></> },
+    {
+      slide: `${config.SLIDE_PATH}phase1/Slide7_${configData.shopTime}.JPG`,
+      children: <></>,
+    },
     { slide: `${config.SLIDE_PATH}phase1/Slide8.JPG`, children: <></> },
     {
       slide: `${config.SLIDE_PATH}phase1/Slide9_${configData.shopTime}.jpg`,
@@ -360,15 +363,14 @@ const SlideShow: React.FC = () => {
       children: <></>,
       transit: "CONTINGENCY",
     },
-    ...[1,2,3,4,4,4,4,4].map((index)=> {
+    ...[1, 2, 3, 4, 4, 4, 4, 4].map((index) => {
       const onClick = (title: string, value: string, delay = 1000) => {
-
         setTimeout(() => {
-          if(title==PICK_OTHERS_LIGHTBULB) {
-            setOthersLightbulbColor(value)
+          if (title == PICK_OTHERS_LIGHTBULB) {
+            setOthersLightbulbColor(value);
           }
-          if(title==PICK_OWN_LIGHTBULB) {
-            setOwnLightbulbColor(value)
+          if (title == PICK_OWN_LIGHTBULB) {
+            setOwnLightbulbColor(value);
           }
           setInterSlideIndex((currentInterSlideIndex) => {
             currentInterSlideIndex = currentInterSlideIndex + 1;
@@ -388,14 +390,14 @@ const SlideShow: React.FC = () => {
           "not at all",
           "very much",
           (value: number) => {
-            dispatch(logExperimentVas({CoDe_VAS:value}))
+            dispatch(logExperimentVas({ CoDe_VAS: value }));
           }
         ),
         variable: "drugDosages",
-        transit:"CONTINGENCY"
-      }
+        transit: "CONTINGENCY",
+      };
 
-      if(index===1) {
+      if (index === 1) {
         interSlide = {
           slide: `${config.SLIDE_PATH}White.png`,
           children: getVasSlides(
@@ -403,13 +405,13 @@ const SlideShow: React.FC = () => {
             "not at all",
             "very much",
             (value: number) => {
-              dispatch(logExperimentVas({CoDe_VAS:value}))
+              dispatch(logExperimentVas({ CoDe_VAS: value }));
             }
           ),
           variable: "drugDosages",
-        }
+        };
       }
-      if(index===2) {
+      if (index === 2) {
         interSlide = {
           slide: `${config.SLIDE_PATH}/duringPhase2/SlideB2.PNG`,
           children: (
@@ -439,11 +441,11 @@ const SlideShow: React.FC = () => {
               />
             </div>
           ),
-          hideNext: true
-        }
+          hideNext: true,
+        };
       }
-      if(index === 3) {
-        interSlide={
+      if (index === 3) {
+        interSlide = {
           slide: `${config.SLIDE_PATH}/duringPhase2/SlideB3.PNG`,
           children: (
             <div
@@ -473,10 +475,10 @@ const SlideShow: React.FC = () => {
             </div>
           ),
           hideNext: true,
-          transit: "CONTINGENCY"
-        }
+          transit: "CONTINGENCY",
+        };
       }
-      return interSlide
+      return interSlide;
     }),
 
     { slide: `${config.SLIDE_PATH}phase3/Slide25.JPG`, children: <></> },
@@ -590,9 +592,8 @@ const SlideShow: React.FC = () => {
 
   const [allSlides, setAllSlides] = useState([...baseSlides]);
 
-  const PICK_OTHERS_LIGHTBULB = "pickOthersLightbulb"
-  const PICK_OWN_LIGHTBULB = "pickOwnLightbulb"
-
+  const PICK_OTHERS_LIGHTBULB = "pickOthersLightbulb";
+  const PICK_OWN_LIGHTBULB = "pickOwnLightbulb";
 
   let currentSlide: BaseSlides = { slide: "", children: <></> };
 
@@ -686,13 +687,12 @@ const SlideShow: React.FC = () => {
     // let onClick = lastBlock? ()=> navigate("/slide"): ()=> navigate("/contingency")
 
     const onClick = (title: string, value: string, delay = 1000) => {
-
       setTimeout(() => {
-        if(title==PICK_OTHERS_LIGHTBULB) {
-          setOthersLightbulbColor(value)
+        if (title == PICK_OTHERS_LIGHTBULB) {
+          setOthersLightbulbColor(value);
         }
-        if(title==PICK_OWN_LIGHTBULB) {
-          setOwnLightbulbColor(value)
+        if (title == PICK_OWN_LIGHTBULB) {
+          setOwnLightbulbColor(value);
         }
         setInterSlideIndex((currentInterSlideIndex) => {
           currentInterSlideIndex = currentInterSlideIndex + 1;
@@ -714,7 +714,7 @@ const SlideShow: React.FC = () => {
             "not at all",
             "very much",
             (value: number) => {
-              dispatch(logExperimentVas({CoDe_VAS:value}))
+              dispatch(logExperimentVas({ CoDe_VAS: value }));
             }
           ),
           variable: "drugDosages",
@@ -748,7 +748,7 @@ const SlideShow: React.FC = () => {
               />
             </div>
           ),
-          hideNext: true
+          hideNext: true,
         },
 
         {
@@ -781,18 +781,21 @@ const SlideShow: React.FC = () => {
             </div>
           ),
           hideNext: true,
-        }
-      ]
-      
+        },
+      ];
+
       const currentSlide = newSlideSequence[interSlideIndex];
 
       return (
         <div className={styles.slideShow}>
-          <TaskViewport backgroundImage={currentSlide.slide} verticalAlign={true}>
+          <TaskViewport
+            backgroundImage={currentSlide.slide}
+            verticalAlign={true}
+          >
             {currentSlide.children}
             <button
               className={styles.nextButton}
-              onClick={() => onClick("","",0)}
+              onClick={() => onClick("", "", 0)}
               style={{
                 visibility: currentSlide.hideNext ? "hidden" : "visible",
               }}
@@ -804,7 +807,6 @@ const SlideShow: React.FC = () => {
       );
     }
   }
-
 
   // When rendering, use the allSlides array
   currentSlide = allSlides[currentSlideIndex];

@@ -1,10 +1,9 @@
-import React, { ChangeEvent, ChangeEventHandler } from "react";
+import React, { ChangeEvent, ChangeEventHandler, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { atom, useAtom } from "jotai";
 import Button from "../components/button.tsx";
-import { useAtomStore } from "../store.ts";
-import { ASSETS_PATH } from "../util/path.ts";
+import useTaskStore from "../store/store.ts";
+import { ASSETS_PATH } from "../util/constants.ts";
 
 interface RadioGroupProps {
   name: string;
@@ -83,27 +82,25 @@ const Dropdown: React.FC<DropdownProps> = ({
   );
 };
 
-const participantIdErrorAtom = atom("");
-const ageErrorAtom = atom("");
-const configVisibleAtom = atom(false);
-
 const DataEntry: React.FC = () => {
   const navigate = useNavigate();
 
-  const [structuredData, setStructuredData, updateStructuredData] =
-    useAtomStore();
-  const [participantIdError, setParticipantIdError] = useAtom(
-    participantIdErrorAtom
-  );
-  const [ageError, setAgeError] = useAtom(ageErrorAtom);
-  const [configVisible, setConfigVisible] = useAtom(configVisibleAtom);
+  const store = useTaskStore();
+
+  const [participantIdError, setParticipantIdError] = useState<string>("");
+  const [ageError, setAgeError] = useState<string>("");
+  const [configVisible, setConfigVisible] = useState<boolean>(false);
 
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {
     const { name, value } = e.target;
 
-    updateStructuredData(name, value);
+    if (name in store.taskOptions) {
+      store.setTaskOption(name, value);
+    } else {
+      store.setSurveyResponse(name, value);
+    }
 
     if (name === "participantId") {
       if (value.match(/^\d{0,4}$/)) {
@@ -124,19 +121,16 @@ const DataEntry: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    // const age = useSelector((state: RootState) => state.survey.age);
-
     if (ageError) {
       alert("Age needs to be 18 or above.");
-      return; // Prevent form submission
+      return;
     }
-    if (structuredData.group === "Select group") {
+    if (store.taskOptions.group === "Select group") {
       alert("Please select a group.");
-      return; // Prevent form submission
+      return;
     }
 
-    // After saving data navigate to the Slide view
-    navigate("/slide");
+    navigate("/slide/1");
   };
 
   return (
@@ -176,7 +170,7 @@ const DataEntry: React.FC = () => {
             required
             name="gender"
             values={["male", "female"]}
-            value={structuredData.gender}
+            value={store.data.survey.gender}
             onChange={handleChange}
           />
         </fieldset>
@@ -192,7 +186,7 @@ const DataEntry: React.FC = () => {
               "Heroin",
               "Control",
             ]}
-            value={structuredData.group}
+            value={store.data.survey.group}
             onChange={handleChange}
           />
         </fieldset>
@@ -221,38 +215,27 @@ const DataEntry: React.FC = () => {
             required
             name="handedness"
             values={["left", "right"]}
-            value={structuredData.handedness}
+            value={store.data.survey.handedness}
             onChange={handleChange}
           />
         </fieldset>
 
+        <div>
+          <fieldset className="border border-gray-300 p-2 mb-4">
+            <legend className="text-sm">Shopping time</legend>
+            <RadioGroup
+              required
+              name="time"
+              values={["10 min", "15 min"]}
+              value={store.taskOptions.time}
+              onChange={handleChange}
+            />
+          </fieldset>
+        </div>
         <hr className="h-px border-none bg-gray-600 mb-4" />
 
         <div className="mx-auto w-fit">
-          {configVisible && (
-            <div>
-              <fieldset className="border border-gray-300 p-2 mb-4">
-                <legend className="text-sm">Shopping time</legend>
-                <RadioGroup
-                  required
-                  name="shopTime"
-                  values={["10", "15"]}
-                  labels={["10 min", "15 min"]}
-                  value={structuredData.shopTime}
-                  onChange={handleChange}
-                />
-              </fieldset>
-              <label>
-                <input
-                  type="checkbox"
-                  name="quickMode"
-                  checked={structuredData.quickMode}
-                  onChange={handleChange}
-                />
-                Quick mode
-              </label>
-            </div>
-          )}
+          {configVisible && <></>}
           <Button
             type="button"
             onClick={() => setConfigVisible(!configVisible)}

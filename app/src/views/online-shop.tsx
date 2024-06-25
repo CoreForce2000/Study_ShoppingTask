@@ -1,19 +1,13 @@
-import { ArrowLeftIcon, ListTodoIcon, Trash2Icon } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { ArrowLeftIcon, ListTodoIcon, ShoppingCartIcon } from "lucide-react";
+import React, { useEffect } from "react";
 import config from "../assets/configs/config.json";
 
+import { useTimer } from "react-use-precision-timer";
 import Button from "../components/button";
 import EvenlySpacedRow from "../components/evenly-spaced-row";
-import TaskViewport from "../components/task-viewport";
 import Tile from "../components/tile";
-import Timer from "../components/timer";
-import { TileItem, TrolleyItem } from "../store/shopSlice";
+import { TileItem, TrolleyItem } from "../store/shop-slice";
 import useTaskStore from "../store/store";
-import {
-  END_SHOPPING_SOUND,
-  LUCKY_CUSTOMER_SOUND,
-  TIME_IS_RUNNING_OUT_SOUND,
-} from "../util/constants";
 import { useScrollRestoration } from "../util/hooks";
 import { getImagePath } from "../util/preload";
 
@@ -44,7 +38,12 @@ const GridPage: React.FC<{
                 ? "categoryClicked"
                 : "none"
             }
-            onClick={() => delayAfterClick(() => store.clickCategory(category))}
+            onClick={() =>
+              delayAfterClick(() => {
+                store.clickCategory(category);
+                store.navigateTo("items");
+              })
+            }
             backgroundColor={config.colors.categoryTileColor}
           />
         ))}
@@ -64,7 +63,10 @@ const GridPage: React.FC<{
                 text={""}
                 tileState={tileItem ? "itemClicked" : "none"}
                 onClick={() =>
-                  delayAfterClick(() => store.clickItemTile(index))
+                  delayAfterClick(() => {
+                    store.clickItemTile(index);
+                    store.navigateTo("item");
+                  })
                 }
                 backgroundColor={config.colors.itemTileColor}
                 imageUrl={
@@ -84,7 +86,7 @@ const GridPage: React.FC<{
             key={`${trolleyItem.index}-${index}`}
             tileState={"itemClicked"}
             backgroundColor={"white"}
-            onClick={() => store.removeItemFromCart(trolleyItem)}
+            onClick={() => store.navigateTo("trolleyItem")}
             imageUrl={
               trolleyItem
                 ? getImagePath(
@@ -119,7 +121,7 @@ const ItemPage: React.FC<{
           alt={store.currentItem.item.image_name}
         />
         <div className="grid grid-cols-2 text-xs">
-          <Button onClick={() => (store.currentItem = null)}>Back</Button>
+          <Button onClick={store.backPressed}>Back</Button>
           {type === "item" ? (
             <Button
               onClick={() =>
@@ -143,152 +145,96 @@ const ItemPage: React.FC<{
   );
 };
 
-interface OnlineShopProps {}
-
-const OnlineShop: React.FC<OnlineShopProps> = ({}) => {
+const Timer: React.FC<{}> = ({}) => {
   const store = useTaskStore();
-  const [interSlide, setInterSlide] = useState<keyof typeof interSlides>();
+
+  const timerObject = useTimer({ delay: 1000 }, store.tickTimer);
+
+  useEffect(() => {
+    timerObject.start();
+    return () => timerObject.stop();
+  }, [timerObject]);
+
+  return (
+    <div>
+      {"Timer:  "}
+      {Math.floor(store.time / 60)}:{store.time % 60 < 10 ? "0" : ""}
+      {store.time % 60}
+    </div>
+  );
+};
+
+// Main OnlineShop Component
+const OnlineShop: React.FC<{}> = () => {
+  const store = useTaskStore();
 
   const scrollRef = useScrollRestoration(
     "category_" + store.currentCategory,
     false
   );
 
-  useEffect(() => {
-    if (interSlide === "timeIsRunningOut") {
-      TIME_IS_RUNNING_OUT_SOUND.play();
-      const timer = setTimeout(() => {
-        setInterSlide(undefined);
-      }, config.shop.general.alarmBellDuration);
+  return (
+    <div className="w-full h-full flex flex-col items-center">
+      {/* Header */}
+      <div
+        className="w-full p-4 pb-2 text-white bg-black text-xs box-border"
+        style={{ borderBottom: `7px solid ${config.colors.lineColor}` }}
+      >
+        <EvenlySpacedRow
+          firstChild={<div>Budget : £{store.budget}</div>}
+          secondChild={<Timer />}
+          lastChild={
+            <Button
+              icon={ShoppingCartIcon}
+              prefixText={"Trolley"}
+              suffixText={`${store.trolley.length}`}
+              onClick={() => store.navigateTo("trolley")}
+              variant="transparent"
+              visible={true}
+            />
+          }
+        />
+      </div>
 
-      return () => clearTimeout(timer);
-    }
-    if (interSlide === "extraBudget") {
-      LUCKY_CUSTOMER_SOUND.play();
-    }
-  }, [interSlide]);
+      {/* Second Header  */}
+      <div className="w-full p-4 text-xs box-border pt-0.5 pb-2">
+        <EvenlySpacedRow
+          firstChild={
+            <Button
+              icon={ArrowLeftIcon}
+              suffixText={"Back"}
+              variant="transparent"
+              color="black"
+              onClick={() => {
+                store.backPressed();
+              }}
+              visible={store.page !== "categories"}
+            />
+          }
+          secondChild={
+            <Button
+              icon={ListTodoIcon}
+              suffixText="Show Shopping List"
+              visible={store.isPhase3}
+              onClick={() => {}}
+            />
+          }
+          lastChild={<div></div>}
+        />
+      </div>
 
-  function showShoppingList(): () => void {
-    throw new Error("Function not implemented.");
-  }
-
-  return interSlide === "timeIsRunningOut" ? (
-    <TaskViewport
-      backgroundImage={interSlides[interSlide]}
-      verticalAlign={true}
-    />
-  ) : interSlide === "extraBudget" ? (
-    <TaskViewport
-      backgroundImage={interSlides[interSlide]}
-      verticalAlign={true}
-    >
-      <button
-        className={styles.continueShoppingButton}
-        onClick={() => setInterSlide(undefined)}
-      ></button>
-    </TaskViewport>
-  ) : (
-    <TaskViewport
-      backgroundImage={interSlides[interSlide]}
-      verticalAlign={true}
-    >
-      {interSlide !== undefined ? (
-        <button
-          className="absolute text-xs top-[86%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-none border-none cursor-pointer px-16"
-          onClick={() => setInterSlide(undefined)}
-        ></button>
-      ) : (
-        <TaskViewport>
-          <div className="w-full h-full flex flex-col items-center">
-            <div
-              className="w-full p-4 pb-2 text-white bg-black text-xs box-border"
-              style={{ borderBottom: `7px solid ${shopConfig.lineColor}` }}
-            >
-              <EvenlySpacedRow
-                firstChild={<div>Budget : £{budget}</div>}
-                secondChild={
-                  <Timer
-                    page={page}
-                    onComplete={() => {
-                      navigate("/slide");
-                      END_SHOPPING_SOUND.play();
-                    }}
-                    setInterSlide={setInterSlide}
-                  />
-                }
-                lastChild={
-                  <Button
-                    prefixText={"Trolley\u00A0\u00A0"}
-                    icon={ShoppingTrolley}
-                    suffixText={`${numItemsInTrolley}`}
-                    onClick={() => {
-                      navigate("/shop?page=Trolley");
-                    }}
-                    variant="transparent"
-                    visible={true}
-                  />
-                }
-              />
-            </div>
-
-            <div className="w-full p-4 text-xs box-border pt-0.5 pb-2">
-              <EvenlySpacedRow
-                firstChild={
-                  <Button
-                    icon={ArrowLeftIcon}
-                    suffixText={"Back"}
-                    variant="transparent"
-                    color="black"
-                    onClick={() => {
-                      setSelectedItems([]);
-                      navigate("/shop");
-                    }}
-                    visible={visibility.back}
-                  />
-                }
-                secondChild={
-                  <Button
-                    icon={ListTodoIcon}
-                    suffixText="Show Shopping List"
-                    visible={isPhase3}
-                    onClick={showShoppingList}
-                  />
-                }
-                lastChild={
-                  <Button
-                    icon={Trash2Icon}
-                    suffixText={"Remove from Trolley"}
-                    onClick={() => removeFromTrolley(selectedItems)}
-                    visible={visibility.removeFromTrolley}
-                  />
-                }
-              />
-            </div>
-
-            <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
-              <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
-                {page === "Trolley" ? (
-                  <TrolleyPage
-                    selectedItems={selectedItems}
-                    setSelectedItems={setSelectedItems}
-                  />
-                ) : category === "" ? (
-                  <OverviewPage />
-                ) : item === 0 ? (
-                  <CategoryPage category={category} />
-                ) : (
-                  <ItemPage
-                    category={category}
-                    item={item}
-                    setInterSlide={setInterSlide}
-                  />
-                )}
-              </div>
-            </div>
-          </div>
-        </TaskViewport>
-      )}
-    </TaskViewport>
+      {/* Content  */}
+      <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
+        <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
+          {store.page === "item" || store.page === "trolleyItem" ? (
+            <ItemPage type="item" />
+          ) : (
+            <GridPage view={store.page} category={store.currentCategory} />
+          )}
+        </div>
+      </div>
+    </div>
   );
 };
+
 export default OnlineShop;

@@ -1,57 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Checkbox from "../components/checkbox.tsx";
 import TaskViewport from "../components/task-viewport.tsx";
-import VAS from "../components/vas.tsx";
 import { preloadSlides } from "../util/preload.ts";
 
-import { atom, useAtom } from "jotai";
 import Button from "../components/button.tsx";
-import useDataStore from "../store/store.ts";
+import VASSlide from "../components/slide-vas.tsx";
+import useTaskStore from "../store/store.ts";
 
-const getVasSlides = (
-  text: string,
-  minLabel: string,
-  maxLabel: string,
-  setValue: (value: number) => void
-): React.ReactNode => {
-  return (
-    <>
-      <div
-        style={{
-          position: "absolute",
-          textAlign: "center",
-          top: "1em",
-          fontSize: "1em",
-          color: "black",
-        }}
-      >
-        {text}{" "}
-      </div>
-
-      <div
-        style={{
-          width: "100%",
-          padding: "1em",
-          display: "flex",
-          justifyContent: "left",
-        }}
-      >
-        <div
-          style={{ backgroundColor: "white", width: "100%", marginTop: "2em" }}
-        >
-          <VAS
-            key={text}
-            minLabel={minLabel}
-            maxLabel={maxLabel}
-            setValue={setValue}
-          />
-        </div>
-      </div>
-    </>
-  );
-};
+import config from "../assets/configs/config.json";
+import { SLIDE_PATH } from "../util/constants.ts";
+import OnlineShop from "./online-shop.tsx";
 
 export interface Slide {
   execute?: () => void;
@@ -59,35 +18,26 @@ export interface Slide {
   children?: React.ReactNode;
 }
 
-const slideIndexAtom = atom<number>(0);
-
 const SlideShow: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
-  const {
-    structuredData,
-    setStructuredData,
-    updateStructuredData,
-    updateDrugCraving,
-  } = useDataStore((state) => ({
-    setStructuredData: state.setStructured,
-  }));
+  const store = useTaskStore();
 
-  const { config, updateConfig, getPhaseValue } = useConfigStore((state) => ({
-    config: state.config,
-    updateConfig: state.updateConfig,
-    getPhaseValue: state.getPhaseValue,
-  }));
-
-  const [slideIndex, setSlideIndex] = useAtom(slideIndexAtom);
+  const slideNumber = parseInt(
+    useParams<{ slideNumber: string }>().slideNumber ?? "1"
+  );
+  if (store.slide !== slideNumber) store.setSlide(slideNumber);
 
   const incrementSlideIndex = () => {
-    setSlideIndex((prevIndex) => prevIndex + 1);
+    if (slideNumber) {
+      navigate(`/slide/${slideNumber + 1}`);
+    }
   };
 
   const decrementslideIndex = () => {
-    setSlideIndex((prevIndex) => Math.max(prevIndex - 1, 0)); // Prevents going below 0
+    if (slideNumber) {
+      navigate(`/slide/${slideNumber - 1}`);
+    }
   };
 
   const [buttonVisible, setButtonVisible] = useState(false);
@@ -95,7 +45,8 @@ const SlideShow: React.FC = () => {
   const customSlideText = (drug: string) => {
     return `How much do you want to use ${
       drug === "LSD" ? "LSD" : drug.toLowerCase()
-    } right now?`;
+    } 
+      right now?`;
   };
 
   const backOneSlide = (event: KeyboardEvent) => {
@@ -138,20 +89,32 @@ const SlideShow: React.FC = () => {
   };
 
   const drugCravingSlides = () => {
-    return structuredData.drugs
-      .filter((drug: string) => drug !== "Other" && drug !== "None of these")
+    return (store.data.survey.drugs ?? [])
+      .filter(
+        (drug: string) =>
+          drug !== config.options.drugScreening.other &&
+          drug !== config.options.drugScreening.none
+      )
       .map((drug: string) => ({
         slide: `VasSlide.JPG`,
-        children: getVasSlides(
-          customSlideText(drug),
-          "not at all",
-          "very much",
-          (value: number) => updateDrugCraving(drug, value)
+        children: (
+          <VASSlide
+            key={drug}
+            text={customSlideText(drug)}
+            minLabel="not at all"
+            maxLabel="very much"
+            setValue={(value: number) => {
+              store.setDrugCraving(drug, value);
+              waitTimeout(1000);
+            }}
+          />
         ),
+        execute: () => setButtonVisible(false),
       }));
   };
 
   const slideSequence = [
+    {},
     {
       slide: `phase1/Slide1.JPG`,
       children: (
@@ -159,18 +122,11 @@ const SlideShow: React.FC = () => {
           <div className="bg-white">
             <Checkbox
               key="online-shopping"
-              initialOptions={[
-                "several times a day",
-                "once a day",
-                "a few times a week",
-                "once a week",
-                "once a month or less",
-                "very rarely / not at all",
-              ]}
+              initialOptions={config.options.shoppingFrequency}
               allowMultiple={false}
               columnLayout="single"
               onChange={(value) => {
-                updateStructuredData("shopTime", value[0]);
+                store.setSurveyResponse("onlineShoppingFrequency", value[0]);
                 waitTimeout(1000);
               }}
             />
@@ -178,7 +134,7 @@ const SlideShow: React.FC = () => {
         </div>
       ),
     },
-    ...(structuredData.group !== "Control"
+    ...(store.taskOptions.group !== "Control"
       ? [
           {
             slide: `phase1/Slide2.JPG`,
@@ -187,12 +143,15 @@ const SlideShow: React.FC = () => {
                 <div className="bg-white w-full">
                   <Checkbox
                     key="drugs"
-                    initialOptions={config.drugsOptions}
-                    exclusiveOptions={["None of these"]}
+                    initialOptions={[
+                      ...config.options.drugScreening.drugs,
+                      config.options.drugScreening.other,
+                    ]}
+                    exclusiveOptions={[config.options.drugScreening.none]}
                     allowMultiple={true}
                     columnLayout="double"
                     onChange={(values) => {
-                      updateStructuredData("drugs", values);
+                      store.setSurveyResponse("drugs", values);
                       values.length === 0
                         ? setButtonVisible(false)
                         : setButtonVisible(true);
@@ -213,52 +172,36 @@ const SlideShow: React.FC = () => {
       },
     },
     { slide: `phase1/Slide6.JPG`, execute: () => setButtonVisible(true) },
-    { slide: `phase1/Slide7_${structuredData.shopTime}.JPG` },
+    { slide: `phase1/Slide7_${store.taskOptions.time.split(" ")[0]}.JPG` },
     { slide: `phase1/Slide8.JPG` },
-    { slide: `phase1/Slide9_${structuredData.shopTime}.jpg` },
-    { execute: () => navigate("/shop") },
+    { slide: `phase1/Slide9_${store.taskOptions.time.split(" ")[0]}.jpg` },
+    { children: <OnlineShop></OnlineShop>, slide: `White.png` },
     { slide: `phase2/Slide12.JPG`, execute: () => waitTimeout(5000) },
     {
       children: (
-        <>
-          <div className="absolute text-center top-4 text-base text-black">
-            Please mark on the line below how satisfied you are with your
-            purchases.
-          </div>
-          <div className="w-full p-4 flex justify-start">
-            <div className="bg-white w-full mt-8">
-              <VAS
-                key="purchaseSatisfaction"
-                minLabel="not at all satisfied"
-                maxLabel="very satisfied"
-                setValue={(value) => {
-                  updateStructuredData("purchaseSatisfaction", value);
-                }}
-              />
-            </div>
-          </div>
-        </>
+        <VASSlide
+          key="purchaseSatisfaction"
+          minLabel="not at all satisfied"
+          maxLabel="very satisfied"
+          setValue={(value) => {
+            store.setSurveyResponse("purchaseSatisfaction", value);
+          }}
+          text={`Please mark on the line below how satisfied you are with your
+            purchases.`}
+        />
       ),
     },
     {
       children: (
-        <>
-          <div className="absolute text-center top-4 text-base text-black">
-            Would you have liked to continue shopping?
-          </div>
-          <div className="w-full p-4 flex justify-start">
-            <div className="bg-white w-full mt-8">
-              <VAS
-                key="desireContinueShopping"
-                minLabel="not at all"
-                maxLabel="very much"
-                setValue={(value) => {
-                  updateStructuredData("desireContinueShopping", value);
-                }}
-              />
-            </div>
-          </div>
-        </>
+        <VASSlide
+          key="desireContinueShopping"
+          minLabel="not at all"
+          maxLabel="very much"
+          setValue={(value) => {
+            store.setSurveyResponse("desireContinueShopping", value);
+          }}
+          text={"Would you have liked to continue shopping?"}
+        />
       ),
     },
     ...drugCravingSlides(),
@@ -270,13 +213,15 @@ const SlideShow: React.FC = () => {
     { slide: `phase2/Slide21.JPG` },
     { execute: () => navigate("/contingency") },
     {
-      children: getVasSlides(
-        "Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR.",
-        "not at all",
-        "very much",
-        (value: number) => {
-          updateStructuredData("CoDe_VAS", value);
-        }
+      children: (
+        <VASSlide
+          text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+          minLabel="not at all"
+          maxLabel="very much"
+          setValue={(value) => {
+            store.setSurveyResponse("CoDe_VAS", value);
+          }}
+        />
       ),
     },
     {
@@ -288,18 +233,14 @@ const SlideShow: React.FC = () => {
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={() => {
-              navigate("/contingency");
-            }}
+            onChange={incrementSlideIndex}
           />
           <Checkbox
             key="column9"
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={() => {
-              navigate("/contingency");
-            }}
+            onChange={incrementSlideIndex}
           />
         </div>
       ),
@@ -313,54 +254,43 @@ const SlideShow: React.FC = () => {
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={() => {
-              navigate("/contingency");
-            }}
+            onChange={incrementSlideIndex}
           />
           <Checkbox
             key="column11"
             initialOptions={[""]}
             columnLayout="single"
             allowMultiple={false}
-            onChange={() => {
-              navigate("/contingency");
-            }}
+            onChange={incrementSlideIndex}
           />
         </div>
       ),
     },
     ...Array(4).fill({
-      children: getVasSlides(
-        "Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR.",
-        "not at all",
-        "very much",
-        (value: number) => {
-          updateStructuredData("CoDe_VAS", value);
-          navigate("/contingency");
-        }
+      children: (
+        <VASSlide
+          text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+          minLabel="not at all"
+          maxLabel="very much"
+          setValue={(value) => {
+            store.setSurveyResponse("CoDe_VAS", value);
+          }}
+        />
       ),
     }),
     { slide: `phase3/Slide25.JPG`, execute: () => waitTimeout(3000) },
     {
       children: (
-        <>
-          <div className="absolute text-center top-4 text-base text-black">
-            Please mark on the line below how satisfied you are with the items
-            that you successfully claimed.
-          </div>
-          <div className="w-full p-4 flex justify-start">
-            <div className="bg-white w-full mt-8">
-              <VAS
-                key="claimSatisfaction"
-                minLabel="not at all satisfied"
-                maxLabel="very satisfied"
-                setValue={(value) => {
-                  updateStructuredData("claimSatisfaction", value);
-                }}
-              />
-            </div>
-          </div>
-        </>
+        <VASSlide
+          key="claimSatisfaction"
+          minLabel="not at all satisfied"
+          maxLabel="very satisfied"
+          setValue={(value) => {
+            store.setSurveyResponse("claimSatisfaction", value);
+          }}
+          text={`Please mark on the line below how satisfied you are with the items
+            that you successfully claimed.`}
+        />
       ),
       variable: "claimSatisfaction",
     },
@@ -372,19 +302,16 @@ const SlideShow: React.FC = () => {
           key={`column1234`}
           className="text-xs mt-20 w-[95%] pl-2.5 grid grid-cols-4 gap-0"
         >
-          {shopConfig.phase3ShoppingListOptions.map((categories, index) => {
+          {config.memoryQuestionConfig.map((person, index) => {
             return (
               <div key={`checkbox-${index}`} className="bg-white w-[80%]">
                 <Checkbox
                   key={`column${index}`}
-                  initialOptions={categories}
+                  initialOptions={person.options}
                   columnLayout="single"
                   allowMultiple={false}
                   onChange={(itemsSelected) => {
-                    checkIfCorrect(
-                      itemsSelected[0],
-                      shopConfig.phase3ShoppingList[index]
-                    );
+                    checkIfCorrect(itemsSelected[0], person.correct);
                   }}
                 />
               </div>
@@ -397,21 +324,23 @@ const SlideShow: React.FC = () => {
     { slide: `phase3/Slide30.JPG` },
   ];
 
-  const currentSlide = slideSequence[slideIndex];
-
   useEffect(() => {
-    if (slideSequence[slideIndex].execute) {
-      slideSequence[slideIndex].execute!();
+    if (slideSequence[slideNumber].execute) {
+      slideSequence[slideNumber].execute!();
     }
-  }, [slideIndex, slideSequence]);
+    console.info("Store data:", store.data);
+    console.info("Store options", store.taskOptions);
+  }, [slideNumber, slideSequence]);
 
   return (
     <div className="flex justify-center font-sans text-shadow-md">
       <TaskViewport
-        backgroundImage={SLIDE_PATH + currentSlide.slide ?? "White.png"}
+        backgroundImage={
+          SLIDE_PATH + slideSequence[slideNumber].slide ?? "White.png"
+        }
         verticalAlign={true}
       >
-        {currentSlide.children}
+        {slideSequence[slideNumber].children}
         <Button
           className="absolute cursor-pointer p-0 bottom-0 right-0"
           onClick={incrementSlideIndex}

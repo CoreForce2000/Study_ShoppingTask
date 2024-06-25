@@ -1,6 +1,6 @@
-import React from 'react';
-import classNames from 'classnames';
-import { LucideIcon, LucideProps } from 'lucide-react'; // Assuming you're using Lucide React
+import classNames from "classnames";
+import { LucideIcon, LucideProps } from "lucide-react"; // Assuming you're using Lucide React
+import React from "react";
 
 interface ButtonProps {
   children?: React.ReactNode;
@@ -29,22 +29,22 @@ const Button: React.FC<ButtonProps> = ({
   prefixText,
   suffixText,
   color,
-  visible = true
+  visible = true,
 }) => {
   const buttonClass = classNames(
-    "border-none text-center text-decoration-none  inline-flex flex justify-center items-center m-1 cursor-pointer rounded-lg py-1.5 px-3 text-base font-medium transition duration-250 ease-in-out",
+    "border-none text-center text-decoration-none  inline-flex flex justify-center items-center m-1 cursor-pointer rounded-lg py-1.5 px-3 transition duration-250 ease-in-out",
     {
       "bg-gray-600 text-white": variant === "secondary",
       "bg-green-500 text-white": variant === "primary",
-      "bg-transparent": variant === "transparent"
+      "bg-transparent": variant === "transparent",
     },
     className
   );
 
   const combinedStyle: React.CSSProperties = {
     color,
-    visibility:visible?'visible':'hidden',
-    ...style
+    visibility: visible ? "visible" : "hidden",
+    ...style,
   };
 
   return (
