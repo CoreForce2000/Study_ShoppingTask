@@ -88,7 +88,12 @@ const GridPage: React.FC<{
             key={`${trolleyItem.index}-${index}`}
             tileState={"itemClicked"}
             backgroundColor={"white"}
-            onClick={() => store.navigateTo("trolleyItem")}
+            onClick={() =>
+              delayAfterClick(() => {
+                store.clickTrolleyItem(index);
+                store.navigateTo("trolleyItem");
+              })
+            }
             imageUrl={
               trolleyItem
                 ? getImagePath(
@@ -122,7 +127,7 @@ const ItemPage: React.FC<{
           )}
           alt={store.currentItem.item.image_name}
         />
-        <div className="grid grid-cols-2 text-xs">
+        <div className="grid grid-cols-2 text-sm">
           <Button onClick={store.backPressed}>Back</Button>
           {type === "item" ? (
             <Button
@@ -189,7 +194,7 @@ const OnlineShop: React.FC<{}> = () => {
   if (time) {
     if (time !== "") {
       store.setTime(parseInt(time));
-      navigate(``);
+      navigate(`slide/${store.slide}`);
     }
   }
 
@@ -247,7 +252,7 @@ const OnlineShop: React.FC<{}> = () => {
       <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
         <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
           {store.page === "item" || store.page === "trolleyItem" ? (
-            <ItemPage type="item" />
+            <ItemPage type={store.page} />
           ) : (
             <GridPage view={store.page} category={store.currentCategory} />
           )}

@@ -348,23 +348,44 @@ const SlideShow: React.FC = () => {
     { slide: `phase3/Slide30.JPG` },
   ];
 
+  const interSlides = {
+    timeIsRunningOut: {
+      slide: `shop/Slide10.JPG`,
+      execute: () => {
+        setButtonVisible(false);
+      },
+    },
+    extraBudget: {
+      slide: `shop/Slide11.JPG`,
+
+      children: (
+        <Button
+          className="absolute cursor-pointer p-0 bottom-[1em] text-base"
+          onClick={() => store.setInterSlide("")}
+        >
+          Continue Shopping
+        </Button>
+      ),
+    },
+  };
+
+  const currentSlide = store.interSlide
+    ? interSlides[store.interSlide]
+    : slideSequence[slideNumber];
+
   useEffect(() => {
-    if (slideSequence[slideNumber].execute) {
-      slideSequence[slideNumber].execute!();
+    if (currentSlide.execute) {
+      currentSlide.execute!();
     }
-    console.info("Store data:", store.data);
-    console.info("Store options", store.taskOptions);
   }, [slideNumber, slideSequence]);
 
   return (
     <div className="flex justify-center font-sans text-shadow-md">
       <TaskViewport
-        backgroundImage={
-          SLIDE_PATH + slideSequence[slideNumber].slide ?? "White.png"
-        }
+        backgroundImage={SLIDE_PATH + currentSlide.slide ?? "White.png"}
         verticalAlign={true}
       >
-        {slideSequence[slideNumber].children}
+        {currentSlide.children}
         <Button
           className="absolute cursor-pointer p-0 bottom-[1em] right-[1em] text-base"
           onClick={incrementSlideIndex}

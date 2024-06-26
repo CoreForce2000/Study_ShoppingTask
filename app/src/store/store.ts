@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import createDataSlice, { DataSlice } from "./data-slice";
 import createShopSlice, { ShopSlice } from "./shop-slice";
 
@@ -8,20 +7,13 @@ export interface TaskStore extends ShopSlice, DataSlice {
   setSlide: (slide: number) => void;
 }
 
-const useTaskStore = create<TaskStore>()(
-  persist(
-    (...a) => ({
-      slide: 0,
-      setSlide: (slide) => {
-        a[0](() => ({ slide: slide }));
-      },
-      ...createDataSlice(...a),
-      ...createShopSlice(...a),
-    }),
-    {
-      name: "task-store",
-    }
-  )
-);
+const useTaskStore = create<TaskStore>()((...a) => ({
+  slide: 0,
+  setSlide: (slide) => {
+    a[0](() => ({ slide: slide }));
+  },
+  ...createDataSlice(...a),
+  ...createShopSlice(...a),
+}));
 
 export default useTaskStore;

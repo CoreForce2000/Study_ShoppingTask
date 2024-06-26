@@ -36,6 +36,8 @@ export interface ShopSlice {
   navigateTo: (page: ShopSlice["page"]) => void;
   currentCategory: string;
   currentItem: TileItem | TrolleyItem | undefined;
+  scrollPositions: Record<string, number>;
+  setScrollPosition: (key: string, position: number) => void;
   budget: number;
   trolley: TrolleyItem[];
   trolleyCounter: number;
@@ -46,8 +48,10 @@ export interface ShopSlice {
   clickCategory: (category: string) => void;
   clickedItemTiles: Record<string, TileItem[]>;
   clickItemTile: (tile_id: number) => void;
+  clickTrolleyItem: (index: number) => void;
   tickTimer: () => void;
-  interSlide: string;
+  interSlide: "" | "timeIsRunningOut" | "extraBudget";
+  setInterSlide: (interSlide: ShopSlice["interSlide"]) => void;
   isPhase3: boolean;
   time: number;
   setTime: (time: number) => void;
@@ -67,6 +71,12 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   setTime: (time: number) =>
     set(() => ({
       time: time,
+    })),
+
+  scrollPositions: {},
+  setScrollPosition: (key, position) =>
+    set((state) => ({
+      scrollPositions: { ...state.scrollPositions, [key]: position },
     })),
 
   currentCategory: "",
@@ -148,9 +158,29 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
 
   clickItemTile: (tile_id: number) =>
     set((state) => {
-      const item = state.items.filter(
+      // Get the number of clicked items in the current category
+      const clickedItems = state.clickedItemTiles[state.currentCategory] || [];
+
+      // Get the items in the current category
+      const items = state.items.filter(
         (item) => item.category === state.currentCategory
-      )[tile_id];
+      );
+
+      //If the index is already in clicked items, use that index, if not, If the number of clicked items is the number of items in that category in total, reset to 0
+      const clickedItemIndex = clickedItems.findIndex(
+        (item) => item.tile_id === tile_id
+      );
+
+      const itemIndex =
+        clickedItemIndex !== -1
+          ? clickedItemIndex
+          : clickedItems.length === items.length
+          ? 0
+          : clickedItems.length;
+
+      const item = items[itemIndex];
+
+      console.log(item);
 
       return {
         clickedItemTiles: {
@@ -167,12 +197,24 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
       };
     }),
 
+  clickTrolleyItem: (index: number) =>
+    set((state) => {
+      const item = state.trolley[index];
+      return {
+        currentItem: item,
+      };
+    }),
+
   tickTimer: () =>
     set((state) => {
       if (state.time <= 1) {
         return { time: config.shop.general.time.phase3 };
       } else {
-        if (state.page === "trolley" || state.interSlide !== "") {
+        if (
+          state.page === "trolley" ||
+          state.page === "trolleyItem" ||
+          state.interSlide !== ""
+        ) {
           return {};
         } else {
           const newInterSlide = !state.isPhase3
@@ -202,122 +244,11 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
     }),
 
   interSlide: "",
+  setInterSlide: (interSlide) =>
+    set(() => ({
+      interSlide: interSlide,
+    })),
   isPhase3: false,
 });
 
 export default createShopSlice;
-
-//
-//
-// Data Collection
-//
-//
-
-/*
-
-      store.logShopAction({
-        Shopping_budget: shop.budget,
-        Shopping_event: "click_item",
-        Shopping_item: currentItem.image_name,
-        Shopping_category: currentItem.category,
-        Shopping_price:
-          shop.budget < config.data.shop.general.useMinimumPriceBelow
-            ? currentItem.minimum
-            : currentItem.maximum,
-      });
-
-              logShopAction({
-          Shopping_budget: budget,
-          Shopping_event: "remove_from_Trolley",
-          Shopping_item: TrolleyItem.product.image_name,
-          Shopping_category: TrolleyItem.product.category,
-          Shopping_price: TrolleyItem.price,
-        })
-
-        dispatch(logShopAction({
-      Shopping_budget: budget,
-      Shopping_event: "click_item",
-      Shopping_item: undefined,
-      Shopping_category: category,
-      Shopping_price: undefined,
-    }));
-*/
-
-/* 
-
-
-  const handleExportCsv = () => {
-    // Define column names for the shop actions
-    const columns: (keyof Row)[] = [
-      "Phase",
-      "Phase_name",
-      "Block_num",
-      "Block_name",
-      "Shopping_event",
-      "Shopping_category",
-      "Shopping_item",
-      "Shopping_time_stamp",
-      "Shopping_time_action",
-      "Shopping_price",
-      "Shopping_budget",
-      "CoDe_cue",
-      "CoDe_stimuli_type",
-      "CoDe_response",
-      "CoDe_outcome",
-      "CoDe_item",
-      "CoDe_RT",
-      "CoDe_VAS",
-      "Control_qs_person",
-      "Control_qs_item",
-      "Control_qs_correct",
-      "Control_qs_attempts",
-      "Control_qs_RT",
-      "Control_event",
-      "Control_category",
-      "Control_item",
-      "Control_time_stamp",
-      "Control_time_action",
-      "Control_price",
-      "Control_budget",
-    ];
-
-    // Create a row for demographics
-    const demographicsRow = [
-      "participantId",
-      participantId,
-      "age",
-      age,
-      "group",
-      group,
-      "gender",
-      gender,
-      "handedness",
-      handedness,
-      "onlineShoppingFrequency",
-      onlineShoppingFrequency,
-      "test_shopTime",
-      shopTime
-    ];
-
-    // Create the header row for shop actions
-    const shopHeaderRow = columns.join(",");
-
-    // Create the CSV content by combining the demographics row, shop actions header, and data rows
-    const csvContent =
-      "data:text/csv;charset=utf-8," +
-      demographicsRow.join(",") +
-      "\n" +
-      "\n" +
-      shopHeaderRow +
-      "\n" +
-      rows.map((row) => Object.values(sortObjectByKeys(row, columns)).join(",")).join("\n");
-
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "shop_actions.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-*/

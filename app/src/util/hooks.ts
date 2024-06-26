@@ -1,13 +1,9 @@
-import { atom, useAtom } from "jotai";
 import { useEffect, useRef } from "react";
-
-type ScrollPosition = Record<string, number>;
-const scrollPositionAtom = atom<ScrollPosition>({});
+import useTaskStore from "../store/store";
 
 export const useScrollRestoration = (scrollKey: string, disable: boolean) => {
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const [scrollPosition, setScrollPosition] = useAtom(scrollPositionAtom);
+  const store = useTaskStore();
 
   useEffect(() => {
     if (!disable) {
@@ -15,17 +11,14 @@ export const useScrollRestoration = (scrollKey: string, disable: boolean) => {
         if (scrollRef.current) {
           const { scrollTop } = scrollRef.current;
           if (scrollTop > 2) {
-            setScrollPosition((prevScrollPosition) => ({
-              ...prevScrollPosition,
-              [scrollKey]: scrollTop,
-            }));
+            store.setScrollPosition(scrollKey, scrollTop);
           }
         }
       };
 
       const scrollElement = scrollRef.current;
       if (scrollElement) {
-        scrollElement.scrollTop = scrollPosition[scrollKey] || 0;
+        scrollElement.scrollTop = store.scrollPositions[scrollKey];
         scrollElement.addEventListener("scroll", handleScroll);
       }
 
@@ -35,19 +28,7 @@ export const useScrollRestoration = (scrollKey: string, disable: boolean) => {
         }
       };
     }
-  }, [scrollPosition, scrollKey, disable, setScrollPosition]);
+  }, [scrollKey, disable, store]);
 
   return scrollRef;
 };
-
-// const useScrollRestoration = () => {
-//   const location = useLocation();
-
-//   useEffect(() => {
-//     if (location.state?.scrollPosition) {
-//       window.scrollTo(0, location.state.scrollPosition);
-//     } else {
-//       window.scrollTo(0, 0);
-//     }
-//   }, [location]);
-// };
