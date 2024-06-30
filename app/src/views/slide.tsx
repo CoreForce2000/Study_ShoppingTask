@@ -9,6 +9,8 @@ import useTaskStore from "../store/store.ts";
 
 import config from "../assets/configs/config.json";
 import { SLIDE_PATH } from "../util/constants.ts";
+import { exportCsv } from "../util/functions.ts";
+import { preloadImage } from "../util/preload.ts";
 import OnlineShop from "./online-shop.tsx";
 
 export interface Slide {
@@ -24,21 +26,31 @@ const SlideShow: React.FC = () => {
   const [buttonVisible, setButtonVisible] = useState(false);
 
   let timeoutId: number = 0;
+  let keyPressHandler: (event: KeyboardEvent) => void;
 
   const slideNumber = parseInt(
     useParams<{ slideNumber: string }>().slideNumber ?? "1"
   );
   if (store.slide !== slideNumber) store.setSlide(slideNumber);
 
-  const incrementSlideIndex = () => {
-    if (slideNumber) {
-      navigate(`/slide/${slideNumber + 1}`);
+  const changeSlideIndex = (newSlideNumber: number) => {
+    if (timeoutId !== 0) {
+      clearTimeout(timeoutId);
+      timeoutId = 0;
     }
+    window.removeEventListener("keydown", keyPressHandler);
+
+    navigate(`/slide/${newSlideNumber}`);
   };
 
-  const decrementslideIndex = () => {
+  const incrementSlideIndex = () => {
     if (slideNumber) {
-      navigate(`/slide/${slideNumber - 1}`);
+      changeSlideIndex(slideNumber + 1);
+    }
+  };
+  const decrementSlideIndex = () => {
+    if (slideNumber) {
+      changeSlideIndex(slideNumber - 1);
     }
   };
 
@@ -52,15 +64,15 @@ const SlideShow: React.FC = () => {
   const backOneSlide = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "b") {
       event.preventDefault();
-      if (timeoutId !== 0) {
-        clearTimeout(timeoutId);
-        timeoutId = 0;
-      }
-      decrementslideIndex();
+      decrementSlideIndex();
     }
   };
 
-  const waitTimeout = (timeout: number) => {
+  const waitTimeout = (lowerBound: number, upperBound?: number) => {
+    const timeout = upperBound
+      ? lowerBound + Math.random() * (upperBound - lowerBound)
+      : lowerBound;
+
     timeoutId = setTimeout(() => {
       incrementSlideIndex();
     }, timeout);
@@ -80,18 +92,17 @@ const SlideShow: React.FC = () => {
   }, []);
 
   const waitKeyPress = (key?: string) => {
-    window.addEventListener(
-      "keydown",
-      (event: KeyboardEvent) => {
-        if (
-          (!key || event.key === key) &&
-          !(event.target instanceof HTMLButtonElement)
-        ) {
-          incrementSlideIndex();
-        }
-      },
-      { once: true }
-    );
+    (keyPressHandler = (event: KeyboardEvent) => {
+      if (
+        (!key || event.key === key) &&
+        !(event.target instanceof HTMLButtonElement)
+      ) {
+        incrementSlideIndex();
+      }
+    }),
+      { once: true };
+
+    window.addEventListener("keydown", keyPressHandler);
   };
 
   const drugCravingSlides = () => {
@@ -180,9 +191,21 @@ const SlideShow: React.FC = () => {
     { slide: `phase1/Slide6.JPG`, execute: () => setButtonVisible(true) },
     { slide: `phase1/Slide7_${store.taskOptions.time.split(" ")[0]}.JPG` },
     { slide: `phase1/Slide8.JPG` },
-    { slide: `phase1/Slide9_${store.taskOptions.time.split(" ")[0]}.jpg` },
-    { children: <OnlineShop></OnlineShop>, slide: `White.png` },
-    { slide: `phase2/Slide12.JPG`, execute: () => waitTimeout(5000) },
+    {
+      slide: `phase1/Slide9_${store.taskOptions.time.split(" ")[0]}.jpg`,
+    },
+    {
+      children: <OnlineShop></OnlineShop>,
+      slide: `White.png`,
+      execute: () => setButtonVisible(false),
+    },
+    {
+      slide: `phase2/Slide12.JPG`,
+      execute: () => {
+        exportCsv(store);
+        waitTimeout(5000);
+      },
+    },
     {
       slide: `phase2/Slide13.JPG`,
       children: (
@@ -215,92 +238,159 @@ const SlideShow: React.FC = () => {
       ),
     },
     ...drugCravingSlides(),
+    { slide: `phase3/Slide30.JPG`, execute: () => setButtonVisible(false) },
+
     { slide: `phase2/Slide16.JPG`, execute: () => setButtonVisible(true) },
     { slide: `phase2/Slide17.JPG` },
     { slide: `phase2/Slide18.jpg` },
     { slide: `phase2/Slide19.JPG` },
     { slide: `phase2/Slide20.JPG` },
     { slide: `phase2/Slide21.JPG` },
-    {
-      slide: `duringPhase2/Slide22.jpg`,
-      children: (
-        <VASSlide
-          text="" //"Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
-          minLabel="not at all"
-          maxLabel="very much"
-          setValue={(value) => {
-            store.setSurveyResponse("CoDe_VAS", value);
-            waitTimeout(1000);
-          }}
-        />
-      ),
-    },
-    {
-      slide: `/duringPhase2/SlideB2.PNG`,
-      children: (
-        <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
-          <Checkbox
-            key="column8"
-            initialOptions={[""]}
-            columnLayout="single"
-            allowMultiple={false}
-            onChange={() => {
-              waitTimeout(1000);
-            }}
-          />
-          <Checkbox
-            key="column9"
-            initialOptions={[""]}
-            columnLayout="single"
-            allowMultiple={false}
-            onChange={() => {
-              waitTimeout(1000);
-            }}
-          />
-        </div>
-      ),
-    },
-    {
-      slide: `/duringPhase2/SlideB3.PNG`,
-      children: (
-        <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
-          <Checkbox
-            key="column10"
-            initialOptions={[""]}
-            columnLayout="single"
-            allowMultiple={false}
-            onChange={() => {
-              waitTimeout(1000);
-            }}
-          />
-          <Checkbox
-            key="column11"
-            initialOptions={[""]}
-            columnLayout="single"
-            allowMultiple={false}
-            onChange={() => {
-              waitTimeout(1000);
-            }}
-          />
-        </div>
-      ),
-    },
-    ...Array(4)
+
+    // ############################################################################################################
+    //
+    // Beginning PHASE 2
+    //
+    // ############################################################################################################
+
+    // const offLightbulbSlide: Slide = {
+    //   id: "offLightbulb",
+    //   type: "offLightbulb",
+    //   image: pathToSlides + "Slide1.PNG",
+    //   allowKeyPress: false,
+    // };
+
+    // const offLightbulbSlide2: Slide = {
+    //   id: "offLightbulb2",
+    //   type: "offLightbulb2",
+    //   image: pathToSlides + "Slide1.PNG",
+    //   allowKeyPress: false,
+    // };
+
+    // const blueLightbulbSlide: Slide = {
+    //   id: "blue",
+    //   type: "coloredLightbulb",
+    //   image: pathToSlides + "Slide3.PNG",
+    //   allowKeyPress: true,
+    // };
+
+    // const orangeLightbulbSlide: Slide = {
+    //   id: "orange",
+    //   type: "coloredLightbulb",
+    //   image: pathToSlides + "Slide2.PNG",
+    //   allowKeyPress: true,
+    // };
+
+    // const receiveItemSlide: Slide = {
+    //   id: "receiveItem",
+    //   type: "receiveItem",
+    //   image: pathToSlides + "Slide4.PNG",
+    //   allowKeyPress: false,
+    // };
+
+    // const offLightbulbNoItemSlide: Slide = {
+    //   id: "offLightbulbNoItem",
+    //   type: "offLightbulb",
+    //   image: pathToSlides + "Slide1.PNG",
+    //   allowKeyPress: false,
+    // };
+
+    ...Array(5)
       .fill(0)
-      .map((_, index) => ({
-        children: (
-          <VASSlide
-            key={"CoDe_VAS" + index}
-            text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
-            minLabel="not at all"
-            maxLabel="very much"
-            setValue={(value) => {
-              store.setSurveyResponse("CoDe_VAS", value);
-              waitTimeout(1000);
-            }}
-          />
-        ),
-      })),
+      .map((_, block) => [
+        Array(60)
+          .fill(0)
+          .map((_, trial) => [
+            {
+              slide: `/duringPhase2/Slide1.PNG`,
+              execute: () => {
+                waitTimeout(1000, 1200);
+              },
+            },
+            {
+              slide: `/duringPhase2/Slide3.PNG`,
+              execute: () => {
+                waitTimeout(1000, 1200);
+              },
+            },
+            {
+              slide: `/duringPhase2/Slide3.PNG`,
+            },
+          ]),
+
+        {
+          children: (
+            <VASSlide
+              key={"CoDe_VAS" + block}
+              text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+              minLabel="not at all"
+              maxLabel="very much"
+              setValue={(value) => {
+                store.setSurveyResponse("CoDe_VAS", value);
+                waitTimeout(1000);
+              }}
+            />
+          ),
+        },
+
+        {
+          slide: `/duringPhase2/SlideB2.PNG`,
+          children: (
+            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+              <Checkbox
+                key="column8"
+                initialOptions={[""]}
+                columnLayout="single"
+                allowMultiple={false}
+                onChange={() => {
+                  waitTimeout(1000);
+                }}
+              />
+              <Checkbox
+                key="column9"
+                initialOptions={[""]}
+                columnLayout="single"
+                allowMultiple={false}
+                onChange={() => {
+                  waitTimeout(1000);
+                }}
+              />
+            </div>
+          ),
+        },
+        {
+          slide: `/duringPhase2/SlideB3.PNG`,
+          children: (
+            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+              <Checkbox
+                key="column10"
+                initialOptions={[""]}
+                columnLayout="single"
+                allowMultiple={false}
+                onChange={() => {
+                  waitTimeout(1000);
+                }}
+              />
+              <Checkbox
+                key="column11"
+                initialOptions={[""]}
+                columnLayout="single"
+                allowMultiple={false}
+                onChange={() => {
+                  waitTimeout(1000);
+                }}
+              />
+            </div>
+          ),
+        },
+      ]),
+
+    // ############################################################################################################
+    //
+    // COMPLETED PHASE 2
+    //
+    // ############################################################################################################
+
     { slide: `phase3/Slide25.JPG`, execute: () => waitTimeout(3000) },
     {
       children: (
@@ -319,33 +409,39 @@ const SlideShow: React.FC = () => {
       variable: "claimSatisfaction",
     },
     { slide: `phase3/Slide27.JPG`, execute: () => setButtonVisible(true) },
-    {
-      slide: `phase3/Slide28.JPG`,
-      children: (
-        <div
-          key={`column1234`}
-          className="text-xs mt-20 w-[95%] pl-2.5 grid grid-cols-4 gap-0"
-        >
-          {config.memoryQuestionConfig.map((person, index) => {
-            return (
-              <div key={`checkbox-${index}`} className="bg-white w-[80%]">
-                <Checkbox
-                  key={`column${index}`}
-                  initialOptions={person.options}
-                  columnLayout="single"
-                  allowMultiple={false}
-                  onChange={(itemsSelected) => {
-                    checkIfCorrect(itemsSelected[0], person.correct);
-                  }}
-                />
-              </div>
-            );
-          })}
-        </div>
-      ),
-    },
+    // {
+    //   slide: `phase3/Slide28.JPG`,
+    //   children: (
+    //     <div
+    //       key={`column1234`}
+    //       className="text-xs mt-20 w-[95%] pl-2.5 grid grid-cols-4 gap-0"
+    //     >
+    //       {config.memoryQuestionConfig.map((person, index) => {
+    //         return (
+    //           <div key={`checkbox-${index}`} className="bg-white w-[80%]">
+    //             <Checkbox
+    //               key={`column${index}`}
+    //               initialOptions={person.options}
+    //               columnLayout="single"
+    //               allowMultiple={false}
+    //               onChange={(itemsSelected) => {
+    //                 checkIfCorrect(itemsSelected[0], person.correct);
+    //               }}
+    //             />
+    //           </div>
+    //         );
+    //       })}
+    //     </div>
+    //   ),
+    // },
     { slide: `phase3/Slide29.JPG` },
-    { slide: `phase3/Slide30.JPG` },
+    {
+      slide: `phase3/Slide30.JPG`,
+      execute: () => {
+        exportCsv(store);
+        waitTimeout(5000);
+      },
+    },
   ];
 
   const interSlides = {
@@ -378,6 +474,12 @@ const SlideShow: React.FC = () => {
       currentSlide.execute!();
     }
   }, [slideNumber, slideSequence]);
+
+  useEffect(() => {
+    slideSequence.forEach((slide) => {
+      if (slide.slide) preloadImage(SLIDE_PATH + slide.slide);
+    });
+  }, []);
 
   return (
     <div className="flex justify-center font-sans text-shadow-md">

@@ -5,7 +5,7 @@ import {
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
-import { addUnique, shuffleArray } from "../util/functions";
+import { addUnique, pseudorandomize, shuffleArray } from "../util/functions";
 import { TaskStore } from "./store";
 
 export type Category = keyof typeof imageData;
@@ -59,9 +59,14 @@ export interface ShopSlice {
 
 const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   items: shuffleArray(imageData),
-  categories: shuffleArray([
-    ...new Set(imageData.map((item) => item.category)),
-  ]),
+  categories: pseudorandomize(
+    [...new Set(imageData.map((item) => item.category))].filter(
+      (x) => !config.shop.pathologicalCategories.addiction.includes(x)
+    ),
+    config.shop.pathologicalCategories.addiction,
+    config.shop.pathologicalCategories.addiction,
+    config.shop.pathologicalCategories.initialScreenCategories
+  ),
   page: "categories",
   navigateTo: (page: ShopSlice["page"]) =>
     set(() => ({

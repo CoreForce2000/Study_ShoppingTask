@@ -5,6 +5,7 @@ import createShopSlice, { ShopSlice } from "./shop-slice";
 export interface TaskStore extends ShopSlice, DataSlice {
   slide: number;
   setSlide: (slide: number) => void;
+  initialTime: number;
 }
 
 const useTaskStore = create<TaskStore>()((...a) => ({
@@ -12,6 +13,7 @@ const useTaskStore = create<TaskStore>()((...a) => ({
   setSlide: (slide) => {
     a[0](() => ({ slide: slide }));
   },
+  initialTime: new Date().getSeconds(),
   ...createDataSlice(...a),
   ...createShopSlice(...a),
 }));

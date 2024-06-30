@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import config from "../assets/configs/config.json";
+import useTaskStore from "../store/store";
 import styles from "./tile.module.css"; // Updated CSS module
 
 type TileState = "none" | "categoryClicked" | "itemClicked";
 
 type TileProps = {
   text: string;
+  actionName?: string;
   imageUrl?: string;
   backgroundColor: string;
   tileState: TileState;
@@ -17,6 +19,7 @@ type TileProps = {
 };
 
 const Tile: React.FC<TileProps> = ({
+  actionName,
   text,
   imageUrl,
   backgroundColor,
@@ -27,6 +30,8 @@ const Tile: React.FC<TileProps> = ({
   onTileSelect = () => {},
   setChecked = false,
 }) => {
+  const store = useTaskStore();
+
   const [tileStyle, setTileStyle] = useState<React.CSSProperties>({
     backgroundColor: backgroundColor,
   });
@@ -56,17 +61,16 @@ const Tile: React.FC<TileProps> = ({
   return (
     <div
       className={styles.tile}
-      onClick={
-        showCheckbox
-          ? () => {
-              handleCheckboxClick();
-              onClick();
-            }
-          : () => {
-              onClick();
-              setTileStyle({ ...tileStyle, border: "2px solid black" });
-            }
-      }
+      onClick={() => {
+        if (actionName) store.logShopAction(actionName);
+        if (showCheckbox) {
+          handleCheckboxClick();
+          onClick();
+        } else {
+          onClick();
+          setTileStyle({ ...tileStyle, border: "2px solid black" });
+        }
+      }}
       style={tileStyle}
     >
       <div

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { CheckboxOption } from "../../SlideShowInterface";
 import styles from "./Checkbox.module.css";
 
 interface CheckboxProps {
@@ -9,6 +8,11 @@ interface CheckboxProps {
   columnLayout: "single" | "double";
   onChange: (selectedOptions: string[]) => void;
   allowedOption?: string;
+}
+
+export interface CheckboxOption {
+  label: string;
+  checked: boolean;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({

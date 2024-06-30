@@ -33,6 +33,7 @@ const GridPage: React.FC<{
       {view === "categories" &&
         store.categories.map((category, index) => (
           <Tile
+            actionName="open category"
             key={`${category}-${index}`}
             text={category}
             tileState={
@@ -61,6 +62,7 @@ const GridPage: React.FC<{
 
             return (
               <Tile
+                actionName="select item"
                 key={index}
                 text={""}
                 tileState={tileItem ? "itemClicked" : "none"}
@@ -85,15 +87,14 @@ const GridPage: React.FC<{
       {view === "trolley" &&
         store.trolley.map((trolleyItem, index) => (
           <Tile
+            actionName="select item trolley"
             key={`${trolleyItem.index}-${index}`}
             tileState={"itemClicked"}
             backgroundColor={"white"}
-            onClick={() =>
-              delayAfterClick(() => {
-                store.clickTrolleyItem(index);
-                store.navigateTo("trolleyItem");
-              })
-            }
+            onClick={() => {
+              store.clickTrolleyItem(index);
+              store.navigateTo("trolleyItem");
+            }}
             imageUrl={
               trolleyItem
                 ? getImagePath(
@@ -121,16 +122,19 @@ const ItemPage: React.FC<{
       <div className="flex flex-col items-center justify-center h-[11em]">
         <img
           className="h-[6.5em] object-cover pb-2"
-          src={getImagePath(
-            store.currentCategory,
+          src={`${getImagePath(
+            store.currentItem.item.category,
             store.currentItem.item.image_name
-          )}
+          )}`}
           alt={store.currentItem.item.image_name}
         />
         <div className="grid grid-cols-2 text-sm">
-          <Button onClick={store.backPressed}>Back</Button>
+          <Button actionName="back" onClick={store.backPressed}>
+            Back
+          </Button>
           {type === "item" ? (
             <Button
+              actionName="add item to trolley"
               onClick={() =>
                 store.addItemToCart((store.currentItem as TileItem).item)
               }
@@ -139,6 +143,7 @@ const ItemPage: React.FC<{
             </Button>
           ) : (
             <Button
+              actionName="remove"
               onClick={() =>
                 store.removeItemFromCart(store.currentItem as TrolleyItem)
               }
@@ -158,7 +163,7 @@ const Timer: React.FC<{}> = ({}) => {
 
   const timerObject = useTimer({ delay: 1000 }, () => {
     if (store.time === 1) {
-      navigate(`slide/${store.slide}`);
+      navigate(`../slide/${store.slide + 1}`);
     }
     store.tickTimer();
   });
@@ -169,7 +174,11 @@ const Timer: React.FC<{}> = ({}) => {
   }, [timerObject]);
 
   return (
-    <div className={classNames(store.page === "trolley" ? "hidden" : "")}>
+    <div
+      className={classNames(
+        store.page === "trolley" || store.page === "trolleyItem" ? "hidden" : ""
+      )}
+    >
       {"Timer:  "}
       {Math.floor(store.time / 60)}:{store.time % 60 < 10 ? "0" : ""}
       {store.time % 60}
@@ -210,6 +219,7 @@ const OnlineShop: React.FC<{}> = () => {
           secondChild={<Timer />}
           lastChild={
             <Button
+              actionName="check trolley"
               icon={ShoppingCartIcon}
               prefixText={"Trolley"}
               suffixText={`${store.trolley.length}`}
@@ -226,6 +236,7 @@ const OnlineShop: React.FC<{}> = () => {
         <EvenlySpacedRow
           firstChild={
             <Button
+              actionName="back"
               icon={ArrowLeftIcon}
               suffixText={"Back"}
               variant="transparent"
@@ -248,7 +259,7 @@ const OnlineShop: React.FC<{}> = () => {
         />
       </div>
 
-      {/* Content  */}
+      {/* Content */}
       <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
         <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
           {store.page === "item" || store.page === "trolleyItem" ? (

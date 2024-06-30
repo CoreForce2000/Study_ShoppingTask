@@ -195,7 +195,7 @@ export function exportCsv(store: TaskStore) {
     "\n" +
     shopHeaderRow +
     "\n" +
-    rows
+    store.data.shopAction
       .map((row) => Object.values(sortObjectByKeys(row, columns)).join(","))
       .join("\n");
 
@@ -208,45 +208,18 @@ export function exportCsv(store: TaskStore) {
   document.body.removeChild(link);
 }
 
+function sortObjectByKeys(
+  row: any,
+  columns: string[]
+): { [s: string]: unknown } | ArrayLike<unknown> {
+  const sortedRow: { [s: string]: unknown } = {};
+  columns.forEach((column) => {
+    sortedRow[column] = row[column];
+  });
+  return sortedRow;
+}
 //
 //
 // Data Collection
 //
 //
-
-/*
-
-      store.logShopAction({
-        Shopping_budget: shop.budget,
-        Shopping_event: "click_item",
-        Shopping_item: currentItem.image_name,
-        Shopping_category: currentItem.category,
-        Shopping_price:
-          shop.budget < config.data.shop.general.useMinimumPriceBelow
-            ? currentItem.minimum
-            : currentItem.maximum,
-      });
-
-              logShopAction({
-          Shopping_budget: budget,
-          Shopping_event: "remove_from_Trolley",
-          Shopping_item: TrolleyItem.product.image_name,
-          Shopping_category: TrolleyItem.product.category,
-          Shopping_price: TrolleyItem.price,
-        })
-
-        dispatch(logShopAction({
-      Shopping_budget: budget,
-      Shopping_event: "click_item",
-      Shopping_item: undefined,
-      Shopping_category: category,
-      Shopping_price: undefined,
-    }));
-*/
-
-/* 
-
-
-  
-
-*/

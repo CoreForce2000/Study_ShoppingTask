@@ -31,7 +31,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
         <input
           key={option}
           type="radio"
-          id={labels[index]}
+          id={labels![index]}
           name={name}
           value={option}
           checked={value === option}
@@ -39,8 +39,8 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
           className="form-radio"
           required={required}
         />
-        <label htmlFor={labels[index]} className="mr-5">
-          {labels[index]}
+        <label htmlFor={labels![index]} className="mr-5">
+          {labels![index]}
         </label>
       </div>
     );
@@ -58,6 +58,7 @@ interface DropdownProps {
   value: string;
   onChange: ChangeEventHandler | undefined;
   required?: boolean;
+  name?: string;
 }
 
 const Dropdown: React.FC<DropdownProps> = ({
@@ -65,9 +66,11 @@ const Dropdown: React.FC<DropdownProps> = ({
   value,
   onChange,
   required,
+  name,
 }) => {
   return (
     <select
+      name={name}
       className="border"
       value={value}
       required={required}
@@ -103,7 +106,7 @@ const DataEntry: React.FC = () => {
     }
 
     if (name === "participantId") {
-      if (value.match(/^\d{0,4}$/)) {
+      if (!value.match(/^\d{4}$/)) {
         setParticipantIdError("Participant ID must be exactly 4 digits");
       } else {
         setParticipantIdError("");
@@ -130,6 +133,8 @@ const DataEntry: React.FC = () => {
       return;
     }
 
+    store.setTime(parseInt(store.taskOptions.time.split(" ")[0]) * 60);
+
     navigate("/slide/1");
   };
 
@@ -148,7 +153,7 @@ const DataEntry: React.FC = () => {
         <div className="flex justify-between w-full font-sans">
           <label htmlFor="participantId">Participant ID</label>
           <input
-            id="participantId"
+            name="participantId"
             type="text"
             className="w-20 h-8 border border-gray-300 rounded px-2"
             maxLength={4}
@@ -157,12 +162,10 @@ const DataEntry: React.FC = () => {
             pattern="\d{4}"
             required
           />
-          {participantIdError && (
-            <div className="text-red-500 text-xl mt-1">
-              {participantIdError}
-            </div>
-          )}
         </div>
+        {participantIdError && (
+          <div className="text-red-500 text-lg mt-1">{participantIdError}</div>
+        )}
 
         <fieldset className="border border-gray-300 p-2 mb-4">
           <legend className="text-xl">Gender</legend>
@@ -179,6 +182,7 @@ const DataEntry: React.FC = () => {
           <legend className="text-xl">Group</legend>
           <Dropdown
             required
+            name="group"
             options={[
               "Select group",
               "Alcohol",
@@ -195,7 +199,7 @@ const DataEntry: React.FC = () => {
           <legend className="text-xl">Age</legend>
           <div className="flex flex-col">
             <input
-              id="age"
+              name="age"
               type="text"
               className="w-10 h-8 border border-gray-300 rounded px-2"
               maxLength={2}
@@ -203,10 +207,10 @@ const DataEntry: React.FC = () => {
               onChange={handleChange}
               required
             />
-            {ageError && (
-              <div className="text-red-500 text-xl mt-1">{ageError}</div>
-            )}
           </div>
+          {ageError && (
+            <div className="text-red-500 text-lg mt-1">{ageError}</div>
+          )}
         </fieldset>
 
         <fieldset className="border border-gray-300 p-2 mb-4">
@@ -226,7 +230,7 @@ const DataEntry: React.FC = () => {
             <RadioGroup
               required
               name="time"
-              values={["10 min", "15 min"]}
+              values={["10 min", "15 min", "1 min"]}
               value={store.taskOptions.time}
               onChange={handleChange}
             />

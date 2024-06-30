@@ -1,8 +1,10 @@
 import classNames from "classnames";
 import { LucideIcon, LucideProps } from "lucide-react"; // Assuming you're using Lucide React
 import React from "react";
+import useTaskStore from "../store/store";
 
 interface ButtonProps {
+  actionName?: string;
   children?: React.ReactNode;
   type?: "button" | "reset" | "submit" | undefined;
   onClick?: () => void;
@@ -18,6 +20,7 @@ interface ButtonProps {
 }
 
 const Button: React.FC<ButtonProps> = ({
+  actionName,
   children,
   type,
   onClick,
@@ -31,6 +34,8 @@ const Button: React.FC<ButtonProps> = ({
   color,
   visible = true,
 }) => {
+  const store = useTaskStore();
+
   const buttonClass = classNames(
     "border-none text-center text-decoration-none  inline-flex flex justify-center items-center m-1 cursor-pointer rounded-lg py-1.5 px-3 transition duration-250 ease-in-out",
     {
@@ -49,7 +54,13 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
-      onClick={onClick}
+      onClick={() => {
+        if (actionName) store.logShopAction(actionName);
+
+        if (onClick) {
+          onClick();
+        }
+      }}
       type={type}
       className={buttonClass}
       style={combinedStyle}

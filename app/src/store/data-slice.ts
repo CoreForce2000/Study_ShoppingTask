@@ -62,7 +62,27 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (set) => ({
     set((state) => ({
       data: {
         ...state.data,
-        shopAction: [...state.data.shopAction, action],
+        shopAction: [
+          ...state.data.shopAction,
+          {
+            Phase: 1,
+            Phase_name: "Shopping",
+            Block: 1,
+            Block_name: "shopping",
+            Trial: state.data.shopAction.length + 1,
+            Shopping_budget: state.budget,
+            Shopping_event: action,
+            Shopping_item: state.currentItem
+              ? state.currentItem.item.image_name
+              : "",
+            Shopping_category: state.currentCategory
+              ? state.currentCategory
+              : "",
+            Shopping_price: state.currentItem ? 0 : "",
+            Shopping_time_stamp: new Date().getSeconds() - state.initialTime,
+            Shopping_time_action: state.time,
+          },
+        ],
       },
     })),
 });

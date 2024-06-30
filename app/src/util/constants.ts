@@ -19,3 +19,8 @@ export const LUCKY_CUSTOMER_SOUND = new Audio(
   `${SOUND_PATH}Lucky customer.mp3`
 );
 export const END_SHOPPING_SOUND = new Audio(`${SOUND_PATH}End of phase1.mp3`);
+
+export const RATING_SOUND = new Audio(`${SOUND_PATH}rating_phase_2.mp3`);
+export const END_OF_PHASE_TWO_SOUND = new Audio(
+  `${SOUND_PATH}End of phase2.mp3`
+);
