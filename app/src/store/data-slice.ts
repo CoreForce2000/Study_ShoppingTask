@@ -88,3 +88,19 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (set) => ({
 });
 
 export default createDataSlice;
+
+//         logExperimentAction({
+//           CoDe_cue: currentSlide.id == "orange" ? "orange" : "blue",
+//           CoDe_stimuli_type:
+//             experimentSequence[index].slide.id == "blue"
+//               ? blueIsSelf
+//                 ? "own"
+//                 : "others"
+//               : blueIsSelf
+//               ? "others"
+//               : "own",
+//           CoDe_outcome: receivedItem ? "TRUE" : "FALSE",
+//           CoDe_response: pressedButton ? "TRUE" : "FALSE",
+//           CoDe_item: experimentSequence[index].product.image_name,
+//           CoDe_RT: Date.now() - reactionStartTime,
+//         })

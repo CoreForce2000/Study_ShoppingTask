@@ -11,6 +11,20 @@ export function shuffleArray(array: any): any[] {
   return array;
 }
 
+export function shuffledBinaryArray<T>(
+  val1: T,
+  val2: T,
+  freqVal1: number,
+  n: number
+): T[] {
+  const numVal1 = Math.floor(n * freqVal1);
+  const numVal2 = n - numVal1;
+
+  const array = [...Array(numVal1).fill(val1), ...Array(numVal2).fill(val2)];
+
+  return shuffleArray(array);
+}
+
 export function pseudorandomize(
   nonDrugCategories: string[],
   drugCategories: string[],

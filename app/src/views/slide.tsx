@@ -8,6 +8,7 @@ import VASSlide from "../components/slide-vas.tsx";
 import useTaskStore from "../store/store.ts";
 
 import config from "../assets/configs/config.json";
+import { Trial } from "../store/contingency-slice.ts";
 import { SLIDE_PATH } from "../util/constants.ts";
 import { exportCsv } from "../util/functions.ts";
 import { preloadImage } from "../util/preload.ts";
@@ -54,17 +55,17 @@ const SlideShow: React.FC = () => {
     }
   };
 
-  const customSlideText = (drug: string) => {
-    return `How much do you want to use ${
-      drug === "LSD" ? "LSD" : drug.toLowerCase()
-    } 
-      right now?`;
-  };
-
   const backOneSlide = (event: KeyboardEvent) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "b") {
       event.preventDefault();
       decrementSlideIndex();
+    }
+  };
+
+  const forwardOneSlide = (event: KeyboardEvent) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === "d") {
+      event.preventDefault();
+      incrementSlideIndex();
     }
   };
 
@@ -80,14 +81,13 @@ const SlideShow: React.FC = () => {
 
   useEffect(() => {
     document.addEventListener("keydown", backOneSlide);
+    document.addEventListener("keydown", forwardOneSlide);
+
     document.addEventListener("keydown", () => waitKeyPress("Enter"));
 
     return () => {
       document.removeEventListener("keydown", backOneSlide);
-      if (timeoutId !== 0) {
-        clearTimeout(timeoutId);
-        timeoutId = 0;
-      }
+      document.removeEventListener("keydown", forwardOneSlide);
     };
   }, []);
 
@@ -117,7 +117,10 @@ const SlideShow: React.FC = () => {
         children: (
           <VASSlide
             key={drug}
-            text={customSlideText(drug)}
+            text={`How much do you want to use ${
+              drug === "LSD" ? "LSD" : drug.toLowerCase()
+            } 
+      right now?`}
             minLabel="not at all"
             maxLabel="very much"
             setValue={(value: number) => {
@@ -200,13 +203,6 @@ const SlideShow: React.FC = () => {
       execute: () => setButtonVisible(false),
     },
     {
-      slide: `phase2/Slide12.JPG`,
-      execute: () => {
-        exportCsv(store);
-        waitTimeout(5000);
-      },
-    },
-    {
       slide: `phase2/Slide13.JPG`,
       children: (
         <VASSlide
@@ -253,137 +249,122 @@ const SlideShow: React.FC = () => {
     //
     // ############################################################################################################
 
-    // const offLightbulbSlide: Slide = {
-    //   id: "offLightbulb",
-    //   type: "offLightbulb",
-    //   image: pathToSlides + "Slide1.PNG",
-    //   allowKeyPress: false,
-    // };
-
-    // const offLightbulbSlide2: Slide = {
-    //   id: "offLightbulb2",
-    //   type: "offLightbulb2",
-    //   image: pathToSlides + "Slide1.PNG",
-    //   allowKeyPress: false,
-    // };
-
-    // const blueLightbulbSlide: Slide = {
-    //   id: "blue",
-    //   type: "coloredLightbulb",
-    //   image: pathToSlides + "Slide3.PNG",
-    //   allowKeyPress: true,
-    // };
-
-    // const orangeLightbulbSlide: Slide = {
-    //   id: "orange",
-    //   type: "coloredLightbulb",
-    //   image: pathToSlides + "Slide2.PNG",
-    //   allowKeyPress: true,
-    // };
-
-    // const receiveItemSlide: Slide = {
-    //   id: "receiveItem",
-    //   type: "receiveItem",
-    //   image: pathToSlides + "Slide4.PNG",
-    //   allowKeyPress: false,
-    // };
-
-    // const offLightbulbNoItemSlide: Slide = {
-    //   id: "offLightbulbNoItem",
-    //   type: "offLightbulb",
-    //   image: pathToSlides + "Slide1.PNG",
-    //   allowKeyPress: false,
-    // };
-
-    ...Array(5)
-      .fill(0)
-      .map((_, block) => [
-        Array(60)
-          .fill(0)
-          .map((_, trial) => [
-            {
-              slide: `/duringPhase2/Slide1.PNG`,
-              execute: () => {
-                waitTimeout(1000, 1200);
+    ...store.contingencyOrder
+      .map((slide: Trial, index: number) =>
+        !slide.questions
+          ? [
+              {
+                slide: `/duringPhase2/Slide1.PNG`,
+                execute: () => {
+                  waitTimeout(
+                    config.experimentConfig.slideTimings.offLightbulb.minValue,
+                    config.experimentConfig.slideTimings.offLightbulb.maxValue
+                  );
+                },
               },
-            },
-            {
-              slide: `/duringPhase2/Slide3.PNG`,
-              execute: () => {
-                waitTimeout(1000, 1200);
+              slide.color === "orange"
+                ? {
+                    slide: `/duringPhase2/Slide2.PNG`,
+                    execute: () => {
+                      waitKeyPress("Space");
+                      waitTimeout(
+                        config.experimentConfig.slideTimings.coloredLightbulb
+                          .minValue,
+                        config.experimentConfig.slideTimings.coloredLightbulb
+                          .maxValue
+                      );
+                    },
+                  }
+                : {
+                    slide: `/duringPhase2/Slide3.PNG`,
+                    execute: () => {
+                      waitKeyPress("Space");
+                      waitTimeout(
+                        config.experimentConfig.slideTimings.coloredLightbulb
+                          .minValue,
+                        config.experimentConfig.slideTimings.coloredLightbulb
+                          .maxValue
+                      );
+                    },
+                  },
+              {
+                slide: `/duringPhase2/Slide4.PNG`,
+                execute: () => {
+                  waitTimeout(
+                    config.experimentConfig.slideTimings.receiveItem.minValue,
+                    config.experimentConfig.slideTimings.receiveItem.maxValue
+                  );
+                },
               },
-            },
-            {
-              slide: `/duringPhase2/Slide3.PNG`,
-            },
-          ]),
-
-        {
-          children: (
-            <VASSlide
-              key={"CoDe_VAS" + block}
-              text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
-              minLabel="not at all"
-              maxLabel="very much"
-              setValue={(value) => {
-                store.setSurveyResponse("CoDe_VAS", value);
-                waitTimeout(1000);
-              }}
-            />
-          ),
-        },
-
-        {
-          slide: `/duringPhase2/SlideB2.PNG`,
-          children: (
-            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
-              <Checkbox
-                key="column8"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
-              />
-              <Checkbox
-                key="column9"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
-              />
-            </div>
-          ),
-        },
-        {
-          slide: `/duringPhase2/SlideB3.PNG`,
-          children: (
-            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
-              <Checkbox
-                key="column10"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
-              />
-              <Checkbox
-                key="column11"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
-              />
-            </div>
-          ),
-        },
-      ]),
+            ]
+          : [
+              {
+                children: (
+                  <VASSlide
+                    key={"CoDe_VAS" + index}
+                    text="Please indicate on the line below, how likely your claims were successful when you pressed the SPACE BAR."
+                    minLabel="not at all"
+                    maxLabel="very much"
+                    setValue={(value) => {
+                      store.setSurveyResponse("CoDe_VAS", value);
+                      waitTimeout(1000);
+                    }}
+                  />
+                ),
+              },
+              {
+                slide: `/duringPhase2/SlideB2.PNG`,
+                children: (
+                  <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+                    <Checkbox
+                      key="column8"
+                      initialOptions={[""]}
+                      columnLayout="single"
+                      allowMultiple={false}
+                      onChange={() => {
+                        waitTimeout(1000);
+                      }}
+                    />
+                    <Checkbox
+                      key="column9"
+                      initialOptions={[""]}
+                      columnLayout="single"
+                      allowMultiple={false}
+                      onChange={() => {
+                        waitTimeout(1000);
+                      }}
+                    />
+                  </div>
+                ),
+              },
+              {
+                slide: `/duringPhase2/SlideB3.PNG`,
+                children: (
+                  <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+                    <Checkbox
+                      key="column10"
+                      initialOptions={[""]}
+                      columnLayout="single"
+                      allowMultiple={false}
+                      onChange={() => {
+                        waitTimeout(1000);
+                      }}
+                    />
+                    <Checkbox
+                      key="column11"
+                      initialOptions={[""]}
+                      columnLayout="single"
+                      allowMultiple={false}
+                      onChange={() => {
+                        waitTimeout(1000);
+                      }}
+                    />
+                  </div>
+                ),
+              },
+            ]
+      )
+      .flat(),
 
     // ############################################################################################################
     //
@@ -476,9 +457,11 @@ const SlideShow: React.FC = () => {
   }, [slideNumber, slideSequence]);
 
   useEffect(() => {
-    slideSequence.forEach((slide) => {
-      if (slide.slide) preloadImage(SLIDE_PATH + slide.slide);
-    });
+    const uniqueSlides = Array.from(
+      new Set(slideSequence.map((slide) => slide.slide))
+    );
+
+    uniqueSlides.forEach((slide) => preloadImage(SLIDE_PATH + slide));
   }, []);
 
   return (
