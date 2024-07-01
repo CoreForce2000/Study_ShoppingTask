@@ -1,24 +1,23 @@
-// Assuming this file is named store.ts and is located in a directory that could be imported as `@/store`
+import { create } from "zustand";
+import createContingencySlice, { ContingencySlice } from "./contingency-slice";
+import createDataSlice, { DataSlice } from "./data-slice";
+import createShopSlice, { ShopSlice } from "./shop-slice";
 
-import { configureStore } from '@reduxjs/toolkit';
-import surveyReducer from './surveySlice';
-import configReducer from './configSlice';
-import shopReducer from './shopSlice';
-import slideReducer from './slideSlice';
+export interface TaskStore extends ShopSlice, DataSlice, ContingencySlice {
+  slide: number;
+  setSlide: (slide: number) => void;
+  initialTime: number;
+}
 
-const store = configureStore({
-  reducer: {
-    survey: surveyReducer,
-    config: configReducer,
-    shop: shopReducer,
-    slide: slideReducer,
+const useTaskStore = create<TaskStore>()((...a) => ({
+  slide: 0,
+  setSlide: (slide) => {
+    a[0](() => ({ slide: slide }));
   },
-});
+  initialTime: new Date().getSeconds(),
+  ...createDataSlice(...a),
+  ...createShopSlice(...a),
+  ...createContingencySlice(...a),
+}));
 
-// Export the store's dispatch function type
-export type AppDispatch = typeof store.dispatch;
-
-// Infer the RootState from the store itself
-export type RootState = ReturnType<typeof store.getState>;
-
-export default store;
+export default useTaskStore;

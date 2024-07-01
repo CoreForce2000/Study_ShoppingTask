@@ -1,0 +1,24 @@
+- Change alcohol pictures, keep some of the price lists
+
+Champagne – new price list included
+Cider – new price list included
+Cocktails – new price list included
+Gin – old price list needs to be included  (moved from the ones that you have to this folder)
+Prosecco – old price list needs to be included  (moved from the ones that you have to this folder)
+Red wine – old price list needs to be included  (moved from the ones that you have to this folder)
+Rum – old price list needs to be included  (moved from the ones that you have to this folder)
+Vodka – old price list needs to be included  (moved from the ones that you have to this folder)
+Whisky – old price list needs to be included  (moved from the ones that you have to this folder)
+White wine – old price list needs to be included  (moved from the ones that you have to this folder)
+
+
+•	It does not make sense if “none of these” is ticked that other drugs are ticked as well. If none of these is ticked, then other options should be disabled. 
+•	When ‘other ‘ is ticked – then the VAS should not appear. The question: How much do you want to use other right now? Does not make sense. 
+
+Align the shop design with the design spec
+•	Why is the button Add to trolley larger than the Back button? There is no rationale for this. They should be the same size. 
+•	Could we please get rid of the underlining of the category names when the category had been opened. 
+•	The trolley button is not working. It is not possible to open the trolley. 
+•	Would it be possible to have a count of items in the trolley next to the trolley icon. 
+•	In progress - Please put a trolley symbol in the right corner, you can also count the items in trolley, so that all three locations of the header (budget, timer, trolley) are changing over time. 
+
