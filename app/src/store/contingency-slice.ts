@@ -1,20 +1,22 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
-import { shuffledBinaryArray } from "../util/functions";
+import { shuffleExtendArray, shuffledBinaryArray } from "../util/functions";
+import { Item } from "./shop-slice";
 import { TaskStore } from "./store";
 
 export interface Trial {
-  color?: string;
-  spacePressedCorrect?: boolean;
-  noSpacePressedCorrect?: boolean;
-  questions: boolean;
+  color: string;
+  spacePressedCorrect: boolean;
+  noSpacePressedCorrect: boolean;
 }
+
+export type TrialPhase = "prepare" | "react" | "outcome";
 
 function generateTrialsArray(
   numBlocks: number,
   numTrialsPerBlock: number
-): Trial[] {
-  const trialArray: Trial[] = [];
+): Trial[][] {
+  const trialArray: Trial[][] = [];
 
   for (let block = 0; block < numBlocks; block++) {
     const lightColor = shuffledBinaryArray(
@@ -37,26 +39,31 @@ function generateTrialsArray(
     );
 
     trialArray.push(
-      ...lightColor.map((value, index) => ({
+      lightColor.map((value, index) => ({
         color: value,
         spacePressedCorrect: spacePressedCorrect[index],
         noSpacePressedCorrect: noSpacePressedCorrect[index],
-        questions: false,
       }))
     );
-    trialArray.push({ questions: true });
   }
-  console.log("trialArray", trialArray);
   return trialArray;
 }
 
 export interface ContingencySlice {
-  block: number;
+  reacted: boolean;
+  setReacted: (newReacted: boolean) => void;
+  generateSelfOtherSequence: () => void;
+  popSelfItem: () => Item | undefined;
+  popOtherItem: () => Item | undefined;
+  selfItems: Item[];
+  otherItems: Item[];
   trial: number;
-  setBlock: (block: number) => void;
-  setTrial: (trial: number) => void;
+  trialPhase: TrialPhase;
+  incrementTrial: (incrementSlide: () => void) => void;
+  resetTrial: () => void;
+  nextTrialPhase: () => void;
   colorMapping: { self: string; other: string };
-  contingencyOrder: Trial[];
+  contingencyOrder: Trial[][];
 }
 
 const createContingencySlice: StateCreator<
@@ -64,11 +71,12 @@ const createContingencySlice: StateCreator<
   [],
   [],
   ContingencySlice
-> = (set) => ({
-  block: 1,
+> = (set, get) => ({
+  reacted: false,
+  selfItems: [],
+  otherItems: [],
   trial: 1,
-  setBlock: (block: number) => set(() => ({ block: block })),
-  setTrial: (trial: number) => set(() => ({ trial: trial })),
+  trialPhase: "prepare",
 
   colorMapping:
     Math.random() < 0.5
@@ -79,6 +87,73 @@ const createContingencySlice: StateCreator<
     config.experimentConfig.trialSequence.length,
     config.experimentConfig.numberOfTrials
   ),
+
+  popSelfItem: () => {
+    set((state) => ({
+      selfItems: state.selfItems.slice(0, -1),
+    }));
+    return get().selfItems.pop();
+  },
+
+  popOtherItem: () => {
+    set((state) => ({
+      otherItems: state.otherItems.slice(0, -1),
+    }));
+    return get().otherItems.pop();
+  },
+
+  setReacted: (newReacted: boolean) => set(() => ({ reacted: newReacted })),
+  generateSelfOtherSequence: () =>
+    set((state) => {
+      const selfItems = Object.values(state.clickedItemTiles)
+        .flat()
+        .map((tileItem) => tileItem.item);
+
+      const otherItems = state.items.filter(
+        (item) =>
+          ![
+            ...Object.values(config.shop.pathologicalCategories).flat(),
+            ...state.clickedCategories,
+          ].includes(item.category)
+      );
+
+      return {
+        selfItems: shuffleExtendArray(
+          selfItems,
+          config.experimentConfig.trialSequence.length * 5
+        ),
+        otherItems: shuffleExtendArray(
+          otherItems,
+          config.experimentConfig.trialSequence.length * 5
+        ),
+      };
+    }),
+  incrementTrial: (incrementSlide) =>
+    set((state) => {
+      console.log(state.trial);
+      if (state.trial < config.experimentConfig.trialSequence.length) {
+        return {
+          trial: state.trial + 1,
+          trialPhase: "prepare",
+        };
+      } else {
+        incrementSlide();
+        return {
+          trial: 0,
+          trialPhase: "prepare",
+        };
+      }
+    }),
+  resetTrial: () => set(() => ({ trial: 0 })),
+  nextTrialPhase: () =>
+    set((state) => ({
+      trialPhase:
+        state.trialPhase === "prepare"
+          ? "react"
+          : state.trialPhase === "react"
+          ? "outcome"
+          : "prepare",
+    })),
 });
 
 export default createContingencySlice;

@@ -81,25 +81,15 @@ export function pseudorandomize(
   return mixedList;
 }
 
-export function shuffleExtendArray(originalArray: any[], targetLength: number) {
-  let resultArray = shuffleArray([...originalArray]);
-
-  if (targetLength <= resultArray.length) {
-    return resultArray.slice(0, targetLength);
-  }
-
-  while (resultArray.length < targetLength) {
-    let remainingNeeded = targetLength - resultArray.length;
-    let itemsToAdd = shuffleArray([...originalArray]);
-
-    if (itemsToAdd.length > remainingNeeded) {
-      itemsToAdd = itemsToAdd.slice(0, remainingNeeded);
-    }
-
-    resultArray = resultArray.concat(itemsToAdd);
-  }
-
-  return resultArray;
+export function shuffleExtendArray(
+  originalArray: any[],
+  targetLength: number
+): any[] {
+  return Array(Math.ceil(targetLength / originalArray.length))
+    .fill(originalArray)
+    .map((array) => shuffleArray(array))
+    .slice(0, targetLength)
+    .flat();
 }
 
 type TimingRange = {

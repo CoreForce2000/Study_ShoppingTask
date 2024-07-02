@@ -97,6 +97,7 @@ const DataEntry: React.FC = () => {
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "d") {
       event.preventDefault();
+      store.activateDevMode();
       fillAndSubmitForm();
     }
   });

@@ -24,3 +24,5 @@ export const RATING_SOUND = new Audio(`${SOUND_PATH}rating_phase_2.mp3`);
 export const END_OF_PHASE_TWO_SOUND = new Audio(
   `${SOUND_PATH}End of phase2.mp3`
 );
+
+export const KEY_SPACE = " ";
