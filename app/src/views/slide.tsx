@@ -39,9 +39,15 @@ const SlideShow: React.FC = () => {
     null
   );
 
-  const slideNumber = parseInt(
-    useParams<{ slideNumber: string }>().slideNumber ?? "1"
-  );
+  const { slideNumberRaw, trialNumberRaw } = useParams<{
+    slideNumberRaw: string;
+    trialName?: string;
+    trialNumberRaw?: string;
+  }>();
+
+  const slideNumber = parseInt(slideNumberRaw ?? "1");
+  const trialNumber = trialNumberRaw ? parseInt(trialNumberRaw) : 1;
+
   if (store.slide !== slideNumber) store.setSlide(slideNumber);
 
   const clearListeners = () => {
@@ -57,27 +63,20 @@ const SlideShow: React.FC = () => {
 
   const incrementSlideIndex = () => {
     if (store.slide) {
-      changeSlideIndex(store.slide + 1);
+      changeSlideIndex(slideNumber + 1);
     }
   };
   const decrementSlideIndex = () => {
     if (store.slide) {
-      changeSlideIndex(store.slide - 1);
+      changeSlideIndex(slideNumber - 1);
     }
   };
 
-  const backOneSlide = (event: KeyboardEvent) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "b") {
-      event.preventDefault();
-      decrementSlideIndex();
+  const incrementTrialIndex = (trialName: string, maxTrial: number) => {
+    if (store.slide) {
+      navigate(`/slide/${slideNumber}/${trialName}/${trialNumber + 1}`);
     }
-  };
-
-  const forwardOneSlide = (event: KeyboardEvent) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      incrementSlideIndex();
-    }
+    if (trialNumber === maxTrial) incrementSlideIndex();
   };
 
   const waitTimeout = (
@@ -111,49 +110,65 @@ const SlideShow: React.FC = () => {
   };
 
   useEffect(() => {
-    document.addEventListener("keydown", backOneSlide);
-    document.addEventListener("keydown", forwardOneSlide);
+    const keydownHandler = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === "b") {
+        event.preventDefault();
+        decrementSlideIndex();
+      } else if ((event.ctrlKey || event.metaKey) && event.key === "d") {
+        event.preventDefault();
+        incrementSlideIndex();
+      } else if ((event.ctrlKey || event.metaKey) && event.key === "v") {
+        event.preventDefault();
+        navigate("/csv");
+      }
+    };
+
+    document.addEventListener("keydown", keydownHandler);
 
     return () => {
-      document.removeEventListener("keydown", backOneSlide);
-      document.removeEventListener("keydown", forwardOneSlide);
+      document.removeEventListener("keydown", keydownHandler);
     };
   }, []);
 
-  const drugCravingSlides = () => {
-    return (store.data.survey.drugs ?? [])
-      .filter(
-        (drug: string) =>
-          drug !== config.options.drugScreening.other &&
-          drug !== config.options.drugScreening.none
-      )
-      .map((drug: string) => ({
-        slide: `VasSlide.JPG`,
-        children: (
-          <VASSlide
-            key={drug}
-            text={`How much do you want to use ${
-              drug === "LSD" ? "LSD" : drug.toLowerCase()
-            } 
-      right now?`}
-            minLabel="not at all"
-            maxLabel="very much"
-            setValue={(value: number) => {
-              store.setDrugCraving(drug, value);
-              waitTimeout(1000);
-            }}
-          />
-        ),
-        execute: () => setButtonVisible(false),
-      }));
+  const drugCravingSlide = (stage: "pre" | "post") => {
+    const drugs = store.getDrugsNow();
+
+    if (drugs.length === 0) return { execute: () => incrementSlideIndex() };
+
+    const drug = drugs[trialNumber - 1];
+
+    console.log(drugs);
+
+    return {
+      slide: `VasSlide.JPG`,
+      children: (
+        <VASSlide
+          key={drug}
+          text={`How much do you want to use ${
+            drug === "LSD" ? "LSD" : drug.toLowerCase()
+          } 
+    right now?`}
+          minLabel="not at all"
+          maxLabel="very much"
+          setValue={(value: number) => {
+            store.setDrugCraving(drug, value);
+            store.logSurveyResponse({ [`VAS_${drug}_${stage}`]: value });
+
+            waitTimeout(1000, 1000, () => {
+              incrementTrialIndex("craving", drugs.length);
+            });
+          }}
+        />
+      ),
+      execute: () => setButtonVisible(false),
+    };
   };
 
   const contingencySlide = (block: number) => {
-    const trialInfo = store.contingencyOrder[block][store.trial];
-    const isSelfItem = trialInfo.color === store.colorMapping.self;
-    const item = isSelfItem ? store.popSelfItem() : store.popOtherItem();
-    const imagePath = getImagePath(item!.category, item!.image_name);
-    preloadImage(imagePath);
+    let trialInfo;
+    let isSelfItem;
+    let item;
+    let imagePath;
 
     switch (store.trialPhase) {
       case "prepare":
@@ -169,6 +184,14 @@ const SlideShow: React.FC = () => {
           },
         };
       case "react":
+        trialInfo = store.contingencyOrder[block][trialNumber - 1];
+        isSelfItem = trialInfo.color === store.colorMapping.self;
+        item = isSelfItem
+          ? store.selfItems[trialNumber - 1]
+          : store.otherItems[trialNumber - 1];
+        imagePath = getImagePath(item!.category, item!.image_name);
+        preloadImage(imagePath);
+
         return {
           slide:
             trialInfo.color === "orange"
@@ -188,14 +211,14 @@ const SlideShow: React.FC = () => {
           },
         };
       case "outcome":
-        return (trialInfo.spacePressedCorrect && store.reacted) ||
-          (trialInfo.noSpacePressedCorrect && !store.reacted)
+        return (trialInfo!.spacePressedCorrect && store.reacted) ||
+          (trialInfo!.noSpacePressedCorrect && !store.reacted)
           ? {
               slide: `/duringPhase2/Slide4.PNG`,
               children: (
                 <div className="mt-12 bg-white w-full pl-6 flex justify-center">
                   <div className="bg-white">
-                    <img src={}></img>
+                    <img src={imagePath}></img>
                   </div>
                 </div>
               ),
@@ -205,7 +228,10 @@ const SlideShow: React.FC = () => {
                   config.experimentConfig.slideTimings.receiveItem.minValue,
                   config.experimentConfig.slideTimings.receiveItem.maxValue,
                   () => {
-                    store.incrementTrial(incrementSlideIndex);
+                    incrementTrialIndex(
+                      "trial",
+                      store.contingencyOrder[block].length
+                    );
                     store.setReacted(false);
                   }
                 );
@@ -244,6 +270,9 @@ const SlideShow: React.FC = () => {
               columnLayout="single"
               onChange={(value) => {
                 store.setSurveyResponse("onlineShoppingFrequency", value[0]);
+                store.logSurveyResponse({
+                  Frequency_online_shopping: value[0],
+                });
                 waitTimeout(1000);
               }}
             />
@@ -270,6 +299,8 @@ const SlideShow: React.FC = () => {
                     columnLayout="double"
                     onChange={(values) => {
                       store.setSurveyResponse("drugs", values);
+
+                      // index for each drugScreening drugs & other, one if in values, otherwise 0
                       values.length === 0
                         ? setButtonVisible(false)
                         : setButtonVisible(true);
@@ -281,12 +312,42 @@ const SlideShow: React.FC = () => {
           },
         ]
       : []),
-    ...drugCravingSlides(),
+    drugCravingSlide("pre"),
     {
       slide: `phase1/Slide5.JPG`,
       execute: () => {
+        // ...config.options.drugScreening.drugs.reduce(
+        //   (acc, drug) => ({
+        //     ...acc,
+        //     [`${drug}_now`]: store.getDrugsNow().includes(drug) ? 1 : 0,
+        //   }),
+        //   {}
+        // ),
+        // [config.options.drugScreening.none]: store.data.survey.drugs.includes(
+        //   config.options.drugScreening.none
+        // )
+        //   ? 1
+        //   : 0,
+
         setButtonVisible(false);
-        waitKeyPress();
+        waitKeyPress(undefined, () => {
+          incrementSlideIndex();
+          store.logSurveyResponse({
+            ...store.getDrugsNow().reduce(
+              (acc, drug) => ({
+                ...acc,
+                [`${drug}_now`]: 1,
+              }),
+              {}
+            ),
+            [config.options.drugScreening.none]:
+              store.data.survey.drugs.includes(
+                config.options.drugScreening.none
+              )
+                ? 1
+                : 0,
+          });
+        });
       },
     },
     { slide: `phase1/Slide6.JPG`, execute: () => setButtonVisible(true) },
@@ -311,12 +372,16 @@ const SlideShow: React.FC = () => {
           maxLabel="very satisfied"
           setValue={(value) => {
             store.setSurveyResponse("purchaseSatisfaction", value);
+            store.logSurveyResponse({ VAS_shopping_satisfaction: value });
             waitTimeout(1000);
           }}
           text={``}
         />
       ),
-      execute: () => setButtonVisible(false),
+      execute: () => {
+        setButtonVisible(false);
+        if (store.selfItems.length === 0) store.generateSelfOtherSequence();
+      },
     },
     {
       slide: `phase2/Slide14.JPG`,
@@ -327,15 +392,16 @@ const SlideShow: React.FC = () => {
           maxLabel="very much"
           setValue={(value) => {
             store.setSurveyResponse("desireContinueShopping", value);
+            store.logSurveyResponse({ VAS_shopping_continuation: value });
             waitTimeout(1000);
           }}
           text={""}
         />
       ),
     },
-    ...drugCravingSlides(),
+    drugCravingSlide("post"),
 
-    { slide: `phase2/Slide16.JPG`, execute: () => setButtonVisible(true) },
+    { slide: `phase2/Slide16.JPG`, execute: () => exportCsv(store) },
     { slide: `phase2/Slide17.JPG` },
     { slide: `phase2/Slide18.jpg` },
     { slide: `phase2/Slide19.JPG` },
@@ -493,8 +559,8 @@ const SlideShow: React.FC = () => {
     : slideSequence[slideNumber];
 
   useEffect(() => {
-    if (currentSlide.execute) {
-      currentSlide.execute!();
+    if ((currentSlide as Slide).execute) {
+      (currentSlide as Slide).execute!();
     }
   }, [slideSequence]);
 
@@ -504,7 +570,7 @@ const SlideShow: React.FC = () => {
         backgroundImage={SLIDE_PATH + currentSlide.slide ?? "White.png"}
         verticalAlign={true}
       >
-        {currentSlide.children}
+        {(currentSlide as Slide).children}
         <Button
           className="absolute cursor-pointer p-0 bottom-[1em] right-[1em] text-base"
           onClick={incrementSlideIndex}

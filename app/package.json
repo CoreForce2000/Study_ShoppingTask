@@ -11,9 +11,11 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
+    "@types/papaparse": "^5.3.14",
     "classnames": "^2.5.1",
     "jotai": "^2.8.2",
     "lucide-react": "^0.379.0",
+    "papaparse": "^5.4.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-modal": "^3.16.1",

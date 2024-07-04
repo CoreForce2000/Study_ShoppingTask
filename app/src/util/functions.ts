@@ -136,74 +136,14 @@ export function addUnique(array: any[], item: any) {
   return array;
 }
 
+export function unique(array: any[]) {
+  return array.filter((item, index) => array.indexOf(item) === index);
+}
+
 export function exportCsv(store: TaskStore) {
-  const columns = [
-    "Phase",
-    "Phase_name",
-    "Block_num",
-    "Block_name",
-    "Shopping_event",
-    "Shopping_category",
-    "Shopping_item",
-    "Shopping_time_stamp",
-    "Shopping_time_action",
-    "Shopping_price",
-    "Shopping_budget",
-    "CoDe_cue",
-    "CoDe_stimuli_type",
-    "CoDe_response",
-    "CoDe_outcome",
-    "CoDe_item",
-    "CoDe_RT",
-    "CoDe_VAS",
-    "Control_qs_person",
-    "Control_qs_item",
-    "Control_qs_correct",
-    "Control_qs_attempts",
-    "Control_qs_RT",
-    "Control_event",
-    "Control_category",
-    "Control_item",
-    "Control_time_stamp",
-    "Control_time_action",
-    "Control_price",
-    "Control_budget",
-  ];
+  const csvString = store.getCsvString();
 
-  // Create a row for demographics
-  const demographicsRow = [
-    "participantId",
-    store.data.survey.participantId,
-    "age",
-    store.data.survey.age,
-    "group",
-    store.taskOptions.group,
-    "gender",
-    store.data.survey.gender,
-    "handedness",
-    store.data.survey.handedness,
-    "onlineShoppingFrequency",
-    store.data.survey.onlineShoppingFrequency,
-    "test_shopTime",
-    store.taskOptions.time,
-  ];
-
-  // Create the header row for shop actions
-  const shopHeaderRow = columns.join(",");
-
-  // Create the CSV content by combining the demographics row, shop actions header, and data rows
-  const csvContent =
-    "data:text/csv;charset=utf-8," +
-    demographicsRow.join(",") +
-    "\n" +
-    "\n" +
-    shopHeaderRow +
-    "\n" +
-    store.data.shopAction
-      .map((row) => Object.values(sortObjectByKeys(row, columns)).join(","))
-      .join("\n");
-
-  const encodedUri = encodeURI(csvContent);
+  const encodedUri = encodeURI(csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
   link.setAttribute("download", "shop_actions.csv");
@@ -212,7 +152,7 @@ export function exportCsv(store: TaskStore) {
   document.body.removeChild(link);
 }
 
-function sortObjectByKeys(
+export function sortObjectByKeys(
   row: any,
   columns: string[]
 ): { [s: string]: unknown } | ArrayLike<unknown> {

@@ -244,7 +244,7 @@ const OnlineShop: React.FC<{}> = () => {
               onClick={() => {
                 store.backPressed();
               }}
-              visible={store.page !== "categories"}
+              visible={store.page !== "categories" && store.page !== "item"}
             />
           }
           secondChild={

@@ -117,6 +117,14 @@ const createContingencySlice: StateCreator<
           ].includes(item.category)
       );
 
+      console.log(selfItems, otherItems);
+      console.log(
+        shuffleExtendArray(
+          selfItems,
+          config.experimentConfig.trialSequence.length * 5
+        )
+      );
+
       return {
         selfItems: shuffleExtendArray(
           selfItems,
