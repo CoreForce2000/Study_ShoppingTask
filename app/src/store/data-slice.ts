@@ -9,7 +9,14 @@ export interface DataSlice {
     time: string;
   };
   data: {
-    survey: any;
+    survey: {
+      gender: string;
+      age: string;
+      participantId: string;
+      handedness: string;
+      onlineShoppingFrequency: string;
+      drugs: string[];
+    };
     actionLog: Record<string, any>[];
     drugCraving: {
       [key: string]: number[];
@@ -29,11 +36,18 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
   get
 ) => ({
   taskOptions: {
-    group: "",
+    group: "Select group",
     time: "",
   },
   data: {
-    survey: { gender: "", age: "", participantId: "" },
+    survey: {
+      gender: "",
+      age: "",
+      participantId: "",
+      handedness: "",
+      onlineShoppingFrequency: "",
+      drugs: [],
+    },
     actionLog: [],
     drugCraving: {},
   },

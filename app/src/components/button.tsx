@@ -17,6 +17,7 @@ interface ButtonProps {
   suffixText?: string;
   color?: string;
   visible?: boolean;
+  disabled?: boolean;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -33,6 +34,7 @@ const Button: React.FC<ButtonProps> = ({
   suffixText,
   color,
   visible = true,
+  disabled = false,
 }) => {
   const store = useTaskStore();
 
@@ -54,6 +56,7 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <button
+      disabled={disabled}
       onClick={() => {
         if (actionName) store.logShopAction(actionName);
 

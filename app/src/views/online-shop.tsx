@@ -1,4 +1,10 @@
-import { ArrowLeftIcon, ListTodoIcon, ShoppingCartIcon } from "lucide-react";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ListTodoIcon,
+  ShoppingCartIcon,
+  Trash2Icon,
+} from "lucide-react";
 import React, { useEffect } from "react";
 import config from "../assets/configs/config.json";
 
@@ -8,7 +14,7 @@ import { useTimer } from "react-use-precision-timer";
 import Button from "../components/button";
 import EvenlySpacedRow from "../components/evenly-spaced-row";
 import Tile from "../components/tile";
-import { TileItem, TrolleyItem } from "../store/shop-slice";
+import { TileItem } from "../store/shop-slice";
 import useTaskStore from "../store/store";
 import { useScrollRestoration } from "../util/hooks";
 import { getImagePath } from "../util/preload";
@@ -92,8 +98,7 @@ const GridPage: React.FC<{
             tileState={"itemClicked"}
             backgroundColor={"white"}
             onClick={() => {
-              store.clickTrolleyItem(index);
-              store.navigateTo("trolleyItem");
+              store.selectTrolleyItem(trolleyItem);
             }}
             imageUrl={
               trolleyItem
@@ -111,9 +116,7 @@ const GridPage: React.FC<{
   );
 };
 
-const ItemPage: React.FC<{
-  type: "item" | "trolleyItem";
-}> = ({ type }) => {
+const ItemPage: React.FC<{}> = ({}) => {
   const store = useTaskStore();
 
   return (
@@ -132,25 +135,14 @@ const ItemPage: React.FC<{
           <Button actionName="back" onClick={store.backPressed}>
             Back
           </Button>
-          {type === "item" ? (
-            <Button
-              actionName="add item to trolley"
-              onClick={() =>
-                store.addItemToCart((store.currentItem as TileItem).item)
-              }
-            >
-              Add to Trolley
-            </Button>
-          ) : (
-            <Button
-              actionName="remove"
-              onClick={() =>
-                store.removeItemFromCart(store.currentItem as TrolleyItem)
-              }
-            >
-              Remove from Trolley
-            </Button>
-          )}
+          <Button
+            actionName="add item to trolley"
+            onClick={() =>
+              store.addItemToCart((store.currentItem as TileItem).item)
+            }
+          >
+            Add to Trolley
+          </Button>
         </div>
       </div>
     )
@@ -174,11 +166,7 @@ const Timer: React.FC<{}> = ({}) => {
   }, [timerObject]);
 
   return (
-    <div
-      className={classNames(
-        store.page === "trolley" || store.page === "trolleyItem" ? "hidden" : ""
-      )}
-    >
+    <div className={classNames(store.page === "trolley" ? "hidden" : "")}>
       {"Timer:  "}
       {Math.floor(store.time / 60)}:{store.time % 60 < 10 ? "0" : ""}
       {store.time % 60}
@@ -255,15 +243,34 @@ const OnlineShop: React.FC<{}> = () => {
               onClick={() => {}}
             />
           }
-          lastChild={<div></div>}
+          lastChild={
+            store.page === "trolley" ? (
+              <Button
+                icon={Trash2Icon}
+                variant="transparent"
+                color="black"
+                prefixText="Remove items"
+                visible={store.selectedTrolleyItems.length > 0}
+                onClick={() => store.removeTrolleyItems()}
+              />
+            ) : (
+              <Button
+                icon={ArrowRightIcon}
+                variant="transparent"
+                color="black"
+                prefixText="Go to trolley"
+                onClick={() => store.navigateTo("trolley")}
+              />
+            )
+          }
         />
       </div>
 
       {/* Content */}
       <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
         <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
-          {store.page === "item" || store.page === "trolleyItem" ? (
-            <ItemPage type={store.page} />
+          {store.page === "item" ? (
+            <ItemPage />
           ) : (
             <GridPage view={store.page} category={store.currentCategory} />
           )}

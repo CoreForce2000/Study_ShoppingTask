@@ -92,7 +92,6 @@ const DataEntry: React.FC = () => {
 
   const [participantIdError, setParticipantIdError] = useState<string>("");
   const [ageError, setAgeError] = useState<string>("");
-  const [configVisible, setConfigVisible] = useState<boolean>(false);
 
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "d") {
@@ -176,12 +175,11 @@ const DataEntry: React.FC = () => {
           <label htmlFor="participantId">Participant ID</label>
           <input
             name="participantId"
-            type="text"
+            type="tel"
             className="w-20 h-8 border border-gray-300 rounded px-2"
-            maxLength={4}
             minLength={4}
+            maxLength={4}
             onChange={handleChange}
-            pattern="\d{4}"
             required
           />
         </div>
@@ -212,7 +210,7 @@ const DataEntry: React.FC = () => {
               "Heroin",
               "Control",
             ]}
-            value={store.data.survey.group}
+            value={store.taskOptions.group}
             onChange={handleChange}
           />
         </fieldset>
@@ -252,7 +250,7 @@ const DataEntry: React.FC = () => {
             <RadioGroup
               required
               name="time"
-              values={["10 min", "15 min", "1 min"]}
+              values={["10 min", "15 min"]}
               value={store.taskOptions.time}
               onChange={handleChange}
             />
@@ -261,13 +259,6 @@ const DataEntry: React.FC = () => {
         <hr className="h-px border-none bg-gray-600 mb-4" />
 
         <div className="mx-auto w-fit">
-          {configVisible && <></>}
-          <Button
-            type="button"
-            onClick={() => setConfigVisible(!configVisible)}
-          >
-            {configVisible ? "Hide Config" : "Show Config"}
-          </Button>
           <Button type="submit" variant="primary">
             Run Task
           </Button>

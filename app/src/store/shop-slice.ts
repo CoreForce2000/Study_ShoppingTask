@@ -31,8 +31,10 @@ export interface TileItem {
 
 export interface ShopSlice {
   items: Item[];
+  selectedTrolleyItems: TrolleyItem[];
+  selectTrolleyItem: (trolleyItem: TrolleyItem) => void;
   categories: string[];
-  page: "categories" | "items" | "trolley" | "item" | "trolleyItem";
+  page: "categories" | "items" | "trolley" | "item";
   navigateTo: (page: ShopSlice["page"]) => void;
   currentCategory: string;
   currentItem: TileItem | TrolleyItem | undefined;
@@ -42,13 +44,12 @@ export interface ShopSlice {
   trolley: TrolleyItem[];
   trolleyCounter: number;
   addItemToCart: (item: Item) => void;
-  removeItemFromCart: (trolleyItem: TrolleyItem) => void;
+  removeTrolleyItems: () => void;
   backPressed: () => void;
   clickedCategories: string[];
   clickCategory: (category: string) => void;
   clickedItemTiles: Record<string, TileItem[]>;
   clickItemTile: (tile_id: number) => void;
-  clickTrolleyItem: (index: number) => void;
   tickTimer: () => void;
   interSlide: "" | "timeIsRunningOut" | "extraBudget";
   setInterSlide: (interSlide: ShopSlice["interSlide"]) => void;
@@ -59,6 +60,13 @@ export interface ShopSlice {
 
 const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   items: shuffleArray(imageData),
+  selectedTrolleyItems: [],
+  selectTrolleyItem: (trolleyItem: TrolleyItem) =>
+    set((state) => ({
+      selectedTrolleyItems: state.selectedTrolleyItems.includes(trolleyItem)
+        ? state.selectedTrolleyItems.filter((item) => item !== trolleyItem)
+        : [...state.selectedTrolleyItems, trolleyItem],
+    })),
   categories: pseudorandomize(
     [...new Set(imageData.map((item) => item.category))].filter(
       (x) => !config.shop.pathologicalCategories.addiction.includes(x)
@@ -121,16 +129,21 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         };
       }
     }),
-  removeItemFromCart: (trolleyItem: TrolleyItem) =>
+  removeTrolleyItems: () =>
     set((state) => {
-      state.backPressed();
-      const newBudget = state.budget + trolleyItem.price;
+      const newBudget = state.selectedTrolleyItems.reduce(
+        (acc, item) => acc + item.price,
+        state.budget
+      );
+
+      const newTrolley = state.trolley.filter(
+        (item) => !state.selectedTrolleyItems.includes(item)
+      );
 
       return {
         budget: newBudget,
-        trolley: state.trolley.filter(
-          (item) => item.index !== trolleyItem.index
-        ),
+        trolley: newTrolley,
+        selectedTrolleyItems: [],
       };
     }),
 
@@ -142,8 +155,6 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         return { page: "categories" };
       } else if (state.page === "item") {
         return { page: "items" };
-      } else if (state.page === "trolleyItem") {
-        return { page: "trolley" };
       } else {
         return {};
       }
@@ -202,24 +213,12 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
       };
     }),
 
-  clickTrolleyItem: (index: number) =>
-    set((state) => {
-      const item = state.trolley[index];
-      return {
-        currentItem: item,
-      };
-    }),
-
   tickTimer: () =>
     set((state) => {
       if (state.time <= 1) {
         return { time: config.shop.general.time.phase3 };
       } else {
-        if (
-          state.page === "trolley" ||
-          state.page === "trolleyItem" ||
-          state.interSlide !== ""
-        ) {
+        if (state.page === "trolley" || state.interSlide !== "") {
           return {};
         } else {
           const newInterSlide = !state.isPhase3
