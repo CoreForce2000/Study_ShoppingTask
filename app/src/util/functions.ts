@@ -32,7 +32,7 @@ export function pseudorandomize(
   initialScreenCategories: string[]
 ): string[] {
   let mixedList: string[] = [];
-  let totalLength: number = 300; // or any other number depending on how long you want the mixedList to be
+  let totalLength: number = 300;
 
   let drugCounter: number = 0;
   let alcoholCounter: number = 0;

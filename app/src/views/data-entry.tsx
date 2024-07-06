@@ -1,6 +1,8 @@
 import React, { ChangeEvent, ChangeEventHandler, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import classNames from "classnames";
+import config from "../assets/configs/config.json";
 import Button from "../components/button.tsx";
 import useTaskStore from "../store/store.ts";
 import { ASSETS_PATH } from "../util/constants.ts";
@@ -93,6 +95,14 @@ const DataEntry: React.FC = () => {
   const [participantIdError, setParticipantIdError] = useState<string>("");
   const [ageError, setAgeError] = useState<string>("");
 
+  const storeCategories = store.items.map((item) => item.category);
+  const pathCategories = Object.values(
+    config.shop.pathologicalCategories
+  ).flat();
+  const error = pathCategories.filter(
+    (category) => !storeCategories.includes(category)
+  );
+
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "d") {
       event.preventDefault();
@@ -170,6 +180,9 @@ const DataEntry: React.FC = () => {
           className="w-full max-w-xs mb-5"
           alt="Cambridge Logo"
         />
+        <div className={classNames(error.length === 0 ? "hidden" : "visible")}>
+          {`Check your config - ${error} are not existing categories`}
+        </div>
 
         <div className="flex justify-between w-full font-sans">
           <label htmlFor="participantId">Participant ID</label>

@@ -3,7 +3,7 @@ import {
   ArrowRightIcon,
   ListTodoIcon,
   ShoppingCartIcon,
-  Trash2Icon,
+  SquareXIcon,
 } from "lucide-react";
 import React, { useEffect } from "react";
 import config from "../assets/configs/config.json";
@@ -90,28 +90,31 @@ const GridPage: React.FC<{
           }
         )}
 
-      {view === "trolley" &&
-        store.trolley.map((trolleyItem, index) => (
-          <Tile
-            actionName="select item trolley"
-            key={`${trolleyItem.index}-${index}`}
-            tileState={"itemClicked"}
-            backgroundColor={"white"}
-            onClick={() => {
-              store.selectTrolleyItem(trolleyItem);
-            }}
-            imageUrl={
-              trolleyItem
-                ? getImagePath(
-                    trolleyItem.item.category,
-                    trolleyItem.item.image_name
-                  )
-                : ""
-            }
-            text={""}
-            showCheckbox={true}
-          />
-        ))}
+      {view === "trolley" && (
+        <>
+          {store.trolley.map((trolleyItem, index) => (
+            <Tile
+              actionName="select item trolley"
+              key={`${trolleyItem.index}-${index}`}
+              tileState={"itemClicked"}
+              backgroundColor={"white"}
+              onClick={() => {
+                store.selectTrolleyItem(trolleyItem);
+              }}
+              imageUrl={
+                trolleyItem
+                  ? getImagePath(
+                      trolleyItem.item.category,
+                      trolleyItem.item.image_name
+                    )
+                  : ""
+              }
+              text={""}
+              showCheckbox={true}
+            />
+          ))}
+        </>
+      )}
     </div>
   );
 };
@@ -246,11 +249,10 @@ const OnlineShop: React.FC<{}> = () => {
           lastChild={
             store.page === "trolley" ? (
               <Button
-                icon={Trash2Icon}
+                icon={SquareXIcon}
                 variant="transparent"
                 color="black"
-                prefixText="Remove items"
-                visible={store.selectedTrolleyItems.length > 0}
+                prefixText="Remove from Trolley"
                 onClick={() => store.removeTrolleyItems()}
               />
             ) : (
@@ -274,6 +276,22 @@ const OnlineShop: React.FC<{}> = () => {
           ) : (
             <GridPage view={store.page} category={store.currentCategory} />
           )}
+          <EvenlySpacedRow
+            firstChild={<div></div>}
+            secondChild={
+              <Button
+                onClick={store.removeTrolleyItems}
+                className="text-sm"
+                visible={
+                  store.page === "trolley" &&
+                  store.selectedTrolleyItems.length > 0
+                }
+              >
+                Remove
+              </Button>
+            }
+            lastChild={<div></div>}
+          ></EvenlySpacedRow>
         </div>
       </div>
     </div>
