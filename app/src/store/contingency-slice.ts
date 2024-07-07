@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
-import { shuffleExtendArray, shuffledBinaryArray } from "../util/functions";
+import { extendArray, shuffledBinaryArray } from "../util/functions";
 import { Item } from "./shop-slice";
 import { TaskStore } from "./store";
 
@@ -117,22 +117,16 @@ const createContingencySlice: StateCreator<
           ].includes(item.category)
       );
 
-      console.log(selfItems, otherItems);
-      console.log(
-        shuffleExtendArray(
-          selfItems,
-          config.experimentConfig.trialSequence.length * 5
-        )
-      );
-
       return {
-        selfItems: shuffleExtendArray(
+        selfItems: extendArray(
           selfItems,
-          config.experimentConfig.trialSequence.length * 5
+          config.experimentConfig.trialSequence.length * 5,
+          true
         ),
-        otherItems: shuffleExtendArray(
+        otherItems: extendArray(
           otherItems,
-          config.experimentConfig.trialSequence.length * 5
+          config.experimentConfig.trialSequence.length * 5,
+          true
         ),
       };
     }),

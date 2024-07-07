@@ -31,6 +31,8 @@ export interface TileItem {
 
 export interface ShopSlice {
   items: Item[];
+  numVisibleRows: number;
+  addVisibleRows: () => void;
   selectedTrolleyItems: TrolleyItem[];
   selectTrolleyItem: (trolleyItem: TrolleyItem) => void;
   categories: string[];
@@ -67,14 +69,9 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         ? state.selectedTrolleyItems.filter((item) => item !== trolleyItem)
         : [...state.selectedTrolleyItems, trolleyItem],
     })),
-  categories: pseudorandomize(
-    [...new Set(imageData.map((item) => item.category))].filter(
-      (x) => !config.shop.pathologicalCategories.addiction.includes(x)
-    ),
-    config.shop.pathologicalCategories.addiction,
-    config.shop.pathologicalCategories.addiction,
-    config.shop.pathologicalCategories.initialScreenCategories
-  ),
+  categories: pseudorandomize([
+    ...new Set(imageData.map((item) => item.category)),
+  ]),
   page: "categories",
   navigateTo: (page: ShopSlice["page"]) =>
     set(() => ({
@@ -90,6 +87,12 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   setScrollPosition: (key, position) =>
     set((state) => ({
       scrollPositions: { ...state.scrollPositions, [key]: position },
+    })),
+  numVisibleRows: config.shop.general.initialVisilbeRows,
+  addVisibleRows: () =>
+    set((state) => ({
+      numVisibleRows:
+        state.numVisibleRows + config.shop.general.newVisibleRowsOnScroll,
     })),
 
   currentCategory: "",

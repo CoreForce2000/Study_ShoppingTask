@@ -20,7 +20,7 @@ const VAS: React.FC<VASProps> = ({ minLabel, maxLabel, setValue }) => {
     const value = (x / width) * 100; // Convert the click position to a value from 0 to 100
 
     setIndicatorPosition(x); // Update the indicator's position
-    setValue(value); // Update the value in the parent component
+    setValue(Math.round(value)); // Update the value in the parent component
   };
 
   return (

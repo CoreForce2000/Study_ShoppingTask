@@ -1,4 +1,21 @@
+import config from "../assets/configs/config.json";
 import { TaskStore } from "../store/store";
+
+export function getCurrentTime() {
+  const currentTime = new Date().getTime() / 1000;
+  console.log("currentTime", currentTime);
+  return currentTime;
+}
+
+export function isScrollAreaAtBottom(
+  element: HTMLElement,
+  bottomBuffer: number = 0
+) {
+  return (
+    element.scrollTop + element.clientHeight + bottomBuffer >=
+    element.scrollHeight
+  );
+}
 
 export function shuffleArray(array: any): any[] {
   for (let i = array.length - 1; i > 0; i--) {
@@ -25,71 +42,123 @@ export function shuffledBinaryArray<T>(
   return shuffleArray(array);
 }
 
-export function pseudorandomize(
-  nonDrugCategories: string[],
-  drugCategories: string[],
-  alcoholCategories: string[],
-  initialScreenCategories: string[]
-): string[] {
-  let mixedList: string[] = [];
-  let totalLength: number = 300;
-
-  let drugCounter: number = 0;
-  let alcoholCounter: number = 0;
-  let nonDrugCounter: number = 0;
-
-  let drugAndInitialScreenCategoriesRand: string[] = shuffleArray(
-    initialScreenCategories
-  ).concat(shuffleArray(drugCategories));
-  let alcoholCategoriesRand: string[] = shuffleArray(alcoholCategories);
-  let nonDrugCategoriesRand: string[] = shuffleArray(nonDrugCategories);
-
-  for (let i: number = 0; i < totalLength; i++) {
-    if (i % 6 === 0) {
-      if (drugCounter < drugAndInitialScreenCategoriesRand.length) {
-        mixedList.push(drugAndInitialScreenCategoriesRand[drugCounter++]);
-      }
-    }
-
-    if (i % 6 === 2) {
-      if (alcoholCounter < alcoholCategoriesRand.length) {
-        mixedList.push(alcoholCategoriesRand[alcoholCounter++]);
-      }
-    }
-
-    if (nonDrugCounter < nonDrugCategoriesRand.length) {
-      mixedList.push(nonDrugCategoriesRand[nonDrugCounter++]);
-    }
-
-    // Reset counters when we've gone through all items in each category
-    if (drugCounter === drugAndInitialScreenCategoriesRand.length) {
-      drugAndInitialScreenCategoriesRand = shuffleArray(
-        initialScreenCategories
-      ).concat(shuffleArray(drugCategories));
-      drugCounter = 0;
-    }
-    if (alcoholCounter === alcoholCategoriesRand.length) {
-      alcoholCategoriesRand = shuffleArray(alcoholCategories);
-      alcoholCounter = 0;
-    }
-    if (nonDrugCounter === nonDrugCategoriesRand.length) {
-      nonDrugCategoriesRand = shuffleArray(nonDrugCategories);
-      nonDrugCounter = 0;
-    }
-  }
-
-  return mixedList;
-}
-
-export function shuffleExtendArray(
+export function extendArray(
   originalArray: any[],
-  targetLength: number
+  targetLength: number,
+  shuffle: boolean = false
 ): any[] {
   return Array(Math.ceil(targetLength / originalArray.length))
     .fill(originalArray)
-    .map((array) => shuffleArray(array))
+    .map((array) => (shuffle ? shuffleArray(array) : array))
     .slice(0, targetLength)
     .flat();
+}
+
+function leftExclusive(left: any[], right: any[]): any[] {
+  return left.filter((l) => !right.includes(l));
+}
+
+function sumArray(numbers: number[]) {
+  return numbers.reduce(
+    (accumulator: number, currentValue: number) => accumulator + currentValue,
+    0
+  );
+}
+
+function transpose(matrix: any[][]) {
+  // Determine the maximum row length
+  const maxRowLength = Math.max(...matrix.map((row) => row.length));
+
+  // Initialize the transposed matrix with empty arrays
+  const transposedMatrix: any[][] = Array.from(
+    { length: maxRowLength },
+    () => []
+  );
+
+  // Iterate over the original matrix and fill the transposed matrix
+  for (let row = 0; row < matrix.length; row++) {
+    for (let col = 0; col < matrix[row].length; col++) {
+      transposedMatrix[col][row] = matrix[row][col];
+    }
+  }
+
+  // Remove any undefined values from the transposed matrix
+  for (let col = 0; col < transposedMatrix.length; col++) {
+    transposedMatrix[col] = transposedMatrix[col].filter(
+      (value) => value !== undefined
+    );
+  }
+
+  return transposedMatrix;
+}
+
+export function pseudorandomize(
+  categories: string[],
+  leftShift: number = 4
+): string[] {
+  function shiftArray(arr: any[], shift: number) {
+    const len = arr.length;
+    const effectiveShift = shift % len;
+    if (effectiveShift === 0) return arr.slice(); // No shift needed
+
+    const shiftedPart = arr.slice(effectiveShift);
+    const remainderPart = arr.slice(0, effectiveShift);
+    return shiftedPart.concat(remainderPart);
+  }
+
+  function shiftedRepeats(arr: any[], repeats: number) {
+    return Array(repeats)
+      .fill(0)
+      .map((_, repeat) => shiftArray(arr, repeat * leftShift));
+  }
+
+  const pathCat = config.shop.pathologicalCategories;
+  const otherCategories = leftExclusive(
+    categories,
+    pathCat.categories.map((x) => x.items).flat()
+  );
+
+  const partsOther =
+    10 - sumArray(pathCat.categories.map((x) => x.partsPerTen));
+
+  const tenRows = [
+    ...Object.keys(pathCat.categories)
+      .map((_, index) =>
+        shiftedRepeats(
+          pathCat.categories[index].items,
+          pathCat.categories[index].partsPerTen
+        )
+      )
+      .flat(),
+
+    ...shiftedRepeats(otherCategories, partsOther),
+  ];
+
+  // longestrow
+  const longestRowLength = Math.max(...tenRows.map((row) => row.length));
+
+  const normalizedTenRows = tenRows.map((row) =>
+    extendArray(row, longestRowLength).slice(0)
+  );
+
+  console.log("normalizedTenRows", normalizedTenRows);
+
+  const transposedTenRows = transpose(normalizedTenRows);
+
+  const randomizedTenRows = transposedTenRows.map((row) => shuffleArray(row));
+
+  const finalShuffledList = randomizedTenRows.flat();
+
+  const finalShuffledListInitialScreen =
+    config.shop.pathologicalCategories.initialScreenCategories.concat(
+      finalShuffledList
+    );
+
+  const mixedList = shuffleArray(
+    finalShuffledListInitialScreen.slice(0, 35)
+  ).concat(finalShuffledListInitialScreen.slice(35));
+
+  return mixedList;
 }
 
 type TimingRange = {
@@ -143,10 +212,15 @@ export function unique(array: any[]) {
 export function exportCsv(store: TaskStore) {
   const csvString = store.getCsvString();
 
+  //nameing: participantId_SHOP_date
+  const fileName = `${
+    store.data.survey.participantId
+  }_SHOP_${new Date().toLocaleDateString()}`;
+
   const encodedUri = encodeURI(csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", "shop_actions.csv");
+  link.setAttribute("download", fileName + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

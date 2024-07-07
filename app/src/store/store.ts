@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { getCurrentTime } from "../util/functions";
 import createContingencySlice, { ContingencySlice } from "./contingency-slice";
 import createDataSlice, { DataSlice } from "./data-slice";
 import createShopSlice, { ShopSlice } from "./shop-slice";
@@ -18,7 +19,7 @@ const useTaskStore = create<TaskStore>()((...a) => ({
   setSlide: (slide) => {
     a[0](() => ({ slide: slide }));
   },
-  initialTime: new Date().getSeconds(),
+  initialTime: getCurrentTime(),
   ...createDataSlice(...a),
   ...createShopSlice(...a),
   ...createContingencySlice(...a),

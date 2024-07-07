@@ -96,9 +96,11 @@ const DataEntry: React.FC = () => {
   const [ageError, setAgeError] = useState<string>("");
 
   const storeCategories = store.items.map((item) => item.category);
-  const pathCategories = Object.values(
-    config.shop.pathologicalCategories
-  ).flat();
+
+  const pathCategories = config.shop.pathologicalCategories.categories
+    .map((x) => x.items)
+    .flat();
+
   const error = pathCategories.filter(
     (category) => !storeCategories.includes(category)
   );
@@ -271,9 +273,12 @@ const DataEntry: React.FC = () => {
         </div>
         <hr className="h-px border-none bg-gray-600 mb-4" />
 
-        <div className="mx-auto w-fit">
+        <div className="mx-auto w-fit flex flex-col">
           <Button type="submit" variant="primary">
             Run Task
+          </Button>
+          <Button variant="secondary" onClick={() => navigate("/images")}>
+            View Categories
           </Button>
         </div>
       </form>

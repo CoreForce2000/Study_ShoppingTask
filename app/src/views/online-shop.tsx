@@ -16,6 +16,7 @@ import EvenlySpacedRow from "../components/evenly-spaced-row";
 import Tile from "../components/tile";
 import { TileItem } from "../store/shop-slice";
 import useTaskStore from "../store/store";
+import { isScrollAreaAtBottom } from "../util/functions";
 import { useScrollRestoration } from "../util/hooks";
 import { getImagePath } from "../util/preload";
 
@@ -37,25 +38,27 @@ const GridPage: React.FC<{
   return (
     <div className="grid grid-cols-7">
       {view === "categories" &&
-        store.categories.map((category, index) => (
-          <Tile
-            actionName="open category"
-            key={`${category}-${index}`}
-            text={category}
-            tileState={
-              store.clickedCategories.includes(category)
-                ? "categoryClicked"
-                : "none"
-            }
-            onClick={() =>
-              delayAfterClick(() => {
-                store.clickCategory(category);
-                store.navigateTo("items");
-              })
-            }
-            backgroundColor={config.colors.categoryTileColor}
-          />
-        ))}
+        store.categories
+          .slice(0, store.numVisibleRows * 7)
+          .map((category, index) => (
+            <Tile
+              actionName="open category"
+              key={`${category}-${index}`}
+              text={category}
+              tileState={
+                store.clickedCategories.includes(category)
+                  ? "categoryClicked"
+                  : "none"
+              }
+              onClick={() =>
+                delayAfterClick(() => {
+                  store.clickCategory(category);
+                  store.navigateTo("items");
+                })
+              }
+              backgroundColor={config.colors.categoryTileColor}
+            />
+          ))}
 
       {view === "items" &&
         category &&
@@ -125,7 +128,7 @@ const ItemPage: React.FC<{}> = ({}) => {
   return (
     store.currentCategory &&
     store.currentItem && (
-      <div className="flex flex-col items-center justify-center h-[11em]">
+      <div className="flex flex-col items-center justify-evenly">
         <img
           className="h-[6.5em] object-cover pb-2"
           src={`${getImagePath(
@@ -180,23 +183,22 @@ const Timer: React.FC<{}> = ({}) => {
 // Main OnlineShop Component
 const OnlineShop: React.FC<{}> = () => {
   const store = useTaskStore();
-  const navigate = useNavigate();
 
   const scrollRef = useScrollRestoration(
     "category_" + store.currentCategory,
     false
   );
 
-  // get page variable "time" from url
-  const urlParams = new URLSearchParams(window.location.search);
-  const time = urlParams.get("time");
-
-  if (time) {
-    if (time !== "") {
-      store.setTime(parseInt(time));
-      navigate(`slide/${store.slide}`);
+  const onScroll = () => {
+    console.log("Scrolling");
+    if (scrollRef.current) {
+      if (isScrollAreaAtBottom(scrollRef.current, 50)) {
+        if (store.page === "categories") {
+          store.addVisibleRows();
+        }
+      }
     }
-  }
+  };
 
   return (
     <div className="w-full h-full flex flex-col items-center">
@@ -270,7 +272,7 @@ const OnlineShop: React.FC<{}> = () => {
 
       {/* Content */}
       <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
-        <div className="overflow-y-auto no-scrollbar" ref={scrollRef}>
+        <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
           {store.page === "item" ? (
             <ItemPage />
           ) : (

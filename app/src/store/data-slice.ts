@@ -94,10 +94,10 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
         actionLog: [
           ...state.data.actionLog,
           {
-            Phase: 0,
-            Phase_name: "Survey",
-            Block: 0,
-            Block_name: "survey",
+            Phase: 1,
+            Phase_name: "Shopping",
+            Block: 1,
+            Block_name: "shopping",
             ...response,
           },
         ],
@@ -125,7 +125,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
               ? state.currentCategory
               : "",
             Shopping_price: state.currentItem ? 0 : "",
-            Shopping_time_stamp: new Date().getSeconds() - state.initialTime,
+            // Shopping_time_stamp: state.time,
             Shopping_time_action: state.time,
           },
         ],
