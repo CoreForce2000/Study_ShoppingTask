@@ -5,58 +5,57 @@
   gap: 0.3em; /* Adjust the gap size to your preference */
   font-weight: 500;
   color: black;
+  direction: rtl;
 }
-  
-  .checkboxLabel {
-    position: relative;
-    padding-left: 1.3em; /* space for the custom checkbox */
-    margin-bottom: 0.2em; /* spacing between checkboxes */
-    cursor: pointer;
-    user-select: none;
-  }
-  
-  .checkboxInput {
-    position: absolute;
-    opacity: 0;
-    cursor: pointer;
-    height: 0;
-    width: 0;
-  }
-  .checkboxTableContainer {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Create four columns */
-    gap: 10px; /* Adjust gap between checkboxes as needed */
-    /* Add other styling as necessary */
+
+.checkboxLabel {
+  position: relative;
+  padding-left: 1.3em; /* space for the custom checkbox */
+  margin-bottom: 0.2em; /* spacing between checkboxes */
+  cursor: pointer;
+  user-select: none;
 }
-  .customCheckbox {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 3em;
-    width: 3em;
-    margin-top: 0.25em;
-    background-color: #fff; /* unselected background color */
-    border-radius: 0px; /* rounded corners for the custom checkbox */
-    box-shadow: 0.1em 0.15em 0px rgba(0, 0, 0, 1);
-    border: 0.1em solid black; /* border for the custom checkbox */
-  }
-  
-  .checkboxInput:checked ~ .customCheckbox {
-    background-color: #2196F3; /* selected background color */
-  }
-  
-  /* Style for the checkmark to appear when selected */
-  .checkboxInput:checked ~ .customCheckbox:after {
-    content: "";
-    position: absolute;
-    display: block;
-    left: 0.25em;
-    top: 0.01em;
-    width: 0.3em;
-    height: 0.6em;
-    border: solid white ;
-    border-width: 0 0.15em 0.15em 0;
-    transform: rotate(45deg);
-  }
-  
-  
+
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+.checkboxTableContainer {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Create four columns */
+  gap: 10px; /* Adjust gap between checkboxes as needed */
+  /* Add other styling as necessary */
+}
+.customCheckbox {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3em;
+  width: 3em;
+  margin-top: 0.25em;
+  background-color: #fff; /* unselected background color */
+  border-radius: 0px; /* rounded corners for the custom checkbox */
+  box-shadow: 0.1em 0.15em 0px rgba(0, 0, 0, 1);
+  border: 0.1em solid black; /* border for the custom checkbox */
+}
+
+.checkboxInput:checked ~ .customCheckbox {
+  background-color: #2196f3; /* selected background color */
+}
+
+/* Style for the checkmark to appear when selected */
+.checkboxInput:checked ~ .customCheckbox:after {
+  content: "";
+  position: absolute;
+  display: block;
+  left: 0.25em;
+  top: 0.01em;
+  width: 0.3em;
+  height: 0.6em;
+  border: solid white;
+  border-width: 0 0.15em 0.15em 0;
+  transform: rotate(45deg);
+}

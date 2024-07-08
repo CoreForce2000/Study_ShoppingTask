@@ -8,6 +8,8 @@ interface CheckboxProps {
   columnLayout: "single" | "double";
   onChange: (selectedOptions: string[]) => void;
   allowedOption?: string;
+  gap?: string;
+  disableOnClick?: boolean;
 }
 
 export interface CheckboxOption {
@@ -22,6 +24,8 @@ const Checkbox: React.FC<CheckboxProps> = ({
   columnLayout,
   onChange,
   allowedOption,
+  gap = "0.3em",
+  disableOnClick = false,
 }) => {
   const [options, setOptions] = useState<CheckboxOption[]>(
     [...initialOptions, ...exclusiveOptions].map((label) => ({
@@ -29,6 +33,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
       checked: false,
     }))
   );
+  const [disabled, setDisabled] = useState<boolean>(false);
 
   // Function to toggle the checked state of a checkbox
   const toggleCheckbox = (index: number) => {
@@ -73,6 +78,8 @@ const Checkbox: React.FC<CheckboxProps> = ({
         .filter((option) => option.checked)
         .map((option) => option.label)
     );
+
+    setDisabled(disableOnClick);
   };
 
   let fontSizeParentNum = 0.7;
@@ -95,32 +102,38 @@ const Checkbox: React.FC<CheckboxProps> = ({
       style={{
         fontSize: fontSizeParent,
         gridTemplateColumns: columnLayout === "double" ? "1fr 1fr" : "1fr",
+        gap: gap,
       }}
     >
       {options.map((option, index) => (
-        <label
-          key={index}
-          className={`${styles.checkboxLabel} ${
-            columnLayout === "double"
-              ? index % 2 === 0
-                ? styles.leftColumn
-                : styles.rightColumn
-              : ""
-          }`}
-        >
-          <input
-            type="checkbox"
-            checked={option.checked}
-            onChange={() => toggleCheckbox(index)}
-            className={styles.checkboxInput}
-          />
-          <span style={{ color: "white", textShadow: "none" }}>-</span>
-          <span
-            className={styles.customCheckbox}
-            style={{ height: boxSize, width: boxSize }}
-          ></span>
-          {option.label}
-        </label>
+        <div className="flex justify-end">
+          <label
+            key={index}
+            className={`${styles.checkboxLabel} ${
+              columnLayout === "double"
+                ? index % 2 === 0
+                  ? styles.leftColumn
+                  : styles.rightColumn
+                : ""
+            }`}
+          >
+            <input
+              type="checkbox"
+              checked={option.checked}
+              onChange={() => toggleCheckbox(index)}
+              className={styles.checkboxInput}
+              disabled={disabled}
+            />
+            {option.label !== "" ? (
+              <span style={{ color: "white", textShadow: "none" }}>-</span>
+            ) : null}
+            <span
+              className={styles.customCheckbox}
+              style={{ height: boxSize, width: boxSize }}
+            ></span>
+            {option.label}
+          </label>
+        </div>
       ))}
     </div>
   );

@@ -161,6 +161,7 @@ const Timer: React.FC<{}> = ({}) => {
 
   const timerObject = useTimer({ delay: 1000 }, () => {
     if (store.time === 1) {
+      store.switchToPhase3();
       navigate(`../slide/${store.slide + 1}`);
     }
     store.tickTimer();

@@ -56,8 +56,14 @@ export interface ShopSlice {
   interSlide: "" | "timeIsRunningOut" | "extraBudget";
   setInterSlide: (interSlide: ShopSlice["interSlide"]) => void;
   isPhase3: boolean;
+  switchToPhase3: () => void;
   time: number;
   setTime: (time: number) => void;
+  quizCorrectPersons: string[];
+  quizAddCorrectPersonUnique: (
+    person: string,
+    sideEffect: (array: string[]) => void
+  ) => void;
 }
 
 const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
@@ -199,8 +205,6 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
 
       const item = items[itemIndex];
 
-      console.log(item);
-
       return {
         clickedItemTiles: {
           ...state.clickedItemTiles,
@@ -256,6 +260,17 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
       interSlide: interSlide,
     })),
   isPhase3: false,
+  switchToPhase3: () => set(() => ({ isPhase3: true })),
+  quizCorrectPersons: [],
+  quizAddCorrectPersonUnique: (person, sideEffect) =>
+    set((state) => {
+      const newArray = addUnique(state.quizCorrectPersons, person);
+      sideEffect(newArray);
+
+      return {
+        quizCorrectPersons: newArray,
+      };
+    }),
 });
 
 export default createShopSlice;

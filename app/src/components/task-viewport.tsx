@@ -39,6 +39,7 @@ const TaskViewport: React.FC<TaskViewportProps> = ({
       backgroundSize: "cover",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center center",
+      backgroundColor: "white",
     };
 
     setSlideStyle({

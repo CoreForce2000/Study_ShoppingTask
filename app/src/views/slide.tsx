@@ -1,16 +1,29 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Checkbox from "../components/checkbox.tsx";
 import TaskViewport from "../components/task-viewport.tsx";
+import { unique } from "../util/functions.ts";
 
 import Button from "../components/button.tsx";
 import VASSlide from "../components/slide-vas.tsx";
 import useTaskStore from "../store/store.ts";
 
 import config from "../assets/configs/config.json";
-import { KEY_SPACE, SLIDE_PATH } from "../util/constants.ts";
+import {
+  KEY_SPACE,
+  MEMORY_ALL_CORRECT_SOUND,
+  MEMORY_CORRECT_SOUND,
+  MEMORY_WRONG_SOUND,
+  SLIDE_PATH,
+} from "../util/constants.ts";
 import { exportCsv } from "../util/functions.ts";
-import { getImagePath, preloadImage, preloadSlides } from "../util/preload.ts";
+import { getImagePath, preloadImage } from "../util/preload.ts";
 import OnlineShop from "./online-shop.tsx";
 
 export interface Slide {
@@ -29,11 +42,6 @@ const SlideShow: React.FC = () => {
       setButtonVisibleRaw(state);
     }
   };
-
-  useEffect(() => {
-    preloadSlides();
-  });
-
   const timeoutIdRef = useRef<number | null>(null);
   const keyPressHandlerRef = useRef<((event: KeyboardEvent) => void) | null>(
     null
@@ -119,7 +127,7 @@ const SlideShow: React.FC = () => {
         incrementSlideIndex();
       } else if ((event.ctrlKey || event.metaKey) && event.key === "v") {
         event.preventDefault();
-        navigate("/csv");
+        exportCsv(store);
       }
     };
 
@@ -136,8 +144,6 @@ const SlideShow: React.FC = () => {
     if (drugs.length === 0) return { execute: () => incrementSlideIndex() };
 
     const drug = drugs[trialNumber - 1];
-
-    console.log(drugs);
 
     return {
       slide: `VasSlide.JPG`,
@@ -165,95 +171,149 @@ const SlideShow: React.FC = () => {
   };
 
   const contingencySlide = (block: number) => {
-    let trialInfo;
-    let isSelfItem;
-    let item;
-    let imagePath;
+    const trialInfo = store.contingencyOrder[block][store.trial - 1];
+    const isSelfItem = trialInfo.color === store.colorMapping.self;
+    const item = isSelfItem
+      ? store.selfItems[store.trial - 1]
+      : store.otherItems[store.trial - 1];
+    const imagePath = getImagePath(item?.category, item?.image_name);
+
+    const prepareExecute = useCallback(() => {
+      setButtonVisible(false);
+      clearListeners();
+      waitTimeout(
+        config.experimentConfig.slideTimings.offLightbulb.minValue,
+        config.experimentConfig.slideTimings.offLightbulb.maxValue,
+        store.nextTrialPhase
+      );
+    }, []);
+
+    const reactExecute = useCallback(() => {
+      clearListeners();
+      waitKeyPress(KEY_SPACE, () => {
+        store.setReacted(true);
+        store.nextTrialPhase();
+      });
+      waitTimeout(
+        config.experimentConfig.slideTimings.coloredLightbulb.minValue,
+        config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
+        store.nextTrialPhase
+      );
+    }, []);
+
+    const outcomeExecuteSuccess = useCallback(() => {
+      clearListeners();
+      waitTimeout(
+        config.experimentConfig.slideTimings.receiveItem.minValue,
+        config.experimentConfig.slideTimings.receiveItem.maxValue,
+        () => {
+          store.incrementTrial(incrementSlideIndex);
+          store.setReacted(false);
+        }
+      );
+    }, []);
+
+    const outcomeExecuteFail = useCallback(() => {
+      clearListeners();
+      waitTimeout(
+        config.experimentConfig.slideTimings.offLightbulbNoItem.minValue,
+        config.experimentConfig.slideTimings.offLightbulbNoItem.maxValue,
+        () => {
+          store.incrementTrial(incrementSlideIndex);
+          store.setReacted(false);
+        }
+      );
+    }, []);
+
+    const childrenElement = useMemo(
+      () => (
+        <div className="w-full h-full flex justify-center items-center pb-[3em]">
+          <div>
+            <img className="max-h-[5em] max-w-[5em]" src={imagePath}></img>
+          </div>
+        </div>
+      ),
+      [imagePath]
+    );
 
     switch (store.trialPhase) {
       case "prepare":
         return {
           slide: `/duringPhase2/Slide1.PNG`,
-          execute: () => {
-            clearListeners();
-            waitTimeout(
-              config.experimentConfig.slideTimings.offLightbulb.minValue,
-              config.experimentConfig.slideTimings.offLightbulb.maxValue,
-              store.nextTrialPhase
-            );
-          },
+          execute: prepareExecute,
         };
       case "react":
-        trialInfo = store.contingencyOrder[block][trialNumber - 1];
-        isSelfItem = trialInfo.color === store.colorMapping.self;
-        item = isSelfItem
-          ? store.selfItems[trialNumber - 1]
-          : store.otherItems[trialNumber - 1];
-        imagePath = getImagePath(item!.category, item!.image_name);
         preloadImage(imagePath);
-
         return {
           slide:
             trialInfo.color === "orange"
               ? "/duringPhase2/Slide2.PNG"
               : "/duringPhase2/Slide3.PNG",
-          execute: () => {
-            clearListeners();
-            waitKeyPress(KEY_SPACE, () => {
-              store.setReacted(true);
-              store.nextTrialPhase();
-            });
-            waitTimeout(
-              config.experimentConfig.slideTimings.coloredLightbulb.minValue,
-              config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
-              store.nextTrialPhase
-            );
-          },
+          execute: reactExecute,
         };
       case "outcome":
-        return (trialInfo!.spacePressedCorrect && store.reacted) ||
-          (trialInfo!.noSpacePressedCorrect && !store.reacted)
+        return (trialInfo.spacePressedCorrect && store.reacted) ||
+          (trialInfo.noSpacePressedCorrect && !store.reacted)
           ? {
               slide: `/duringPhase2/Slide4.PNG`,
-              children: (
-                <div className="mt-12 bg-white w-full pl-6 flex justify-center">
-                  <div className="bg-white">
-                    <img src={imagePath}></img>
-                  </div>
-                </div>
-              ),
-              execute: () => {
-                clearListeners();
-                waitTimeout(
-                  config.experimentConfig.slideTimings.receiveItem.minValue,
-                  config.experimentConfig.slideTimings.receiveItem.maxValue,
-                  () => {
-                    incrementTrialIndex(
-                      "trial",
-                      store.contingencyOrder[block].length
-                    );
-                    store.setReacted(false);
-                  }
-                );
-              },
+              children: childrenElement,
+              execute: outcomeExecuteSuccess,
             }
           : {
               slide: `/duringPhase2/Slide1.PNG`,
-              execute: () => {
-                clearListeners();
-                waitTimeout(
-                  config.experimentConfig.slideTimings.offLightbulbNoItem
-                    .minValue,
-                  config.experimentConfig.slideTimings.offLightbulbNoItem
-                    .maxValue,
-                  () => {
-                    store.incrementTrial(incrementSlideIndex);
-                    store.setReacted(false);
-                  }
-                );
-              },
+              execute: outcomeExecuteFail,
             };
     }
+  };
+
+  const quizSlide = () => {
+    return {
+      slide: `phase3/Slide28.JPG`,
+      children: (
+        <div
+          key={`column1234`}
+          className="text-base mt-[4em] w-[95%] pl-2.5 grid grid-cols-4 gap-0"
+        >
+          {config.memoryQuestionConfig.map((person, index) => {
+            return (
+              <div key={`checkbox-${index}`} className="bg-white w-[80%]">
+                <Checkbox
+                  key={`column${index}`}
+                  initialOptions={person.options}
+                  columnLayout="single"
+                  allowMultiple={false}
+                  onChange={(itemsSelected) => {
+                    if (itemsSelected[0] === person.correct) {
+                      MEMORY_CORRECT_SOUND.play();
+                      store.quizAddCorrectPersonUnique(
+                        person.person,
+                        (quizCorrectPersons) => {
+                          if (
+                            quizCorrectPersons.length ===
+                            config.memoryQuestionConfig.length
+                          ) {
+                            waitTimeout(1500, 1500, () =>
+                              MEMORY_ALL_CORRECT_SOUND.play()
+                            );
+                            waitTimeout(4500);
+                          }
+                        }
+                      );
+                    } else {
+                      MEMORY_WRONG_SOUND.play();
+                    }
+                  }}
+                  disableOnClick={store.quizCorrectPersons.includes(
+                    person.person
+                  )}
+                />
+              </div>
+            );
+          })}
+        </div>
+      ),
+      execute: () => setButtonVisible(false),
+    };
   };
 
   const slideSequence = [
@@ -275,6 +335,7 @@ const SlideShow: React.FC = () => {
                 });
                 waitTimeout(1000);
               }}
+              disableOnClick={true}
             />
           </div>
         </div>
@@ -316,19 +377,6 @@ const SlideShow: React.FC = () => {
     {
       slide: `phase1/Slide5.JPG`,
       execute: () => {
-        // ...config.options.drugScreening.drugs.reduce(
-        //   (acc, drug) => ({
-        //     ...acc,
-        //     [`${drug}_now`]: store.getDrugsNow().includes(drug) ? 1 : 0,
-        //   }),
-        //   {}
-        // ),
-        // [config.options.drugScreening.none]: store.data.survey.drugs.includes(
-        //   config.options.drugScreening.none
-        // )
-        //   ? 1
-        //   : 0,
-
         setButtonVisible(false);
         waitKeyPress(undefined, () => {
           incrementSlideIndex();
@@ -361,8 +409,9 @@ const SlideShow: React.FC = () => {
     {
       children: <OnlineShop></OnlineShop>,
       slide: `White.png`,
-      execute: () => setButtonVisible(false),
+      execute: () => setButtonVisible(true),
     },
+    { slide: `phase2/Slide12.JPG`, execute: () => waitTimeout(3000) },
     {
       slide: `phase2/Slide13.JPG`,
       children: (
@@ -401,12 +450,17 @@ const SlideShow: React.FC = () => {
     },
     drugCravingSlide("post"),
 
-    { slide: `phase2/Slide16.JPG`, execute: () => exportCsv(store) },
+    {
+      slide: `phase2/Slide16.JPG`,
+      execute: () => {
+        setButtonVisible(true);
+      },
+    },
     { slide: `phase2/Slide17.JPG` },
     { slide: `phase2/Slide18.jpg` },
     { slide: `phase2/Slide19.JPG` },
     { slide: `phase2/Slide20.JPG` },
-    { slide: `phase2/Slide21.JPG` },
+    { slide: `phase2/Slide21.JPG`, execute: clearListeners },
 
     ...Array(5)
       .fill(0)
@@ -430,24 +484,17 @@ const SlideShow: React.FC = () => {
         {
           slide: `/duringPhase2/SlideB2.PNG`,
           children: (
-            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+            <div className="pt-[3em] pl-[0.5em]">
               <Checkbox
-                key="column8"
-                initialOptions={[""]}
-                columnLayout="single"
+                key="B2"
+                initialOptions={["", ""]}
+                columnLayout="double"
                 allowMultiple={false}
                 onChange={() => {
                   waitTimeout(1000);
                 }}
-              />
-              <Checkbox
-                key="column9"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
+                gap={"3.3em"}
+                disableOnClick={true}
               />
             </div>
           ),
@@ -455,24 +502,17 @@ const SlideShow: React.FC = () => {
         {
           slide: `/duringPhase2/SlideB3.PNG`,
           children: (
-            <div className="pt-14 pl-2.5 flex w-12 gap-8 justify-center">
+            <div className="pt-[3em] pl-[0.5em]">
               <Checkbox
-                key="column10"
-                initialOptions={[""]}
-                columnLayout="single"
+                key="B3"
+                initialOptions={["", ""]}
+                columnLayout="double"
                 allowMultiple={false}
                 onChange={() => {
                   waitTimeout(1000);
                 }}
-              />
-              <Checkbox
-                key="column11"
-                initialOptions={[""]}
-                columnLayout="single"
-                allowMultiple={false}
-                onChange={() => {
-                  waitTimeout(1000);
-                }}
+                gap={"3.3em"}
+                disableOnClick={true}
               />
             </div>
           ),
@@ -497,32 +537,20 @@ const SlideShow: React.FC = () => {
       ),
       variable: "claimSatisfaction",
     },
-    { slide: `phase3/Slide27.JPG`, execute: () => setButtonVisible(true) },
-    // {
-    //   slide: `phase3/Slide28.JPG`,
-    //   children: (
-    //     <div
-    //       key={`column1234`}
-    //       className="text-xs mt-20 w-[95%] pl-2.5 grid grid-cols-4 gap-0"
-    //     >
-    //       {config.memoryQuestionConfig.map((person, index) => {
-    //         return (
-    //           <div key={`checkbox-${index}`} className="bg-white w-[80%]">
-    //             <Checkbox
-    //               key={`column${index}`}
-    //               initialOptions={person.options}
-    //               columnLayout="single"
-    //               allowMultiple={false}
-    //               onChange={(itemsSelected) => {
-    //                 checkIfCorrect(itemsSelected[0], person.correct);
-    //               }}
-    //             />
-    //           </div>
-    //         );
-    //       })}
-    //     </div>
-    //   ),
-    // },
+    {
+      slide: `phase3/Slide27.JPG`,
+      execute: () => {
+        setButtonVisible(true);
+      },
+    },
+    quizSlide(),
+    {
+      children: <OnlineShop></OnlineShop>,
+      slide: `White.png`,
+      execute: () => {
+        setButtonVisible(true);
+      },
+    },
     { slide: `phase3/Slide29.JPG` },
     {
       slide: `phase3/Slide30.JPG`,
@@ -563,6 +591,12 @@ const SlideShow: React.FC = () => {
       (currentSlide as Slide).execute!();
     }
   }, [slideSequence]);
+
+  useEffect(() => {
+    unique(slideSequence.map((slide) => slide.slide ?? "White.png")).forEach(
+      (slide) => preloadImage(SLIDE_PATH + slide)
+    );
+  }, []);
 
   return (
     <div className="flex justify-center font-sans text-shadow-md">

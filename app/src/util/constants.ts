@@ -40,6 +40,7 @@ export const COLUMN_NAMES = [
   "Shopping_time_action",
   "Shopping_price",
   "Shopping_budget",
+  "VAS_shopping_satisfaction",
   "CoDe_cue",
   "CoDe_stimuli_type",
   "CoDe_response",
