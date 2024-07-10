@@ -106,7 +106,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
       }}
     >
       {options.map((option, index) => (
-        <div className="flex justify-end">
+        <div className="flex justify-end" key={index}>
           <label
             key={index}
             className={`${styles.checkboxLabel} ${

@@ -114,12 +114,12 @@ const DataEntry: React.FC = () => {
   });
 
   const fillAndSubmitForm = () => {
-    store.setTaskOption("participantId", "1234");
+    store.setSurveyResponse("participantId", "1234");
     store.setSurveyResponse("gender", "male");
     store.setSurveyResponse("group", "Control");
     store.setSurveyResponse("age", "18");
     store.setSurveyResponse("handedness", "right");
-    store.setTaskOption("time", "1 min");
+    store.setSurveyResponse("time", "1 min");
 
     setParticipantIdError("");
     setAgeError("");
@@ -132,11 +132,7 @@ const DataEntry: React.FC = () => {
   ): void => {
     const { name, value } = e.target;
 
-    if (name in store.data.survey) {
-      store.setTaskOption(name, value);
-    } else {
-      store.setSurveyResponse(name, value);
-    }
+    store.setSurveyResponse(name, value);
 
     if (name === "participantId") {
       if (!value.match(/^\d{4}$/)) {

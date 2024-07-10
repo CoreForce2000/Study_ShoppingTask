@@ -3,18 +3,20 @@ import config from "../assets/configs/config.json";
 import { unique } from "../util/functions";
 import { TaskStore } from "./store";
 
+export type SurveyData = {
+  gender: string;
+  age: string;
+  participantId: string;
+  handedness: string;
+  group: string;
+  time: string;
+  onlineShoppingFrequency: string;
+  drugs: string[];
+};
+
 export interface DataSlice {
   data: {
-    survey: {
-      gender: string;
-      age: string;
-      participantId: string;
-      handedness: string;
-      group: string;
-      time: string;
-      onlineShoppingFrequency: string;
-      drugs: string[];
-    };
+    survey: SurveyData;
     actionLog: Record<string, any>[];
     drugCraving: {
       [key: string]: number[];
@@ -34,12 +36,12 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
 ) => ({
   data: {
     survey: {
-      gender: "",
-      age: "",
-      group: "Select group",
-      time: "",
-      participantId: "",
-      handedness: "",
+      gender: "male",
+      age: "23",
+      group: "Cocaine",
+      time: "10",
+      participantId: "1425",
+      handedness: "left",
       onlineShoppingFrequency: "",
       drugs: [],
     },

@@ -148,14 +148,18 @@ const createContingencySlice: StateCreator<
     }),
   resetTrial: () => set(() => ({ trial: 0 })),
   nextTrialPhase: () =>
-    set((state) => ({
-      trialPhase:
+    set((state) => {
+      const nextTrialPhase =
         state.trialPhase === "prepare"
           ? "react"
           : state.trialPhase === "react"
           ? "outcome"
-          : "prepare",
-    })),
+          : "prepare";
+
+      console.log("nextTrialPhase", nextTrialPhase);
+
+      return { trialPhase: nextTrialPhase };
+    }),
 });
 
 export default createContingencySlice;
