@@ -4,8 +4,8 @@ import styles from "./Checkbox.module.css";
 interface CheckboxProps {
   initialOptions: string[];
   exclusiveOptions?: string[];
-  allowMultiple: boolean;
-  columnLayout: "single" | "double";
+  allowMultiple?: boolean;
+  columnLayout?: "single" | "double";
   onChange: (selectedOptions: string[]) => void;
   allowedOption?: string;
   gap?: string;
@@ -20,8 +20,8 @@ export interface CheckboxOption {
 const Checkbox: React.FC<CheckboxProps> = ({
   initialOptions,
   exclusiveOptions = [],
-  allowMultiple,
-  columnLayout,
+  allowMultiple = false,
+  columnLayout = "single",
   onChange,
   allowedOption,
   gap = "0.3em",

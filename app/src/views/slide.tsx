@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Checkbox from "../components/checkbox.tsx";
 import TaskViewport from "../components/task-viewport.tsx";
@@ -176,92 +170,88 @@ const SlideShow: React.FC = () => {
     const item = isSelfItem
       ? store.selfItems[store.trial - 1]
       : store.otherItems[store.trial - 1];
+
     const imagePath = getImagePath(item?.category, item?.image_name);
-
-    const prepareExecute = useCallback(() => {
-      setButtonVisible(false);
-      clearListeners();
-      waitTimeout(
-        config.experimentConfig.slideTimings.offLightbulb.minValue,
-        config.experimentConfig.slideTimings.offLightbulb.maxValue,
-        store.nextTrialPhase
-      );
-    }, []);
-
-    const reactExecute = useCallback(() => {
-      clearListeners();
-      waitKeyPress(KEY_SPACE, () => {
-        store.setReacted(true);
-        store.nextTrialPhase();
-      });
-      waitTimeout(
-        config.experimentConfig.slideTimings.coloredLightbulb.minValue,
-        config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
-        store.nextTrialPhase
-      );
-    }, []);
-
-    const outcomeExecuteSuccess = useCallback(() => {
-      clearListeners();
-      waitTimeout(
-        config.experimentConfig.slideTimings.receiveItem.minValue,
-        config.experimentConfig.slideTimings.receiveItem.maxValue,
-        () => {
-          store.incrementTrial(incrementSlideIndex);
-          store.setReacted(false);
-        }
-      );
-    }, []);
-
-    const outcomeExecuteFail = useCallback(() => {
-      clearListeners();
-      waitTimeout(
-        config.experimentConfig.slideTimings.offLightbulbNoItem.minValue,
-        config.experimentConfig.slideTimings.offLightbulbNoItem.maxValue,
-        () => {
-          store.incrementTrial(incrementSlideIndex);
-          store.setReacted(false);
-        }
-      );
-    }, []);
-
-    const childrenElement = useMemo(
-      () => (
-        <div className="w-full h-full flex justify-center items-center pb-[3em]">
-          <div>
-            <img className="max-h-[5em] max-w-[5em]" src={imagePath}></img>
-          </div>
-        </div>
-      ),
-      [imagePath]
-    );
 
     switch (store.trialPhase) {
       case "prepare":
         return {
           slide: `/duringPhase2/Slide1.PNG`,
-          execute: prepareExecute,
+          execute: () => {
+            setButtonVisible(false);
+            clearListeners();
+            waitTimeout(
+              config.experimentConfig.slideTimings.offLightbulb.minValue,
+              config.experimentConfig.slideTimings.offLightbulb.maxValue,
+              store.nextTrialPhase
+            );
+          },
         };
       case "react":
         preloadImage(imagePath);
+
         return {
           slide:
             trialInfo.color === "orange"
               ? "/duringPhase2/Slide2.PNG"
               : "/duringPhase2/Slide3.PNG",
-          execute: reactExecute,
+          execute: () => {
+            clearListeners();
+            waitKeyPress(KEY_SPACE, () => {
+              store.setReacted(true);
+              store.nextTrialPhase();
+            });
+            waitTimeout(
+              config.experimentConfig.slideTimings.coloredLightbulb.minValue,
+              config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
+              store.nextTrialPhase
+            );
+          },
         };
       case "outcome":
-        return (trialInfo.spacePressedCorrect && store.reacted) ||
-          (trialInfo.noSpacePressedCorrect && !store.reacted)
+        return (trialInfo!.spacePressedCorrect && store.reacted) ||
+          (trialInfo!.noSpacePressedCorrect && !store.reacted)
           ? {
               slide: `/duringPhase2/Slide4.PNG`,
-              children: childrenElement,
-              execute: outcomeExecuteSuccess,
+              children: (
+                <div className=" w-full h-full flex justify-center items-center pb-[3em]">
+                  <div>
+                    {/* Set max width and height */}
+                    <img
+                      className="max-h-[5em] max-w-[5em]"
+                      src={imagePath}
+                    ></img>
+                  </div>
+                </div>
+              ),
+              execute: () => {
+                clearListeners();
+                waitTimeout(
+                  config.experimentConfig.slideTimings.receiveItem.minValue,
+                  config.experimentConfig.slideTimings.receiveItem.maxValue,
+                  () => {
+                    store.incrementTrial(incrementSlideIndex);
+
+                    store.setReacted(false);
+                  }
+                );
+              },
             }
           : {
               slide: `/duringPhase2/Slide1.PNG`,
-              execute: outcomeExecuteFail,
+              execute: () => {
+                clearListeners();
+                waitTimeout(
+                  config.experimentConfig.slideTimings.offLightbulbNoItem
+                    .minValue,
+                  config.experimentConfig.slideTimings.offLightbulbNoItem
+                    .maxValue,
+                  () => {
+                    store.incrementTrial(incrementSlideIndex);
+                    store.setReacted(false);
+                  }
+                );
+              },
             };
     }
   };
@@ -321,7 +311,7 @@ const SlideShow: React.FC = () => {
     {
       slide: `phase1/Slide1.JPG`,
       children: (
-        <div className="mt-12 bg-white w-full pl-6 flex justify-center">
+        <div className="mt-121 bg-white w-full pl-6 flex justify-center">
           <div className="bg-white">
             <Checkbox
               key="online-shopping"
@@ -342,7 +332,7 @@ const SlideShow: React.FC = () => {
       ),
       execute: () => setButtonVisible(false),
     },
-    ...(store.taskOptions.group !== "Control"
+    ...(store.data.survey.group !== "Control"
       ? [
           {
             slide: `phase1/Slide2.JPG`,
@@ -400,11 +390,11 @@ const SlideShow: React.FC = () => {
     },
     { slide: `phase1/Slide6.JPG`, execute: () => setButtonVisible(true) },
     {
-      slide: `phase1/Slide7_${store.taskOptions.time.split(" ")[0] ?? 10}.JPG`,
+      slide: `phase1/Slide7_${store.data.survey.time.split(" ")[0] ?? 10}.JPG`,
     },
     { slide: `phase1/Slide8.JPG` },
     {
-      slide: `phase1/Slide9_${store.taskOptions.time.split(" ")[0] ?? 10}.jpg`,
+      slide: `phase1/Slide9_${store.data.survey.time.split(" ")[0] ?? 10}.jpg`,
     },
     {
       children: <OnlineShop></OnlineShop>,

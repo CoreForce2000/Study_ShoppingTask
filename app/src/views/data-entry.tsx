@@ -132,7 +132,7 @@ const DataEntry: React.FC = () => {
   ): void => {
     const { name, value } = e.target;
 
-    if (name in store.taskOptions) {
+    if (name in store.data.survey) {
       store.setTaskOption(name, value);
     } else {
       store.setSurveyResponse(name, value);
@@ -161,12 +161,12 @@ const DataEntry: React.FC = () => {
       alert("Age needs to be 18 or above.");
       return;
     }
-    if (store.taskOptions.group === "Select group") {
+    if (store.data.survey.group === "Select group") {
       alert("Please select a group.");
       return;
     }
 
-    store.setTime(parseInt(store.taskOptions.time.split(" ")[0]) * 60);
+    store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
 
     navigate("/slide/1");
   };
@@ -225,7 +225,7 @@ const DataEntry: React.FC = () => {
               "Heroin",
               "Control",
             ]}
-            value={store.taskOptions.group}
+            value={store.data.survey.group}
             onChange={handleChange}
           />
         </fieldset>
@@ -266,7 +266,7 @@ const DataEntry: React.FC = () => {
               required
               name="time"
               values={["10 min", "15 min"]}
-              value={store.taskOptions.time}
+              value={store.data.survey.time}
               onChange={handleChange}
             />
           </fieldset>

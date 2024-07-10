@@ -4,16 +4,14 @@ import { unique } from "../util/functions";
 import { TaskStore } from "./store";
 
 export interface DataSlice {
-  taskOptions: {
-    group: string;
-    time: string;
-  };
   data: {
     survey: {
       gender: string;
       age: string;
       participantId: string;
       handedness: string;
+      group: string;
+      time: string;
       onlineShoppingFrequency: string;
       drugs: string[];
     };
@@ -23,7 +21,6 @@ export interface DataSlice {
     };
   };
   getDrugsNow: () => string[];
-  setTaskOption: (name: string, value: any) => void;
   setSurveyResponse: (name: string, value: any) => void;
   logShopAction: (action: any) => void;
   logSurveyResponse: (response: Record<string, any>) => void;
@@ -35,14 +32,12 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
   set,
   get
 ) => ({
-  taskOptions: {
-    group: "Select group",
-    time: "",
-  },
   data: {
     survey: {
       gender: "",
       age: "",
+      group: "Select group",
+      time: "",
       participantId: "",
       handedness: "",
       onlineShoppingFrequency: "",
@@ -59,13 +54,6 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
         drug !== config.options.drugScreening.none
     ) ?? [],
 
-  setTaskOption: (name: string, value: any) =>
-    set((state) => ({
-      taskOptions: {
-        ...state.taskOptions,
-        [name]: value,
-      },
-    })),
   setSurveyResponse: (name: string, value: any) =>
     set((state) => ({
       data: {
@@ -142,7 +130,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       "age",
       state.data.survey.age,
       "group",
-      state.taskOptions.group,
+      state.data.survey.group,
       "gender",
       state.data.survey.gender,
       "handedness",
@@ -150,7 +138,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       "onlineShoppingFrequency",
       state.data.survey.onlineShoppingFrequency,
       "test_shopTime",
-      state.taskOptions.time,
+      state.data.survey.time,
     ];
 
     const columnNames = unique(
