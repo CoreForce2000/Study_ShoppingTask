@@ -1,0 +1,14 @@
+{
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": "*.json",
+      "options": {
+        "printWidth": 180,
+        "jsonRecursiveSort": true,
+        "braceStyle": "preserve",
+        "trailingComma": "none"
+      }
+    }
+  ]
+}

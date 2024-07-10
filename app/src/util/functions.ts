@@ -3,7 +3,6 @@ import { TaskStore } from "../store/store";
 
 export function getCurrentTime() {
   const currentTime = new Date().getTime() / 1000;
-  console.log("currentTime", currentTime);
   return currentTime;
 }
 
@@ -141,8 +140,6 @@ export function pseudorandomize(
     extendArray(row, longestRowLength).slice(0)
   );
 
-  console.log("normalizedTenRows", normalizedTenRows);
-
   const transposedTenRows = transpose(normalizedTenRows);
 
   const randomizedTenRows = transposedTenRows.map((row) => shuffleArray(row));
@@ -209,7 +206,7 @@ export function unique(array: any[]) {
   return array.filter((item, index) => array.indexOf(item) === index);
 }
 
-export function exportCsv(store: TaskStore) {
+export function exportCsv(store: TaskStore, suffix: string = "") {
   const csvString = store.getCsvString();
 
   //nameing: participantId_SHOP_date
@@ -220,7 +217,7 @@ export function exportCsv(store: TaskStore) {
   const encodedUri = encodeURI(csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", fileName + ".csv");
+  link.setAttribute("download", fileName + suffix + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

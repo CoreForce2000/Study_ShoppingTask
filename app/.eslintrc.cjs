@@ -18,8 +18,21 @@ module.exports = {
     },
     ecmaVersion: 12,
   },
-  plugins: ["react", "@typescript-eslint", "unused-imports", "react-refresh"],
+  plugins: [
+    "react",
+    "@typescript-eslint",
+    "unused-imports",
+    "react-refresh",
+    "prettier",
+  ],
+
   rules: {
+    "prettier/prettier": [
+      "error",
+      {
+        printWidth: 80,
+      },
+    ],
     "react-refresh/only-export-components": [
       "warn",
       { allowConstantExport: true },

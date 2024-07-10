@@ -26,6 +26,15 @@ export interface DataSlice {
   setSurveyResponse: (name: string, value: any) => void;
   logShopAction: (action: any) => void;
   logSurveyResponse: (response: Record<string, any>) => void;
+  logExperimentAction: (action: {
+    block: number;
+    cue: string;
+    stimuli_type: string;
+    outcome: string;
+    response: string;
+    item: string;
+    RT: number;
+  }) => void;
   setDrugCraving: (drug: string, value?: number) => void;
   getCsvString: () => string;
 }
@@ -36,12 +45,12 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
 ) => ({
   data: {
     survey: {
-      gender: "male",
-      age: "23",
-      group: "Cocaine",
-      time: "10",
-      participantId: "1425",
-      handedness: "left",
+      gender: "",
+      age: "",
+      group: "Select group",
+      time: "15",
+      participantId: "",
+      handedness: "",
       onlineShoppingFrequency: "",
       drugs: [],
     },
@@ -78,49 +87,94 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     })),
 
   logSurveyResponse: (response: any) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        actionLog: [
-          ...state.data.actionLog,
-          {
-            Phase: 1,
-            Phase_name: "Shopping",
-            Block: 1,
-            Block_name: "shopping",
-            ...response,
-          },
-        ],
-      },
-    })),
+    set((state) => {
+      const row = {
+        data: {
+          ...state.data,
+          actionLog: [
+            ...state.data.actionLog,
+            {
+              Phase: 1,
+              Phase_name: "Shopping",
+              Block: 1,
+              Block_name: "shopping",
+              ...response,
+            },
+          ],
+        },
+      };
+      console.log("row(survey):", JSON.stringify(row.data.actionLog));
+      return row;
+    }),
 
   logShopAction: (action: any) =>
-    set((state) => ({
-      data: {
-        ...state.data,
-        actionLog: [
-          ...state.data.actionLog,
-          {
-            Phase: 1,
-            Phase_name: "Shopping",
-            Block: 1,
-            Block_name: "shopping",
-            Trial: state.data.actionLog.length + 1,
-            Shopping_budget: state.budget,
-            Shopping_event: action,
-            Shopping_item: state.currentItem
-              ? state.currentItem.item.image_name
-              : "",
-            Shopping_category: state.currentCategory
-              ? state.currentCategory
-              : "",
-            Shopping_price: state.currentItem ? 0 : "",
-            Shopping_time_stamp: new Date().toTimeString(),
-            Shopping_time_action: state.time,
-          },
-        ],
-      },
-    })),
+    set((state) => {
+      const row = {
+        data: {
+          ...state.data,
+          actionLog: [
+            ...state.data.actionLog,
+            {
+              Phase: 1,
+              Phase_name: "Shopping",
+              Block: 1,
+              Block_name: "shopping",
+              Trial: state.data.actionLog.length + 1,
+              Shopping_budget: state.budget,
+              Shopping_event: action,
+              Shopping_item: state.currentItem
+                ? state.currentItem.item.image_name
+                : "",
+              Shopping_category: state.currentCategory
+                ? state.currentCategory
+                : "",
+              Shopping_price: state.currentItem ? 0 : "",
+              Shopping_time_stamp: new Date().toTimeString(),
+              Shopping_time_action: state.time,
+            },
+          ],
+        },
+      };
+
+      console.log("row(shop):", JSON.stringify(row.data.actionLog));
+      return row;
+    }),
+
+  logExperimentAction: ({
+    block,
+    cue,
+    stimuli_type,
+    outcome,
+    response,
+    item,
+    RT,
+  }) =>
+    set((state) => {
+      const row = {
+        data: {
+          ...state.data,
+          actionLog: [
+            ...state.data.actionLog,
+            {
+              Phase: 2,
+              Phase_name: "Experiment",
+              Block: block,
+              Block_name: config.experimentConfig.trialSequence[block].bockName,
+              Trial: state.data.actionLog.length + 1,
+              CoDe_cue: cue,
+              CoDe_stimuli_type: stimuli_type,
+              CoDe_outcome: outcome,
+              CoDe_response: response,
+              CoDe_item: item,
+              CoDe_RT: RT,
+            },
+          ],
+        },
+      };
+
+      console.log("row(experiment):", JSON.stringify(row.data.actionLog));
+      return row;
+    }),
 
   getCsvString: () => {
     const state = get();
@@ -147,8 +201,6 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       state.data.actionLog.map((row) => Object.keys(row)).flat()
     );
 
-    console.log("Action Log:", state.data.actionLog);
-
     // Create the header row for shop actions
     const shopHeaderRow = columnNames.join(",");
 
@@ -169,19 +221,3 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
 });
 
 export default createDataSlice;
-
-//         logExperimentAction({
-//           CoDe_cue: currentSlide.id == "orange" ? "orange" : "blue",
-//           CoDe_stimuli_type:
-//             experimentSequence[index].slide.id == "blue"
-//               ? blueIsSelf
-//                 ? "own"
-//                 : "others"
-//               : blueIsSelf
-//               ? "others"
-//               : "own",
-//           CoDe_outcome: receivedItem ? "TRUE" : "FALSE",
-//           CoDe_response: pressedButton ? "TRUE" : "FALSE",
-//           CoDe_item: experimentSequence[index].product.image_name,
-//           CoDe_RT: Date.now() - reactionStartTime,
-//         })

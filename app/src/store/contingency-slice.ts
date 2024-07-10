@@ -132,7 +132,6 @@ const createContingencySlice: StateCreator<
     }),
   incrementTrial: (incrementSlide) =>
     set((state) => {
-      console.log(state.trial);
       if (state.trial < config.experimentConfig.trialSequence.length) {
         return {
           trial: state.trial + 1,

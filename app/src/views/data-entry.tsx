@@ -261,7 +261,8 @@ const DataEntry: React.FC = () => {
             <RadioGroup
               required
               name="time"
-              values={["10 min", "15 min"]}
+              values={["15", "10"]}
+              labels={["Basic (15min)", "Retest (10min)"]}
               value={store.data.survey.time}
               onChange={handleChange}
             />

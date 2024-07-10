@@ -15,11 +15,12 @@ import {
   MEMORY_WRONG_SOUND,
   SLIDE_PATH,
 } from "../util/constants";
+import { exportCsv } from "../util/functions";
 import { getImagePath, preloadImage } from "../util/preload";
 import OnlineShop from "./online-shop";
 
 type SlideJson = {
-  type: string;
+  type?: string;
   slidePath?: string;
   index?: number;
   variableName?: string;
@@ -136,7 +137,6 @@ const SlideShow: React.FC = () => {
   } = useSlideHandlers(slideNumber, trialNumber);
 
   const incrementSlideIndex = () => changeSlideIndex(slideNumber + 1);
-  const decrementSlideIndex = () => changeSlideIndex(slideNumber - 1);
 
   const drugCravingSlide = (stage: "pre" | "post") => {
     const drugs = store.getDrugsNow();
@@ -209,8 +209,21 @@ const SlideShow: React.FC = () => {
           },
         };
       case "outcome":
-        return (trialInfo.spacePressedCorrect && store.reacted) ||
-          (trialInfo.noSpacePressedCorrect && !store.reacted)
+        const positiveOutcome =
+          (trialInfo.spacePressedCorrect && store.reacted) ||
+          (trialInfo.noSpacePressedCorrect && !store.reacted);
+
+        store.logExperimentAction({
+          block: block,
+          cue: trialInfo.color,
+          stimuli_type: isSelfItem ? "self" : "other",
+          outcome: positiveOutcome ? "TRUE" : "FALSE",
+          response: store.reacted ? "TRUE" : "FALSE",
+          item: item?.image_name ?? "none",
+          RT: -1,
+        });
+
+        return positiveOutcome
           ? {
               slide: `/duringPhase2/Slide4.PNG`,
               children: (
@@ -229,7 +242,7 @@ const SlideShow: React.FC = () => {
                   config.experimentConfig.slideTimings.receiveItem.minValue,
                   config.experimentConfig.slideTimings.receiveItem.maxValue,
                   () => {
-                    incrementTrialIndex(4);
+                    incrementTrialIndex(config.experimentConfig.numberOfTrials);
                     store.setReacted(false);
                   }
                 );
@@ -351,6 +364,28 @@ const SlideShow: React.FC = () => {
     ),
   });
 
+  const checkboxBulb = (slidePath: string, index: number) => {
+    return {
+      slide: slidePath,
+      children: (
+        <div className="pt-[3em] pl-[0.5em]">
+          <Checkbox
+            key={`${slidePath.slice(-3, -1)}_${index}`}
+            initialOptions={["", ""]}
+            columnLayout="double"
+            allowMultiple={false}
+            onChange={() => {
+              waitTimeout(1000);
+            }}
+            gap={"3.3em"}
+            disableOnClick={true}
+          />
+        </div>
+      ),
+      execute: () => setButtonVisible(false),
+    };
+  };
+
   const vas = (
     slidePath: string,
     variableName: string,
@@ -379,7 +414,7 @@ const SlideShow: React.FC = () => {
   const renderSlide: () => Slide = () => {
     const currentSlideInfo: SlideJson =
       typeof task[slideNumber - 1] === "string"
-        ? ({ slidePath: task[slideNumber - 1] } as SlideJson)
+        ? ({ slidePath: task[slideNumber - 1] } as unknown as SlideJson)
         : (task[slideNumber - 1] as SlideJson);
 
     const isCustomSlide = currentSlideInfo.type !== undefined;
@@ -443,6 +478,8 @@ const SlideShow: React.FC = () => {
           return checkboxShopping(slidePath);
         case "checkboxDrugs":
           return checkboxDrugs(slidePath);
+        case "checkboxBulb":
+          return checkboxBulb(slidePath, slideNumber);
         case "drugCravingPre":
           return drugCravingSlide("pre");
         case "drugCravingPost":
@@ -457,8 +494,14 @@ const SlideShow: React.FC = () => {
             children: <OnlineShop></OnlineShop>,
             execute: () => setButtonVisible(true),
           };
+        case "exportData":
+          exportCsv(store, currentSlideInfo.variableName!);
+          store.generateSelfOtherSequence();
+          incrementSlideIndex();
+          return { slide: "White.PNG" };
         default:
           console.error("Unknown slide type", currentSlideInfo.type);
+          setButtonVisible(false);
           return { slide: slidePath };
       }
     } else {
@@ -471,7 +514,8 @@ const SlideShow: React.FC = () => {
 
   useEffect(() => {
     const slide = renderSlide();
-    console.log("slide rendering:", slide);
+
+    console.log(slide.slide);
 
     if (slide.execute) slide.execute();
     if (slide.slide) setCurrentSlide(slide);
