@@ -155,13 +155,27 @@ const ItemPage: React.FC<{}> = ({}) => {
   );
 };
 
+// ShoppingListPage: Simple page similar to itempage that contains just a list of four items taken from the config (same as quiz)
+// with a button to go back to the main page
+const ShoppingListPage: React.FC<{}> = ({}) => {
+  return (
+    <div className="flex flex-col items-center justify-evenly">
+      <div className="grid grid-cols-2 gap-x-14 text-base">
+        {config.memoryQuestionConfig.map((item) => [
+          <div className="font-bold"> {`${item.person}`}</div>,
+          <div className=""> {item.correct}</div>,
+        ])}
+      </div>
+    </div>
+  );
+};
+
 const Timer: React.FC<{}> = ({}) => {
   const store = useTaskStore();
   const navigate = useNavigate();
 
   const timerObject = useTimer({ delay: 1000 }, () => {
     if (store.time === 1) {
-      store.switchToPhase3();
       navigate(`../slide/${store.slide + 1}`);
     }
     store.tickTimer();
@@ -244,9 +258,10 @@ const OnlineShop: React.FC<{}> = () => {
           secondChild={
             <Button
               icon={ListTodoIcon}
+              variant="transparent"
               suffixText="Show Shopping List"
-              visible={store.isPhase3}
-              onClick={() => {}}
+              visible={store.isPhase3 && store.page !== "shoppingList"}
+              onClick={() => store.navigateTo("shoppingList")}
             />
           }
           lastChild={
@@ -276,6 +291,8 @@ const OnlineShop: React.FC<{}> = () => {
         <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
           {store.page === "item" ? (
             <ItemPage />
+          ) : store.page === "shoppingList" ? (
+            <ShoppingListPage></ShoppingListPage>
           ) : (
             <GridPage view={store.page} category={store.currentCategory} />
           )}

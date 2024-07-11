@@ -36,7 +36,7 @@ export interface ShopSlice {
   selectedTrolleyItems: TrolleyItem[];
   selectTrolleyItem: (trolleyItem: TrolleyItem) => void;
   categories: string[];
-  page: "categories" | "items" | "trolley" | "item";
+  page: "categories" | "items" | "trolley" | "item" | "shoppingList";
   navigateTo: (page: ShopSlice["page"]) => void;
   currentCategory: string;
   currentItem: TileItem | TrolleyItem | undefined;
@@ -56,6 +56,7 @@ export interface ShopSlice {
   interSlide: "" | "timeIsRunningOut" | "extraBudget";
   setInterSlide: (interSlide: ShopSlice["interSlide"]) => void;
   isPhase3: boolean;
+  resetTrolley: () => void;
   switchToPhase3: () => void;
   time: number;
   setTime: (time: number) => void;
@@ -75,9 +76,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         ? state.selectedTrolleyItems.filter((item) => item !== trolleyItem)
         : [...state.selectedTrolleyItems, trolleyItem],
     })),
-  categories: pseudorandomize([
-    ...new Set(imageData.map((item) => item.category)),
-  ]),
+  categories: pseudorandomize(),
   page: "categories",
   navigateTo: (page: ShopSlice["page"]) =>
     set(() => ({
@@ -108,6 +107,12 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
   trolley: [],
   trolleyCounter: 0,
 
+  resetTrolley: () =>
+    set(() => ({
+      trolley: [],
+      trolleyCounter: 0,
+    })),
+
   addItemToCart: (item: Item) =>
     set((state) => {
       state.backPressed();
@@ -123,6 +128,23 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
           { index: state.trolleyCounter, item: item, price: price },
         ],
       };
+
+      if (state.isPhase3) {
+        const itemsPurchased = ["Flowers", "Chocolates", "Toys", "Books"].every(
+          (requiredItem) =>
+            newState.trolley
+              .map(
+                (x) =>
+                  x.item.category.split(" ")[
+                    x.item.category.split(" ").length - 1
+                  ]
+              )
+              .includes(requiredItem)
+        );
+        if (itemsPurchased) {
+          state.setTime(1);
+        }
+      }
 
       if (state.budget < price) {
         LUCKY_CUSTOMER_SOUND.play();
@@ -164,6 +186,8 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         return { page: "categories" };
       } else if (state.page === "item") {
         return { page: "items" };
+      } else if (state.page === "shoppingList") {
+        return { page: "categories" };
       } else {
         return {};
       }

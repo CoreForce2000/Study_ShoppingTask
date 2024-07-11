@@ -1,3 +1,4 @@
+import imageData from "../assets/categories/image_data.json";
 import config from "../assets/configs/config.json";
 import { TaskStore } from "../store/store";
 
@@ -53,109 +54,71 @@ export function extendArray(
     .flat();
 }
 
-function leftExclusive(left: any[], right: any[]): any[] {
-  return left.filter((l) => !right.includes(l));
+function sumArray(array: number[]): number {
+  return array.reduce((a, b) => a + b, 0);
 }
 
-function sumArray(numbers: number[]) {
-  return numbers.reduce(
-    (accumulator: number, currentValue: number) => accumulator + currentValue,
-    0
-  );
+interface InputArray {
+  cols: number;
+  list: (string | number)[];
 }
 
-function transpose(matrix: any[][]) {
-  // Determine the maximum row length
-  const maxRowLength = Math.max(...matrix.map((row) => row.length));
+function listToMatrix<T>(
+  list: T[],
+  elementsPerSubArray: number,
+  numberOfRows: number
+): T[][] {
+  const matrix: T[][] = [];
+  let i: number, k: number;
 
-  // Initialize the transposed matrix with empty arrays
-  const transposedMatrix: any[][] = Array.from(
-    { length: maxRowLength },
-    () => []
-  );
-
-  // Iterate over the original matrix and fill the transposed matrix
-  for (let row = 0; row < matrix.length; row++) {
-    for (let col = 0; col < matrix[row].length; col++) {
-      transposedMatrix[col][row] = matrix[row][col];
+  for (i = 0, k = -1; i < numberOfRows * elementsPerSubArray; i++) {
+    if (i % elementsPerSubArray === 0) {
+      k++;
+      matrix[k] = [];
     }
+
+    matrix[k].push(list[i % list.length]);
   }
 
-  // Remove any undefined values from the transposed matrix
-  for (let col = 0; col < transposedMatrix.length; col++) {
-    transposedMatrix[col] = transposedMatrix[col].filter(
-      (value) => value !== undefined
-    );
-  }
-
-  return transposedMatrix;
+  return matrix;
 }
 
-export function pseudorandomize(
-  categories: string[],
-  leftShift: number = 4
-): string[] {
-  function shiftArray(arr: any[], shift: number) {
-    const len = arr.length;
-    const effectiveShift = shift % len;
-    if (effectiveShift === 0) return arr.slice(); // No shift needed
+function matrixRandomize(
+  arrays: InputArray[],
+  rows: number
+): (string | number)[][] {
+  const matrices = arrays.map((arr) => listToMatrix(arr.list, arr.cols, rows));
 
-    const shiftedPart = arr.slice(effectiveShift);
-    const remainderPart = arr.slice(0, effectiveShift);
-    return shiftedPart.concat(remainderPart);
+  const result = [];
+  for (let i = 0; i < rows; i++) {
+    result.push(shuffleArray(matrices.map((mat) => mat[i]).flat()));
   }
+  return result;
+}
 
-  function shiftedRepeats(arr: any[], repeats: number) {
-    return Array(repeats)
-      .fill(0)
-      .map((_, repeat) => shiftArray(arr, repeat * leftShift));
-  }
-
-  const pathCat = config.shop.pathologicalCategories;
-  const otherCategories = leftExclusive(
-    categories,
-    pathCat.categories.map((x) => x.items).flat()
+export function pseudorandomize(): string[] {
+  const specialCategories = config.shop.pathologicalCategories.categories
+    .map((cat) => cat.items)
+    .flat();
+  const specialCategoriesCols = sumArray(
+    config.shop.pathologicalCategories.categories.map((cat) => cat.partsPerTen)
   );
 
-  const partsOther =
-    10 - sumArray(pathCat.categories.map((x) => x.partsPerTen));
+  const nonSpecialCategories = [
+    ...new Set(imageData.map((item) => item.category)),
+  ].filter((x) => !specialCategories.includes(x));
 
-  const tenRows = [
-    ...Object.keys(pathCat.categories)
-      .map((_, index) =>
-        shiftedRepeats(
-          pathCat.categories[index].items,
-          pathCat.categories[index].partsPerTen
-        )
-      )
-      .flat(),
+  return matrixRandomize(
+    [
+      ...config.shop.pathologicalCategories.categories.map((cat) => ({
+        cols: cat.partsPerTen,
+        list: cat.items,
+      })),
 
-    ...shiftedRepeats(otherCategories, partsOther),
-  ];
-
-  // longestrow
-  const longestRowLength = Math.max(...tenRows.map((row) => row.length));
-
-  const normalizedTenRows = tenRows.map((row) =>
-    extendArray(row, longestRowLength).slice(0)
-  );
-
-  const transposedTenRows = transpose(normalizedTenRows);
-
-  const randomizedTenRows = transposedTenRows.map((row) => shuffleArray(row));
-
-  const finalShuffledList = randomizedTenRows.flat();
-
-  const finalShuffledListInitialScreen =
-    config.shop.pathologicalCategories.initialScreenCategories.concat(
-      finalShuffledList
-    );
-
-  const mixedList = shuffleArray(
-    finalShuffledListInitialScreen.slice(0, 35)
-  ).concat(finalShuffledListInitialScreen.slice(35));
-
-  return mixedList;
+      { cols: 10 - specialCategoriesCols, list: nonSpecialCategories },
+    ],
+    100
+  ).flat() as string[];
 }
 
 type TimingRange = {

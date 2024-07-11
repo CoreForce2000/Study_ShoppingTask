@@ -57,10 +57,7 @@ export interface ContingencySlice {
   popOtherItem: () => Item | undefined;
   selfItems: Item[];
   otherItems: Item[];
-  trial: number;
   trialPhase: TrialPhase;
-  incrementTrial: (incrementSlide: () => void) => void;
-  resetTrial: () => void;
   nextTrialPhase: () => void;
   colorMapping: { self: string; other: string };
   contingencyOrder: Trial[][];
@@ -75,7 +72,6 @@ const createContingencySlice: StateCreator<
   reacted: false,
   selfItems: [],
   otherItems: [],
-  trial: 1,
   trialPhase: "prepare",
 
   colorMapping:
@@ -130,22 +126,6 @@ const createContingencySlice: StateCreator<
         ),
       };
     }),
-  incrementTrial: (incrementSlide) =>
-    set((state) => {
-      if (state.trial < config.experimentConfig.trialSequence.length) {
-        return {
-          trial: state.trial + 1,
-          trialPhase: "prepare",
-        };
-      } else {
-        incrementSlide();
-        return {
-          trial: 0,
-          trialPhase: "prepare",
-        };
-      }
-    }),
-  resetTrial: () => set(() => ({ trial: 0 })),
   nextTrialPhase: () =>
     set((state) => {
       const nextTrialPhase =

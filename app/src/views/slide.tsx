@@ -179,7 +179,7 @@ const SlideShow: React.FC = () => {
         return {
           slide: `/duringPhase2/Slide1.PNG`,
           execute: () => {
-            setButtonVisible(false);
+            setButtonVisible(true);
             clearListeners();
             waitTimeout(
               config.experimentConfig.slideTimings.offLightbulb.minValue,
@@ -242,6 +242,7 @@ const SlideShow: React.FC = () => {
                   config.experimentConfig.slideTimings.receiveItem.minValue,
                   config.experimentConfig.slideTimings.receiveItem.maxValue,
                   () => {
+                    store.nextTrialPhase();
                     incrementTrialIndex(config.experimentConfig.numberOfTrials);
                     store.setReacted(false);
                   }
@@ -258,7 +259,8 @@ const SlideShow: React.FC = () => {
                   config.experimentConfig.slideTimings.offLightbulbNoItem
                     .maxValue,
                   () => {
-                    store.incrementTrial(incrementSlideIndex);
+                    store.nextTrialPhase();
+                    incrementTrialIndex(config.experimentConfig.numberOfTrials);
                     store.setReacted(false);
                   }
                 );
@@ -489,6 +491,15 @@ const SlideShow: React.FC = () => {
         case "quiz":
           return quizSlide();
         case "onlineShop":
+          return {
+            slide: "White.PNG",
+            children: <OnlineShop></OnlineShop>,
+            execute: () => setButtonVisible(true),
+          };
+        case "onlineShopControl":
+          store.resetTrolley();
+          store.switchToPhase3();
+          store.setTime(config.shop.general.time.phase3);
           return {
             slide: "White.PNG",
             children: <OnlineShop></OnlineShop>,
