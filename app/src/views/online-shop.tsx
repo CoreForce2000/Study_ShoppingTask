@@ -25,10 +25,6 @@ export interface Tile {
   tile: number;
 }
 
-function delayAfterClick(callback: () => void) {
-  setTimeout(callback, 500);
-}
-
 const GridPage: React.FC<{
   view: "categories" | "items" | "trolley";
   category?: string;
@@ -50,12 +46,11 @@ const GridPage: React.FC<{
                   ? "categoryClicked"
                   : "none"
               }
-              onClick={() =>
-                delayAfterClick(() => {
-                  store.clickCategory(category);
-                  store.navigateTo("items");
-                })
-              }
+              onClick={() => {
+                store.clickCategory(category);
+                store.navigateTo("items");
+              }}
+              delayAfterClick={true}
               backgroundColor={config.colors.categoryTileColor}
             />
           ))}
@@ -75,12 +70,11 @@ const GridPage: React.FC<{
                 key={index}
                 text={""}
                 tileState={tileItem ? "itemClicked" : "none"}
-                onClick={() =>
-                  delayAfterClick(() => {
-                    store.clickItemTile(index);
-                    store.navigateTo("item");
-                  })
-                }
+                onClick={() => {
+                  store.clickItemTile(index);
+                  store.navigateTo("item");
+                }}
+                delayAfterClick={true}
                 backgroundColor={config.colors.itemTileColor}
                 imageUrl={
                   tileItem
@@ -97,7 +91,11 @@ const GridPage: React.FC<{
         <>
           {store.trolley.map((trolleyItem, index) => (
             <Tile
-              actionName="select item trolley"
+              actionName={
+                store.selectedTrolleyItems.includes(trolleyItem)
+                  ? "deselect item trolley"
+                  : "select item trolley"
+              }
               key={`${trolleyItem.index}-${index}`}
               tileState={"itemClicked"}
               backgroundColor={"white"}
@@ -256,6 +254,7 @@ const OnlineShop: React.FC<{}> = () => {
           }
           secondChild={
             <Button
+              actionName="open shopping list"
               icon={ListTodoIcon}
               variant="transparent"
               suffixText="Show Shopping List"
@@ -266,6 +265,7 @@ const OnlineShop: React.FC<{}> = () => {
           lastChild={
             store.page === "trolley" ? (
               <Button
+                actionName="remove trolley items"
                 icon={SquareXIcon}
                 variant="transparent"
                 color="black"
@@ -274,6 +274,7 @@ const OnlineShop: React.FC<{}> = () => {
               />
             ) : (
               <Button
+                actionName="check trolley"
                 icon={ArrowRightIcon}
                 variant="transparent"
                 color="black"
@@ -299,6 +300,7 @@ const OnlineShop: React.FC<{}> = () => {
             firstChild={<div></div>}
             secondChild={
               <Button
+                actionName="remove trolley items"
                 onClick={store.removeTrolleyItems}
                 className="text-[0.25em]"
                 visible={

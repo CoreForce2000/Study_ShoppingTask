@@ -135,8 +135,6 @@ const createContingencySlice: StateCreator<
           ? "outcome"
           : "prepare";
 
-      console.log("nextTrialPhase", nextTrialPhase);
-
       return { trialPhase: nextTrialPhase };
     }),
 });

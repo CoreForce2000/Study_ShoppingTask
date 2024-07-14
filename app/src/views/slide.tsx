@@ -59,7 +59,6 @@ const SlideShow: React.FC = () => {
 
   useEffect(() => {
     if (store.slideNumber !== slideNumber) {
-      console.log("Updating slideNumber", slideNumber);
       store.setSlideNumber(slideNumber);
     }
     if (store.trialNumber !== trialNumber) {

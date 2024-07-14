@@ -103,40 +103,62 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
           ],
         },
       };
-      console.log("row(survey):", JSON.stringify(row.data.actionLog));
+      // console.log("row(survey):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 
   logShopAction: (action: any) =>
     set((state) => {
+      console.log("Item", state.currentItem?.item.image_name);
       const row = {
         data: {
           ...state.data,
           actionLog: [
             ...state.data.actionLog,
-            {
-              Phase: 1,
-              Phase_name: "Shopping",
-              Block: 1,
-              Block_name: "shopping",
-              Trial: state.data.actionLog.length + 1,
-              Shopping_budget: state.budget,
-              Shopping_event: action,
-              Shopping_item: state.currentItem
-                ? state.currentItem.item.image_name
-                : "",
-              Shopping_category: state.currentCategory
-                ? state.currentCategory
-                : "",
-              Shopping_price: state.getItemPrice(),
-              Shopping_time_stamp: new Date().toTimeString(),
-              Shopping_time_action: state.time,
-            },
+            state.isPhase3
+              ? {
+                  Phase: 3,
+                  Phase_name: "Control",
+                  Block: 1,
+                  Block_name: "shopping",
+                  Trial: state.data.actionLog.length + 1,
+                  Control_budget: state.budget,
+                  Control_event: action,
+                  Control_item: state.currentItem
+                    ? state.currentItem.item.image_name
+                    : "",
+                  Control_category: state.currentCategory
+                    ? state.currentCategory
+                    : "",
+                  Control_price:
+                    state.getItemPrice(state.currentItem?.item!) ?? 0,
+                  Control_time_stamp: new Date().toTimeString(),
+                  Control_time_action: state.time,
+                }
+              : {
+                  Phase: 1,
+                  Phase_name: "Shopping",
+                  Block: 1,
+                  Block_name: "shopping",
+                  Trial: state.data.actionLog.length + 1,
+                  Shopping_budget: state.budget,
+                  Shopping_event: action,
+                  Shopping_item: state.currentItem
+                    ? state.currentItem.item.image_name
+                    : "",
+                  Shopping_category: state.currentCategory
+                    ? state.currentCategory
+                    : "",
+                  Shopping_price:
+                    state.getItemPrice(state.currentItem?.item!) ?? 0,
+                  Shopping_time_stamp: new Date().toTimeString(),
+                  Shopping_time_action: state.time,
+                },
           ],
         },
       };
 
-      console.log("row(shop):", JSON.stringify(row.data.actionLog));
+      // console.log("row(shop):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 
@@ -172,7 +194,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
         },
       };
 
-      console.log("row(experiment):", JSON.stringify(row.data.actionLog));
+      // console.log("row(experiment):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 
@@ -208,6 +230,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     const csvString =
       "data:text/csv;charset=utf-8," +
       demographicsRow.join(",") +
+      "\n" +
       "\n" +
       "\n" +
       shopHeaderRow +

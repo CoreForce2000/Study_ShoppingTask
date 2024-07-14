@@ -16,6 +16,7 @@ type TileProps = {
   showCheckbox?: boolean;
   onTileSelect?: (tileName: string, isSelected: boolean) => void; // Callback for managing selected tiles
   setChecked?: boolean;
+  delayAfterClick?: boolean;
 };
 
 const Tile: React.FC<TileProps> = ({
@@ -29,6 +30,7 @@ const Tile: React.FC<TileProps> = ({
   showCheckbox = false,
   onTileSelect = () => {},
   setChecked = false,
+  delayAfterClick = false,
 }) => {
   const store = useTaskStore();
 
@@ -62,14 +64,19 @@ const Tile: React.FC<TileProps> = ({
     <div
       className={styles.tile}
       onClick={() => {
-        if (actionName) store.logShopAction(actionName);
         if (showCheckbox) {
           handleCheckboxClick();
-          onClick();
         } else {
-          onClick();
           setTileStyle({ ...tileStyle, border: "2px solid black" });
         }
+        setTimeout(
+          () => {
+            onClick();
+
+            if (actionName) store.logShopAction(actionName);
+          },
+          delayAfterClick ? 500 : 0
+        );
       }}
       style={tileStyle}
     >

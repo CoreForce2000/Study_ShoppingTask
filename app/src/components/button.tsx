@@ -58,11 +58,10 @@ const Button: React.FC<ButtonProps> = ({
     <button
       disabled={disabled}
       onClick={() => {
-        if (actionName) store.logShopAction(actionName);
-
         if (onClick) {
           onClick();
         }
+        if (actionName) store.logShopAction(actionName);
       }}
       type={type}
       className={buttonClass}

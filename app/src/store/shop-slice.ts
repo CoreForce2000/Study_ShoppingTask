@@ -47,7 +47,7 @@ export interface ShopSlice {
   trolleyCounter: number;
   addItemToCart: (item: Item) => void;
   removeTrolleyItems: () => void;
-  getItemPrice: () => number;
+  getItemPrice: (item: Item) => number;
   backPressed: () => void;
   clickedCategories: string[];
   clickCategory: (category: string) => void;
@@ -77,13 +77,33 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
       selectedTrolleyItems: state.selectedTrolleyItems.includes(trolleyItem)
         ? state.selectedTrolleyItems.filter((item) => item !== trolleyItem)
         : [...state.selectedTrolleyItems, trolleyItem],
+      currentItem: trolleyItem,
+      currentCategory: trolleyItem ? trolleyItem.item.category : "",
     })),
   categories: pseudorandomize(),
   page: "categories",
   navigateTo: (page: ShopSlice["page"]) =>
-    set(() => ({
-      page: page,
-    })),
+    set(() => {
+      if (
+        page === "categories" ||
+        page === "shoppingList" ||
+        page === "trolley"
+      ) {
+        return {
+          page: page,
+          currentCategory: "",
+          currentItem: undefined,
+        };
+      } else if (page === "items") {
+        return {
+          page: page,
+          currentItem: undefined,
+        };
+      }
+      return {
+        page: page,
+      };
+    }),
   time: config.shop.general.time.phase1,
   setTime: (time: number) =>
     set(() => ({
@@ -115,9 +135,8 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
       trolleyCounter: 0,
     })),
 
-  getItemPrice: () => {
+  getItemPrice: (item) => {
     const state = get();
-    const item = state.currentItem?.item;
     if (!item) {
       return 0;
     }
@@ -129,7 +148,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
   addItemToCart: (item: Item) =>
     set((state) => {
       state.backPressed();
-      const price = state.getItemPrice();
+      const price = state.getItemPrice(item);
       const newState = {
         trolleyCounter: state.trolleyCounter + 1,
         trolley: [
@@ -164,7 +183,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
       return {
         ...newState,
-        budget: state.budget - price,
+        budget: newBudget,
       };
     }),
 
@@ -183,23 +202,24 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
         budget: newBudget,
         trolley: newTrolley,
         selectedTrolleyItems: [],
+        currentItem: undefined,
+        currentCategory: "",
       };
     }),
 
-  backPressed: () =>
-    set((state) => {
-      if (state.page === "items") {
-        return { page: "categories" };
-      } else if (state.page === "trolley") {
-        return { page: "categories" };
-      } else if (state.page === "item") {
-        return { page: "items" };
-      } else if (state.page === "shoppingList") {
-        return { page: "categories" };
-      } else {
-        return {};
-      }
-    }),
+  backPressed: () => {
+    const state = get();
+    if (
+      state.page === "items" ||
+      state.page === "trolley" ||
+      state.page === "shoppingList"
+    ) {
+      state.navigateTo("categories");
+    } else if (state.page === "item") {
+      state.navigateTo("items");
+    }
+  },
+
   clickedCategories: [],
   clickCategory: (category) =>
     set((state) => ({

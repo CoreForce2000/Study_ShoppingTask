@@ -189,8 +189,6 @@ export function exportCsvFromListOfObjects(
     Object.keys(list[0]).join(",") +
     list.map((row) => Object.values(row).join(",")).join("\n");
 
-  console.log(csvString);
-
   exportCsvFromString(csvString, fileName);
 }
 
