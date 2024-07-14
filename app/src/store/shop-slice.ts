@@ -47,14 +47,13 @@ export interface ShopSlice {
   trolleyCounter: number;
   addItemToCart: (item: Item) => void;
   removeTrolleyItems: () => void;
+  getItemPrice: () => number;
   backPressed: () => void;
   clickedCategories: string[];
   clickCategory: (category: string) => void;
   clickedItemTiles: Record<string, TileItem[]>;
   clickItemTile: (tile_id: number) => void;
   tickTimer: () => void;
-  interSlide: "" | "timeIsRunningOut" | "extraBudget";
-  setInterSlide: (interSlide: ShopSlice["interSlide"]) => void;
   isPhase3: boolean;
   resetTrolley: () => void;
   switchToPhase3: () => void;
@@ -67,7 +66,10 @@ export interface ShopSlice {
   ) => void;
 }
 
-const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
+const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
+  set,
+  get
+) => ({
   items: shuffleArray(imageData),
   selectedTrolleyItems: [],
   selectTrolleyItem: (trolleyItem: TrolleyItem) =>
@@ -113,14 +115,21 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
       trolleyCounter: 0,
     })),
 
+  getItemPrice: () => {
+    const state = get();
+    const item = state.currentItem?.item;
+    if (!item) {
+      return 0;
+    }
+    return state.budget < config.shop.general.minimumPriceThreshold
+      ? item.minimum
+      : item.maximum;
+  },
+
   addItemToCart: (item: Item) =>
     set((state) => {
       state.backPressed();
-      const price =
-        state.budget < config.shop.general.minimumPriceThreshold
-          ? item.minimum
-          : item.maximum;
-
+      const price = state.getItemPrice();
       const newState = {
         trolleyCounter: state.trolleyCounter + 1,
         trolley: [
@@ -146,20 +155,19 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
         }
       }
 
+      let newBudget = state.budget - price;
       if (state.budget < price) {
         LUCKY_CUSTOMER_SOUND.play();
-        return {
-          ...newState,
-          budget: config.shop.general.initialBudget - price,
-          interSlide: "extraBudget",
-        };
-      } else {
-        return {
-          ...newState,
-          budget: state.budget - price,
-        };
+        state.setTrialIndex(3);
+        newBudget = config.shop.general.initialBudget;
       }
+
+      return {
+        ...newState,
+        budget: state.budget - price,
+      };
     }),
+
   removeTrolleyItems: () =>
     set((state) => {
       const newBudget = state.selectedTrolleyItems.reduce(
@@ -249,40 +257,26 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (set) => ({
       if (state.time <= 1) {
         return { time: config.shop.general.time.phase3 };
       } else {
-        if (state.page === "trolley" || state.interSlide !== "") {
+        if (state.page === "trolley" || state.page === "shoppingList") {
           return {};
         } else {
-          const newInterSlide = !state.isPhase3
-            ? (state.time === 5 * 60 && state.trolley.length === 0) ||
-              (state.time === 2 * 60 && state.trolley.length < 10)
-              ? "timeIsRunningOut"
-              : ""
-            : state.isPhase3
-            ? state.time === 2.5 * 60 && state.trolley.length === 0
-              ? "timeIsRunningOut"
-              : ""
-            : "";
-
-          if (newInterSlide === "timeIsRunningOut") {
+          if (
+            state.isPhase3
+              ? state.time === 2.5 * 60 && state.trolley.length === 0
+              : (state.time === 5 * 60 && state.trolley.length === 0) ||
+                (state.time === 2 * 60 && state.trolley.length < 10)
+          ) {
             TIME_IS_RUNNING_OUT_SOUND.play();
-            setTimeout(() => {
-              set(() => ({ interSlide: "" }));
-            }, config.shop.general.alarmBellDuration);
+            state.setTrialIndex(2);
           }
 
           return {
             time: state.time - 1,
-            interSlide: newInterSlide,
           };
         }
       }
     }),
 
-  interSlide: "",
-  setInterSlide: (interSlide) =>
-    set(() => ({
-      interSlide: interSlide,
-    })),
   isPhase3: false,
   switchToPhase3: () => set(() => ({ isPhase3: true })),
   quizCorrectPersons: [],

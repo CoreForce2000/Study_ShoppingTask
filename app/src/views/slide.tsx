@@ -36,9 +36,37 @@ export interface Slide {
   slide?: string;
   children?: React.ReactNode;
 }
-const useSlideHandlers = (slideNumber: number, trialNumber: number) => {
+
+const SlideShow: React.FC = () => {
   const store = useTaskStore();
   const navigate = useNavigate();
+
+  const [buttonVisible, setButtonVisibleRaw] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState<Slide | null>(null);
+
+  const setButtonVisible = (state: boolean) => {
+    setButtonVisibleRaw(state);
+  };
+
+  const { slideNumberRaw, trialNumberRaw } = useParams<{
+    slideNumberRaw: string;
+    trialName?: string;
+    trialNumberRaw?: string;
+  }>();
+
+  const slideNumber = parseInt(slideNumberRaw ?? "1");
+  const trialNumber = trialNumberRaw ? parseInt(trialNumberRaw) : 1;
+
+  useEffect(() => {
+    if (store.slideNumber !== slideNumber) {
+      console.log("Updating slideNumber", slideNumber);
+      store.setSlideNumber(slideNumber);
+    }
+    if (store.trialNumber !== trialNumber) {
+      store.setTrialNumber(trialNumber);
+    }
+  }, [slideNumber, trialNumber, store]);
+
   const timeoutIdRef = useRef<number | null>(null);
   const keyPressHandlerRef = useRef<((event: KeyboardEvent) => void) | null>(
     null
@@ -55,18 +83,17 @@ const useSlideHandlers = (slideNumber: number, trialNumber: number) => {
     navigate(`/slide/${newSlideNumber}/1`);
   };
 
-  const incrementSlideIndex = () => {
-    if (store.slide) {
-      navigate(`/slide/${slideNumber + 1}/1`);
-    }
-    changeSlideIndex(slideNumber + 1);
-  };
+  const incrementSlideIndex = () => changeSlideIndex(store.slideNumber + 1);
+
+  const decrementSlideIndex = () => changeSlideIndex(store.slideNumber - 1);
 
   const incrementTrialIndex = (maxTrial: number) => {
-    if (store.slide) {
-      navigate(`/slide/${slideNumber}/${trialNumber + 1}`);
-    }
-    if (trialNumber === maxTrial) incrementSlideIndex();
+    if (store.trialNumber === maxTrial) incrementSlideIndex();
+    else navigate(`/slide/${store.slideNumber}/${store.trialNumber + 1}`);
+  };
+
+  const setTrialIndex = (newTrialNumber: number) => {
+    navigate(`/slide/${store.slideNumber}/${newTrialNumber}`);
   };
 
   const waitTimeout = (
@@ -99,49 +126,10 @@ const useSlideHandlers = (slideNumber: number, trialNumber: number) => {
     });
   };
 
-  return {
-    clearListeners,
-    changeSlideIndex,
-    incrementTrialIndex,
-    waitTimeout,
-    waitKeyPress,
-  };
-};
-
-const SlideShow: React.FC = () => {
-  const store = useTaskStore();
-  const [buttonVisible, setButtonVisibleRaw] = useState(true);
-  const [currentSlide, setCurrentSlide] = useState<Slide | null>(null);
-
-  const setButtonVisible = (state: boolean) => {
-    setButtonVisibleRaw(state);
-  };
-
-  const { slideNumberRaw, trialNumberRaw } = useParams<{
-    slideNumberRaw: string;
-    trialName?: string;
-    trialNumberRaw?: string;
-  }>();
-
-  const slideNumber = parseInt(slideNumberRaw ?? "1");
-  const trialNumber = trialNumberRaw ? parseInt(trialNumberRaw) : 1;
-
-  if (store.slide !== slideNumber) store.setSlide(slideNumber);
-
-  const {
-    clearListeners,
-    changeSlideIndex,
-    incrementTrialIndex,
-    waitTimeout,
-    waitKeyPress,
-  } = useSlideHandlers(slideNumber, trialNumber);
-
-  const incrementSlideIndex = () => changeSlideIndex(slideNumber + 1);
-
   const drugCravingSlide = (stage: "pre" | "post") => {
     const drugs = store.getDrugsNow();
     if (drugs.length === 0) return { execute: () => incrementSlideIndex() };
-    const drug = drugs[trialNumber - 1];
+    const drug = drugs[store.trialNumber - 1];
     return {
       slide: `VasSlide.JPG`,
       children: (
@@ -166,11 +154,11 @@ const SlideShow: React.FC = () => {
   };
 
   const contingencySlide = (block: number) => {
-    const trialInfo = store.contingencyOrder[block][trialNumber - 1];
+    const trialInfo = store.contingencyOrder[block][store.trialNumber - 1];
     const isSelfItem = trialInfo.color === store.colorMapping.self;
     const item = isSelfItem
-      ? store.selfItems[trialNumber - 1]
-      : store.otherItems[trialNumber - 1];
+      ? store.selfItems[store.trialNumber - 1]
+      : store.otherItems[store.trialNumber - 1];
 
     const imagePath = getImagePath(item?.category, item?.image_name);
 
@@ -317,21 +305,19 @@ const SlideShow: React.FC = () => {
     return {
       slide: slidePath,
       children: (
-        <div className="mt-121 bg-white w-full pl-6 flex justify-center">
-          <div className="bg-white">
-            <Checkbox
-              key="online-shopping"
-              initialOptions={config.options.shoppingFrequency}
-              onChange={(value) => {
-                store.setSurveyResponse("onlineShoppingFrequency", value[0]);
-                store.logSurveyResponse({
-                  Frequency_online_shopping: value[0],
-                });
-                waitTimeout(1000);
-              }}
-              disableOnClick={true}
-            />
-          </div>
+        <div className="mt-[3em] bg-white w-full pl-6 flex justify-center">
+          <Checkbox
+            key="online-shopping"
+            initialOptions={config.options.shoppingFrequency}
+            onChange={(value) => {
+              store.setSurveyResponse("onlineShoppingFrequency", value[0]);
+              store.logSurveyResponse({
+                Frequency_online_shopping: value[0],
+              });
+              waitTimeout(1000);
+            }}
+            disableOnClick={true}
+          />
         </div>
       ),
       execute: () => setButtonVisible(false),
@@ -341,13 +327,15 @@ const SlideShow: React.FC = () => {
   const checkboxDrugs = (slidePath: string) => ({
     slide: slidePath,
     children: (
-      <div className="mt-12 w-full pl-6 flex justify-start">
-        <div className="bg-white w-full">
+      <div className="mt-[2em] w-full pl-6 flex justify-center text-lg">
+        <div className="bg-white">
           <Checkbox
             key="drugs"
+            gap="0.7em"
             initialOptions={[
-              ...config.options.drugScreening.drugs,
-              config.options.drugScreening.other,
+              ...config.options.drugScreening.drugs.filter(
+                (x) => x != config.options.drugScreening.none
+              ),
             ]}
             exclusiveOptions={[config.options.drugScreening.none]}
             allowMultiple={true}
@@ -388,6 +376,30 @@ const SlideShow: React.FC = () => {
     };
   };
 
+  const interSlideTime = (slidePath: string) => {
+    const timeout = config.shop.general.alarmBellDuration;
+    return {
+      slide: slidePath,
+      execute: () => waitTimeout(timeout, timeout, () => setTrialIndex(1)),
+    };
+  };
+
+  const interSlideBudget = (slidePath: string) => {
+    return {
+      slide: slidePath,
+      //button "Continuge Shopping" with same style as next, and navigates to same slide but trial /1
+      children: (
+        <Button
+          className="absolute cursor-pointer p-0 bottom-[1em] text-base"
+          onClick={() => setTrialIndex(1)}
+        >
+          Continue Shopping
+        </Button>
+      ),
+      execute: () => setButtonVisible(false),
+    };
+  };
+
   const vas = (
     slidePath: string,
     variableName: string,
@@ -414,10 +426,12 @@ const SlideShow: React.FC = () => {
   };
 
   const renderSlide: () => Slide = () => {
+    if (!store.slideNumber) return { slide: "White.PNG" };
+
     const currentSlideInfo: SlideJson =
-      typeof task[slideNumber - 1] === "string"
-        ? ({ slidePath: task[slideNumber - 1] } as unknown as SlideJson)
-        : (task[slideNumber - 1] as SlideJson);
+      typeof task[store.slideNumber - 1] === "string"
+        ? ({ slidePath: task[store.slideNumber - 1] } as unknown as SlideJson)
+        : (task[store.slideNumber - 1] as SlideJson);
 
     const isCustomSlide = currentSlideInfo.type !== undefined;
 
@@ -435,7 +449,6 @@ const SlideShow: React.FC = () => {
         case "!=":
           if (store.data.survey[group] === value) incrementSlideIndex();
           return;
-          break;
       }
     };
 
@@ -481,7 +494,7 @@ const SlideShow: React.FC = () => {
         case "checkboxDrugs":
           return checkboxDrugs(slidePath);
         case "checkboxBulb":
-          return checkboxBulb(slidePath, slideNumber);
+          return checkboxBulb(slidePath, store.slideNumber);
         case "drugCravingPre":
           return drugCravingSlide("pre");
         case "drugCravingPost":
@@ -491,6 +504,12 @@ const SlideShow: React.FC = () => {
         case "quiz":
           return quizSlide();
         case "onlineShop":
+          if (store.trialNumber === 2) {
+            return interSlideTime("shop/Slide10.JPG");
+          }
+          if (store.trialNumber === 3) {
+            return interSlideBudget("shop/Slide11.JPG");
+          }
           return {
             slide: "White.PNG",
             children: <OnlineShop></OnlineShop>,
@@ -503,7 +522,7 @@ const SlideShow: React.FC = () => {
           return {
             slide: "White.PNG",
             children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(true),
+            execute: () => setButtonVisible(false),
           };
         case "exportData":
           exportCsv(store, currentSlideInfo.variableName!);
@@ -526,11 +545,32 @@ const SlideShow: React.FC = () => {
   useEffect(() => {
     const slide = renderSlide();
 
-    console.log(slide.slide);
-
     if (slide.execute) slide.execute();
     if (slide.slide) setCurrentSlide(slide);
-  }, [slideNumber, trialNumber, store.trialPhase]);
+  }, [store.slideNumber, store.trialNumber, store.trialPhase]);
+
+  // listener for moving forward and backward one slide, using ctrl+b for back and ctrl+f for forward
+  useEffect(() => {
+    store.initializeSetTrialIndex(setTrialIndex);
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.ctrlKey) {
+        if (event.key === "b") {
+          event.preventDefault();
+          decrementSlideIndex();
+        } else if (event.key === "d") {
+          event.preventDefault();
+          incrementSlideIndex();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyPress);
+    };
+  }, []);
 
   return (
     <div>

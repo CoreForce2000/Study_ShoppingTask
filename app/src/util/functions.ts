@@ -117,7 +117,7 @@ export function pseudorandomize(): string[] {
 
       { cols: 10 - specialCategoriesCols, list: nonSpecialCategories },
     ],
-    100
+    300
   ).flat() as string[];
 }
 
@@ -177,10 +177,28 @@ export function exportCsv(store: TaskStore, suffix: string = "") {
     store.data.survey.participantId
   }_SHOP_${new Date().toLocaleDateString()}`;
 
-  const encodedUri = encodeURI(csvString);
+  exportCsvFromString(csvString, fileName + suffix);
+}
+
+//export csv from list of Objects (keys as columns, values as rows)
+export function exportCsvFromListOfObjects(
+  list: Record<string, any>[],
+  fileName: string
+) {
+  const csvString =
+    Object.keys(list[0]).join(",") +
+    list.map((row) => Object.values(row).join(",")).join("\n");
+
+  console.log(csvString);
+
+  exportCsvFromString(csvString, fileName);
+}
+
+export function exportCsvFromString(csvString: string, fileName: string) {
+  const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", fileName + suffix + ".csv");
+  link.setAttribute("download", fileName + ".csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

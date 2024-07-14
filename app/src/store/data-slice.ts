@@ -128,7 +128,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
               Shopping_category: state.currentCategory
                 ? state.currentCategory
                 : "",
-              Shopping_price: state.currentItem ? 0 : "",
+              Shopping_price: state.getItemPrice(),
               Shopping_time_stamp: new Date().toTimeString(),
               Shopping_time_action: state.time,
             },

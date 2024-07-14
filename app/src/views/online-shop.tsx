@@ -176,7 +176,7 @@ const Timer: React.FC<{}> = ({}) => {
 
   const timerObject = useTimer({ delay: 1000 }, () => {
     if (store.time === 1) {
-      navigate(`../slide/${store.slide + 1}`);
+      navigate(`../slide/${store.slideNumber + 1}`);
     }
     store.tickTimer();
   });
@@ -205,7 +205,6 @@ const OnlineShop: React.FC<{}> = () => {
   );
 
   const onScroll = () => {
-    console.log("Scrolling");
     if (scrollRef.current) {
       if (isScrollAreaAtBottom(scrollRef.current, 50)) {
         if (store.page === "categories") {
@@ -301,7 +300,7 @@ const OnlineShop: React.FC<{}> = () => {
             secondChild={
               <Button
                 onClick={store.removeTrolleyItems}
-                className="text-sm"
+                className="text-[0.25em]"
                 visible={
                   store.page === "trolley" &&
                   store.selectedTrolleyItems.length > 0

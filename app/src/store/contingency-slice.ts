@@ -115,7 +115,7 @@ const createContingencySlice: StateCreator<
 
       return {
         selfItems: extendArray(
-          selfItems,
+          selfItems.length === 0 ? ["Art/Art_1.jpeg"] : selfItems,
           config.experimentConfig.trialSequence.length * 5,
           true
         ),
