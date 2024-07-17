@@ -10,6 +10,7 @@ interface CheckboxProps {
   allowedOption?: string;
   gap?: string;
   disableOnClick?: boolean;
+  hideLabel?: boolean;
 }
 
 export interface CheckboxOption {
@@ -26,6 +27,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   allowedOption,
   gap = "0.3em",
   disableOnClick = false,
+  hideLabel = false,
 }) => {
   const [options, setOptions] = useState<CheckboxOption[]>(
     [...initialOptions, ...exclusiveOptions].map((label) => ({
@@ -129,9 +131,18 @@ const Checkbox: React.FC<CheckboxProps> = ({
             ) : null}
             <span
               className={styles.customCheckbox}
-              style={{ height: boxSize, width: boxSize }}
+              style={{
+                height: boxSize,
+                width: boxSize,
+              }}
             ></span>
-            {option.label}
+            <span
+              style={{
+                display: hideLabel ? "none" : "inline-block",
+              }}
+            >
+              {option.label}
+            </span>
           </label>
         </div>
       ))}

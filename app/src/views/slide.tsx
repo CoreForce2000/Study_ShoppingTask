@@ -58,6 +58,7 @@ const SlideShow: React.FC = () => {
   const trialNumber = trialNumberRaw ? parseInt(trialNumberRaw) : 1;
 
   useEffect(() => {
+    console.log("rawSlide", slideNumberRaw, "storeSlide", store.slideNumber);
     if (store.slideNumber !== slideNumber) {
       store.setSlideNumber(slideNumber);
     }
@@ -89,10 +90,6 @@ const SlideShow: React.FC = () => {
   const incrementTrialIndex = (maxTrial: number) => {
     if (store.trialNumber === maxTrial) incrementSlideIndex();
     else navigate(`/slide/${store.slideNumber}/${store.trialNumber + 1}`);
-  };
-
-  const setTrialIndex = (newTrialNumber: number) => {
-    navigate(`/slide/${store.slideNumber}/${newTrialNumber}`);
   };
 
   const waitTimeout = (
@@ -166,7 +163,7 @@ const SlideShow: React.FC = () => {
         return {
           slide: `/duringPhase2/Slide1.PNG`,
           execute: () => {
-            setButtonVisible(true);
+            setButtonVisible(false);
             clearListeners();
             waitTimeout(
               config.experimentConfig.slideTimings.offLightbulb.minValue,
@@ -353,21 +350,27 @@ const SlideShow: React.FC = () => {
     ),
   });
 
-  const checkboxBulb = (slidePath: string, index: number) => {
+  const checkboxBulb = (
+    slidePath: string,
+    index: number,
+    variableName: string
+  ) => {
     return {
       slide: slidePath,
       children: (
-        <div className="pt-[3em] pl-[0.5em]">
+        <div className="pt-[3.6em] pl-[0.5em]">
           <Checkbox
             key={`${slidePath.slice(-3, -1)}_${index}`}
-            initialOptions={["", ""]}
+            initialOptions={["blue", "orange"]}
             columnLayout="double"
             allowMultiple={false}
-            onChange={() => {
+            onChange={(value) => {
+              store.logSurveyResponse({ [variableName]: value });
               waitTimeout(1000);
             }}
             gap={"3.3em"}
             disableOnClick={true}
+            hideLabel={true}
           />
         </div>
       ),
@@ -379,7 +382,8 @@ const SlideShow: React.FC = () => {
     const timeout = config.shop.general.alarmBellDuration;
     return {
       slide: slidePath,
-      execute: () => waitTimeout(timeout, timeout, () => setTrialIndex(1)),
+      execute: () =>
+        waitTimeout(timeout, timeout, () => store.setTrialIndex(1)),
     };
   };
 
@@ -390,7 +394,7 @@ const SlideShow: React.FC = () => {
       children: (
         <Button
           className="absolute cursor-pointer p-0 bottom-[1em] text-base"
-          onClick={() => setTrialIndex(1)}
+          onClick={() => store.setTrialIndex(1)}
         >
           Continue Shopping
         </Button>
@@ -414,7 +418,7 @@ const SlideShow: React.FC = () => {
           maxLabel={maxLabel}
           setValue={(value) => {
             store.setSurveyResponse(variableName, value);
-            store.logSurveyResponse({ variableName: value });
+            store.logSurveyResponse({ [variableName]: value });
             waitTimeout(1000);
           }}
           text={``}
@@ -493,7 +497,11 @@ const SlideShow: React.FC = () => {
         case "checkboxDrugs":
           return checkboxDrugs(slidePath);
         case "checkboxBulb":
-          return checkboxBulb(slidePath, store.slideNumber);
+          return checkboxBulb(
+            slidePath,
+            store.slideNumber,
+            currentSlideInfo.variableName!
+          );
         case "drugCravingPre":
           return drugCravingSlide("pre");
         case "drugCravingPost":
@@ -512,7 +520,7 @@ const SlideShow: React.FC = () => {
           return {
             slide: "White.PNG",
             children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(true),
+            execute: () => setButtonVisible(false),
           };
         case "onlineShopControl":
           store.resetTrolley();
@@ -550,7 +558,7 @@ const SlideShow: React.FC = () => {
 
   // listener for moving forward and backward one slide, using ctrl+b for back and ctrl+f for forward
   useEffect(() => {
-    store.initializeSetTrialIndex(setTrialIndex);
+    store.initializeStoreNavigate(navigate);
 
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.ctrlKey) {

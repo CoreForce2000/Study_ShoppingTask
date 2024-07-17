@@ -103,13 +103,11 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
           ],
         },
       };
-      // console.log("row(survey):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 
   logShopAction: (action: any) =>
     set((state) => {
-      console.log("Item", state.currentItem?.item.image_name);
       const row = {
         data: {
           ...state.data,
@@ -158,7 +156,6 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
         },
       };
 
-      // console.log("row(shop):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 
@@ -194,7 +191,6 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
         },
       };
 
-      // console.log("row(experiment):", JSON.stringify(row.data.actionLog));
       return row;
     }),
 

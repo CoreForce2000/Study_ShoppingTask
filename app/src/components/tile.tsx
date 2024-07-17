@@ -72,7 +72,6 @@ const Tile: React.FC<TileProps> = ({
         setTimeout(
           () => {
             onClick();
-
             if (actionName) store.logShopAction(actionName);
           },
           delayAfterClick ? 500 : 0
