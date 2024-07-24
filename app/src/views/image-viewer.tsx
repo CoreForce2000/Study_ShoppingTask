@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import imageData from "../assets/categories/image_data.json";
 import Button from "../components/button";
 import { Item } from "../store/shop-slice";
-import { getImagePath } from "../util/preload";
+import { getImagePath } from "../util/functions";
 
 interface CategoryListProps {
   categories: Item[];

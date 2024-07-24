@@ -16,9 +16,8 @@ import EvenlySpacedRow from "../components/evenly-spaced-row";
 import Tile from "../components/tile";
 import { TileItem } from "../store/shop-slice";
 import useTaskStore from "../store/store";
-import { isScrollAreaAtBottom } from "../util/functions";
+import { getImagePath, isScrollAreaAtBottom } from "../util/functions";
 import { useScrollRestoration } from "../util/hooks";
-import { getImagePath } from "../util/preload";
 
 export interface Tile {
   category: string;

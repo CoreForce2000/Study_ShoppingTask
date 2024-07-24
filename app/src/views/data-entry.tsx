@@ -162,7 +162,8 @@ const DataEntry: React.FC = () => {
       return;
     }
 
-    store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
+    // store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
+    store.setTime(10);
 
     navigate("/slide/1");
   };

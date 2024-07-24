@@ -1,53 +1,10 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
-import { extendArray, shuffledBinaryArray } from "../util/functions";
+import { extendArray, generateTrialsArray, Trial } from "../util/functions";
 import { Item } from "./shop-slice";
 import { TaskStore } from "./store";
 
-export interface Trial {
-  color: string;
-  spacePressedCorrect: boolean;
-  noSpacePressedCorrect: boolean;
-}
-
 export type TrialPhase = "prepare" | "react" | "outcome";
-
-function generateTrialsArray(
-  numBlocks: number,
-  numTrialsPerBlock: number
-): Trial[][] {
-  const trialArray: Trial[][] = [];
-
-  for (let block = 0; block < numBlocks; block++) {
-    const lightColor = shuffledBinaryArray(
-      "orange",
-      "blue",
-      0.5,
-      numTrialsPerBlock * 2
-    );
-    const spacePressedCorrect = shuffledBinaryArray(
-      true,
-      false,
-      config.experimentConfig.trialSequence[block].pressButton,
-      numTrialsPerBlock * 2
-    );
-    const noSpacePressedCorrect = shuffledBinaryArray(
-      true,
-      false,
-      config.experimentConfig.trialSequence[block].noPressButton,
-      numTrialsPerBlock * 2
-    );
-
-    trialArray.push(
-      lightColor.map((value, index) => ({
-        color: value,
-        spacePressedCorrect: spacePressedCorrect[index],
-        noSpacePressedCorrect: noSpacePressedCorrect[index],
-      }))
-    );
-  }
-  return trialArray;
-}
 
 export interface ContingencySlice {
   reacted: boolean;
@@ -79,9 +36,8 @@ const createContingencySlice: StateCreator<
       ? { self: "orange", other: "blue" }
       : { self: "blue", other: "orange" },
 
-  contingencyOrder: generateTrialsArray(
-    config.experimentConfig.trialSequence.length,
-    config.experimentConfig.numberOfTrials
+  contingencyOrder: [0, 0, 0, 0.3, 0.6, 0, 0.3, 0.6].map((prob) =>
+    generateTrialsArray(60, 0.6, prob)
   ),
 
   popSelfItem: () => {
@@ -116,14 +72,10 @@ const createContingencySlice: StateCreator<
       return {
         selfItems: extendArray(
           selfItems.length === 0 ? ["Art/Art_1.jpeg"] : selfItems,
-          config.experimentConfig.trialSequence.length * 5,
+          60 * 8,
           true
         ),
-        otherItems: extendArray(
-          otherItems,
-          config.experimentConfig.trialSequence.length * 5,
-          true
-        ),
+        otherItems: extendArray(otherItems, 60 * 8, true),
       };
     }),
   nextTrialPhase: () =>

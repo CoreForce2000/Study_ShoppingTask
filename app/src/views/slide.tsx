@@ -15,9 +15,10 @@ import {
   MEMORY_WRONG_SOUND,
   SLIDE_PATH,
 } from "../util/constants";
-import { exportCsv } from "../util/functions";
-import { getImagePath, preloadImage } from "../util/preload";
+import { exportCsv, getImagePath } from "../util/functions";
 import OnlineShop from "./online-shop";
+
+const quickNext = false;
 
 type SlideJson = {
   type?: string;
@@ -29,6 +30,12 @@ type SlideJson = {
   showIf?: string;
   keyPress?: string;
   delay?: number;
+  setPhase?: string;
+  setPhaseNumber?: number;
+  setBlock?: string;
+  setBlockNumber?: number;
+  numTrials?: number;
+  probabilityOutcomeNoAction?: number;
 };
 
 export interface Slide {
@@ -58,7 +65,6 @@ const SlideShow: React.FC = () => {
   const trialNumber = trialNumberRaw ? parseInt(trialNumberRaw) : 1;
 
   useEffect(() => {
-    console.log("rawSlide", slideNumberRaw, "storeSlide", store.slideNumber);
     if (store.slideNumber !== slideNumber) {
       store.setSlideNumber(slideNumber);
     }
@@ -138,7 +144,7 @@ const SlideShow: React.FC = () => {
           maxLabel="very much"
           setValue={(value: number) => {
             store.setDrugCraving(drug, value);
-            store.logSurveyResponse({ [`VAS_${drug}_${stage}`]: value });
+            store.logAction({ [`VAS_${drug}_${stage}`]: value });
             waitTimeout(1000, 1000, () => {
               incrementTrialIndex(drugs.length);
             });
@@ -149,8 +155,9 @@ const SlideShow: React.FC = () => {
     };
   };
 
-  const contingencySlide = (block: number) => {
-    const trialInfo = store.contingencyOrder[block][store.trialNumber - 1];
+  const contingencySlide = () => {
+    const trialInfo =
+      store.contingencyOrder[store.block - 1][store.trialNumber - 1];
     const isSelfItem = trialInfo.color === store.colorMapping.self;
     const item = isSelfItem
       ? store.selfItems[store.trialNumber - 1]
@@ -163,7 +170,7 @@ const SlideShow: React.FC = () => {
         return {
           slide: `/duringPhase2/Slide1.PNG`,
           execute: () => {
-            setButtonVisible(false);
+            setButtonVisible(quickNext ? true : false);
             clearListeners();
             waitTimeout(
               config.experimentConfig.slideTimings.offLightbulb.minValue,
@@ -173,7 +180,6 @@ const SlideShow: React.FC = () => {
           },
         };
       case "react":
-        preloadImage(imagePath);
         return {
           slide:
             trialInfo.color === "orange"
@@ -198,7 +204,6 @@ const SlideShow: React.FC = () => {
           (trialInfo.noSpacePressedCorrect && !store.reacted);
 
         store.logExperimentAction({
-          block: block,
           cue: trialInfo.color,
           stimuli_type: isSelfItem ? "self" : "other",
           outcome: positiveOutcome ? "TRUE" : "FALSE",
@@ -307,7 +312,7 @@ const SlideShow: React.FC = () => {
             initialOptions={config.options.shoppingFrequency}
             onChange={(value) => {
               store.setSurveyResponse("onlineShoppingFrequency", value[0]);
-              store.logSurveyResponse({
+              store.logAction({
                 Frequency_online_shopping: value[0],
               });
               waitTimeout(1000);
@@ -365,7 +370,7 @@ const SlideShow: React.FC = () => {
             columnLayout="double"
             allowMultiple={false}
             onChange={(value) => {
-              store.logSurveyResponse({ [variableName]: value });
+              store.logAction({ [variableName]: value });
               waitTimeout(1000);
             }}
             gap={"3.3em"}
@@ -418,7 +423,7 @@ const SlideShow: React.FC = () => {
           maxLabel={maxLabel}
           setValue={(value) => {
             store.setSurveyResponse(variableName, value);
-            store.logSurveyResponse({ [variableName]: value });
+            store.logAction({ [variableName]: value });
             waitTimeout(1000);
           }}
           text={``}
@@ -429,8 +434,7 @@ const SlideShow: React.FC = () => {
   };
 
   const renderSlide: () => Slide = () => {
-    if (!store.slideNumber) return { slide: "White.PNG" };
-
+    if (!store.slideNumber) return { slide: "White.png" };
     const currentSlideInfo: SlideJson =
       typeof task[store.slideNumber - 1] === "string"
         ? ({ slidePath: task[store.slideNumber - 1] } as unknown as SlideJson)
@@ -483,6 +487,18 @@ const SlideShow: React.FC = () => {
       ? renderSlideString(currentSlideInfo.slidePath!)
       : "";
 
+    if (currentSlideInfo.setPhase)
+      store.setPhase(
+        currentSlideInfo.setPhase,
+        currentSlideInfo.setPhaseNumber!
+      );
+    if (currentSlideInfo.setBlock) {
+      store.setBlock(
+        currentSlideInfo.setBlock,
+        currentSlideInfo.setBlockNumber!
+      );
+    }
+
     if (isCustomSlide) {
       switch (currentSlideInfo.type) {
         case "VAS":
@@ -507,7 +523,7 @@ const SlideShow: React.FC = () => {
         case "drugCravingPost":
           return drugCravingSlide("post");
         case "contingency":
-          return contingencySlide(currentSlideInfo.index!);
+          return contingencySlide();
         case "quiz":
           return quizSlide();
         case "onlineShop":
@@ -518,24 +534,27 @@ const SlideShow: React.FC = () => {
             return interSlideBudget("shop/Slide11.JPG");
           }
           return {
-            slide: "White.PNG",
+            slide: "White.png",
             children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(false),
+            execute: () => setButtonVisible(quickNext ? true : false),
           };
         case "onlineShopControl":
           store.resetTrolley();
           store.switchToPhase3();
           store.setTime(config.shop.general.time.phase3);
           return {
-            slide: "White.PNG",
+            slide: "White.png",
             children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(false),
+            execute: () => setButtonVisible(quickNext ? true : false),
           };
         case "exportData":
           exportCsv(store, currentSlideInfo.variableName!);
           store.generateSelfOtherSequence();
           incrementSlideIndex();
-          return { slide: "White.PNG" };
+          return { slide: "White.png" };
+        case "set":
+          incrementSlideIndex();
+          return { slide: "White.png" };
         default:
           console.error("Unknown slide type", currentSlideInfo.type);
           setButtonVisible(false);

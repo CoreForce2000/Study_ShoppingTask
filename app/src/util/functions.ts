@@ -1,6 +1,23 @@
 import imageData from "../assets/categories/image_data.json";
 import config from "../assets/configs/config.json";
 import { TaskStore } from "../store/store";
+import { ASSETS_PATH, IMAGE_BASE_PATH } from "./constants";
+
+export const preloadImage = (path: string) => {
+  return new Promise<void>((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve();
+    img.onerror = (error) => {
+      console.error(`Failed to load image at ${path}:`, error);
+      reject(error);
+    };
+    img.src = ASSETS_PATH + path;
+  });
+};
+
+export const getImagePath = (category: string, imageName: string) => {
+  return IMAGE_BASE_PATH + category + "/" + imageName;
+};
 
 export function getCurrentTime() {
   const currentTime = new Date().getTime() / 1000;
@@ -15,6 +32,37 @@ export function isScrollAreaAtBottom(
     element.scrollTop + element.clientHeight + bottomBuffer >=
     element.scrollHeight
   );
+}
+
+export interface Trial {
+  color: string;
+  spacePressedCorrect: boolean;
+  noSpacePressedCorrect: boolean;
+}
+export function generateTrialsArray(
+  numTrials: number,
+  probabilityGetItemPress: number,
+  probabilityGetItemNoPress: number
+): Trial[] {
+  const lightColor = shuffledBinaryArray("orange", "blue", 0.5, numTrials);
+  const spacePressedCorrect = shuffledBinaryArray(
+    true,
+    false,
+    probabilityGetItemPress,
+    numTrials
+  );
+  const noSpacePressedCorrect = shuffledBinaryArray(
+    true,
+    false,
+    probabilityGetItemNoPress,
+    numTrials
+  );
+
+  return lightColor.map((value, index) => ({
+    color: value,
+    spacePressedCorrect: spacePressedCorrect[index],
+    noSpacePressedCorrect: noSpacePressedCorrect[index],
+  }));
 }
 
 export function shuffleArray(array: any): any[] {
