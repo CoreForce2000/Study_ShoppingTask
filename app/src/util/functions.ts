@@ -1,17 +1,19 @@
 import imageData from "../assets/categories/image_data.json";
 import config from "../assets/configs/config.json";
 import { TaskStore } from "../store/store";
-import { ASSETS_PATH, IMAGE_BASE_PATH } from "./constants";
+import { IMAGE_BASE_PATH } from "./constants";
 
 export const preloadImage = (path: string) => {
-  return new Promise<void>((resolve, reject) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
-    img.onload = () => resolve();
+    img.onload = () => {
+      resolve(img);
+    };
     img.onerror = (error) => {
       console.error(`Failed to load image at ${path}:`, error);
       reject(error);
     };
-    img.src = ASSETS_PATH + path;
+    img.src = path;
   });
 };
 

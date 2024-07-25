@@ -52,7 +52,7 @@ export interface ShopSlice {
   clickedCategories: string[];
   clickCategory: (category: string) => void;
   clickedItemTiles: Record<string, TileItem[]>;
-  clickItemTile: (tile_id: number) => void;
+  clickItemTile: (tile_id: number, beforeTimeout: boolean) => void;
   tickTimer: () => void;
   isPhase3: boolean;
   resetTrolley: () => void;
@@ -220,6 +220,27 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
     }
   },
 
+  switchToPhase3: () => {
+    set(() => ({
+      items: shuffleArray(imageData),
+      selectedTrolleyItems: [],
+      categories: pseudorandomize(),
+      page: "categories",
+      time: config.shop.general.time.phase3,
+      scrollPositions: {},
+      numVisibleRows: config.shop.general.initialVisilbeRows,
+      currentCategory: "",
+      currentItem: undefined,
+      budget: config.shop.general.initialBudget,
+      trolley: [],
+      trolleyCounter: 0,
+      clickedCategories: [],
+      clickedItemTiles: {},
+      quizCorrectPersons: [],
+      isPhase3: true,
+    }));
+  },
+
   clickedCategories: [],
   clickCategory: (category) =>
     set((state) => ({
@@ -233,7 +254,12 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
   clickedItemTiles: {},
 
-  clickItemTile: (tile_id: number) =>
+  setCurrentItem: (item: TileItem) =>
+    set(() => ({
+      currentItem: item,
+    })),
+
+  clickItemTile: (tile_id: number, beforeTimeout: boolean) =>
     set((state) => {
       // Get the number of clicked items in the current category
       const clickedItems = state.clickedItemTiles[state.currentCategory] || [];
@@ -257,19 +283,22 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
       const item = items[itemIndex];
 
-      return {
-        clickedItemTiles: {
-          ...state.clickedItemTiles,
-          [state.currentCategory]: addUnique(
-            state.clickedItemTiles[state.currentCategory] || [],
-            {
-              tile_id: tile_id,
-              item: item,
-            }
-          ),
-        },
-        currentItem: { tile_id: tile_id, item: item },
-      };
+      return beforeTimeout
+        ? {
+            currentItem: { tile_id: tile_id, item: item },
+          }
+        : {
+            clickedItemTiles: {
+              ...state.clickedItemTiles,
+              [state.currentCategory]: addUnique(
+                state.clickedItemTiles[state.currentCategory] || [],
+                {
+                  tile_id: tile_id,
+                  item: item,
+                }
+              ),
+            },
+          };
     }),
 
   tickTimer: () =>
@@ -298,7 +327,6 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
     }),
 
   isPhase3: false,
-  switchToPhase3: () => set(() => ({ isPhase3: true })),
   quizCorrectPersons: [],
   quizAddCorrectPersonUnique: (person, sideEffect) =>
     set((state) => {

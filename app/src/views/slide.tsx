@@ -1,7 +1,10 @@
+import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import config from "../assets/configs/config.json";
 import { task } from "../assets/configs/task.json";
+
+import White from "../assets/slides/white.jpg";
 import Button from "../components/button";
 import Checkbox from "../components/checkbox";
 import VASSlide from "../components/slide-vas";
@@ -13,7 +16,6 @@ import {
   MEMORY_ALL_CORRECT_SOUND,
   MEMORY_CORRECT_SOUND,
   MEMORY_WRONG_SOUND,
-  SLIDE_PATH,
 } from "../util/constants";
 import { exportCsv, getImagePath } from "../util/functions";
 import OnlineShop from "./online-shop";
@@ -44,7 +46,9 @@ export interface Slide {
   children?: React.ReactNode;
 }
 
-const SlideShow: React.FC = () => {
+const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
+  slideMapping,
+}) => {
   const store = useTaskStore();
   const navigate = useNavigate();
 
@@ -133,7 +137,7 @@ const SlideShow: React.FC = () => {
     if (drugs.length === 0) return { execute: () => incrementSlideIndex() };
     const drug = drugs[store.trialNumber - 1];
     return {
-      slide: `VasSlide.JPG`,
+      slide: `vasslide.jpg`,
       children: (
         <VASSlide
           key={drug}
@@ -163,13 +167,15 @@ const SlideShow: React.FC = () => {
       ? store.selfItems[store.trialNumber - 1]
       : store.otherItems[store.trialNumber - 1];
 
-    const imagePath = getImagePath(item?.category, item?.image_name);
+    store.setOutcomeImage(getImagePath(item?.category, item?.image_name));
 
     switch (store.trialPhase) {
       case "prepare":
         return {
-          slide: `/duringPhase2/Slide1.PNG`,
+          slide: `duringPhase2/slide1.jpg`,
           execute: () => {
+            store.setShowImage(false);
+
             setButtonVisible(quickNext ? true : false);
             clearListeners();
             waitTimeout(
@@ -183,8 +189,8 @@ const SlideShow: React.FC = () => {
         return {
           slide:
             trialInfo.color === "orange"
-              ? "/duringPhase2/Slide2.PNG"
-              : "/duringPhase2/Slide3.PNG",
+              ? "duringPhase2/slide2.jpg"
+              : "duringPhase2/slide3.jpg",
           execute: () => {
             clearListeners();
             waitKeyPress(KEY_SPACE, () => {
@@ -203,6 +209,8 @@ const SlideShow: React.FC = () => {
           (trialInfo.spacePressedCorrect && store.reacted) ||
           (trialInfo.noSpacePressedCorrect && !store.reacted);
 
+        store.setShowImage(positiveOutcome);
+
         store.logExperimentAction({
           cue: trialInfo.color,
           stimuli_type: isSelfItem ? "self" : "other",
@@ -214,17 +222,7 @@ const SlideShow: React.FC = () => {
 
         return positiveOutcome
           ? {
-              slide: `/duringPhase2/Slide4.PNG`,
-              children: (
-                <div className="w-full h-full flex justify-center items-center pb-[3em]">
-                  <div>
-                    <img
-                      className="max-h-[5em] max-w-[5em]"
-                      src={imagePath}
-                    ></img>
-                  </div>
-                </div>
-              ),
+              slide: `duringPhase2/slide4.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(
@@ -239,7 +237,7 @@ const SlideShow: React.FC = () => {
               },
             }
           : {
-              slide: `/duringPhase2/Slide1.PNG`,
+              slide: `duringPhase2/slide1.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(
@@ -259,7 +257,7 @@ const SlideShow: React.FC = () => {
   };
 
   const quizSlide = () => ({
-    slide: `phase3/Slide28.JPG`,
+    slide: `phase3/slide28.jpg`,
     children: (
       <div
         key={`column1234`}
@@ -434,7 +432,7 @@ const SlideShow: React.FC = () => {
   };
 
   const renderSlide: () => Slide = () => {
-    if (!store.slideNumber) return { slide: "White.png" };
+    if (!store.slideNumber) return { slide: "white.jpg" };
     const currentSlideInfo: SlideJson =
       typeof task[store.slideNumber - 1] === "string"
         ? ({ slidePath: task[store.slideNumber - 1] } as unknown as SlideJson)
@@ -528,13 +526,13 @@ const SlideShow: React.FC = () => {
           return quizSlide();
         case "onlineShop":
           if (store.trialNumber === 2) {
-            return interSlideTime("shop/Slide10.JPG");
+            return interSlideTime("shop/slide10.jpg");
           }
           if (store.trialNumber === 3) {
-            return interSlideBudget("shop/Slide11.JPG");
+            return interSlideBudget("shop/slide11.jpg");
           }
           return {
-            slide: "White.png",
+            slide: "white.jpg",
             children: <OnlineShop></OnlineShop>,
             execute: () => setButtonVisible(quickNext ? true : false),
           };
@@ -542,8 +540,14 @@ const SlideShow: React.FC = () => {
           store.resetTrolley();
           store.switchToPhase3();
           store.setTime(config.shop.general.time.phase3);
+          if (store.trialNumber === 2) {
+            return interSlideTime("shop/slide10.jpg");
+          }
+          if (store.trialNumber === 3) {
+            return interSlideBudget("shop/slide11.jpg");
+          }
           return {
-            slide: "White.png",
+            slide: "white.jpg",
             children: <OnlineShop></OnlineShop>,
             execute: () => setButtonVisible(quickNext ? true : false),
           };
@@ -551,10 +555,10 @@ const SlideShow: React.FC = () => {
           exportCsv(store, currentSlideInfo.variableName!);
           store.generateSelfOtherSequence();
           incrementSlideIndex();
-          return { slide: "White.png" };
+          return { slide: "white.jpg" };
         case "set":
           incrementSlideIndex();
-          return { slide: "White.png" };
+          return { slide: "white.jpg" };
         default:
           console.error("Unknown slide type", currentSlideInfo.type);
           setButtonVisible(false);
@@ -601,9 +605,24 @@ const SlideShow: React.FC = () => {
   return (
     <div>
       <TaskViewport
-        backgroundImage={SLIDE_PATH + currentSlide?.slide ?? "White.png"}
+        backgroundImage={
+          currentSlide ? slideMapping[currentSlide.slide!] : White
+        }
         verticalAlign={true}
       >
+        <div
+          className={classNames(
+            "w-full h-full flex justify-center items-center pb-[3em]",
+            store.showImage ? "block" : "hidden"
+          )}
+        >
+          <div>
+            <img
+              className="max-h-[5em] max-w-[5em]"
+              src={store.outcomeImage}
+            ></img>
+          </div>
+        </div>
         {currentSlide?.children}
         <Button
           className="absolute cursor-pointer p-0 bottom-[1em] right-[1em] text-base"

@@ -1,285 +1,112 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { task } from "./assets/configs/task.json";
-import { SLIDE_PATH } from "./util/constants";
-import { preloadImage } from "./util/functions";
 import DataEntry from "./views/data-entry";
 import ImageViewer from "./views/image-viewer";
 import SlideShow from "./views/slide";
 
-// import SlideB1 from "./assets/slides/duringPhase2/SlideB1.jpg";
-// import SlideB2 from "./assets/slides/duringPhase2/SlideB2.jpg";
-// import SlideB3 from "./assets/slides/duringPhase2/SlideB3.jpg";
-// import Slide1 from "./assets/slides/phase1/Slide1.jpg";
-// import Slide2 from "./assets/slides/phase1/Slide2.jpg";
-// import Slide5 from "./assets/slides/phase1/Slide5.jpg";
-// import Slide6 from "./assets/slides/phase1/Slide6.jpg";
-// import Slide7 from "./assets/slides/phase1/Slide7_{time}.jpg";
-// import Slide8 from "./assets/slides/phase1/Slide8.jpg";
-// import Slide9 from "./assets/slides/phase1/Slide9_{time}.jpg";
-// import Slide12 from "./assets/slides/phase2/Slide12.jpg";
-// import Slide13 from "./assets/slides/phase2/Slide13.jpg";
-// import Slide14 from "./assets/slides/phase2/Slide14.jpg";
-// import Slide16 from "./assets/slides/phase2/Slide16.jpg";
-// import Slide17 from "./assets/slides/phase2/Slide17.jpg";
-// import Slide18 from "./assets/slides/phase2/Slide18.jpg";
-// import Slide19 from "./assets/slides/phase2/Slide19.jpg";
-// import Slide20 from "./assets/slides/phase2/Slide20.jpg";
-// import Slide21 from "./assets/slides/phase2/Slide21.jpg";
-// import Slide25 from "./assets/slides/phase3/Slide25.jpg";
-// import Slide26 from "./assets/slides/phase3/Slide26.jpg";
-// import Slide27 from "./assets/slides/phase3/Slide27.jpg";
-// import Slide29 from "./assets/slides/phase3/Slide29.jpg";
-// import Slide30 from "./assets/slides/phase3/Slide30.jpg";
+import Cover from "./assets/slides/cover.jpg";
+import SlideP21 from "./assets/slides/duringPhase2/slide1.jpg";
+import SlideP22 from "./assets/slides/duringPhase2/slide2.jpg";
+import SlideP222 from "./assets/slides/duringPhase2/slide22.jpg";
+import SlideP23 from "./assets/slides/duringPhase2/slide3.jpg";
+import SlideP24 from "./assets/slides/duringPhase2/slide4.jpg";
+import SlideP25 from "./assets/slides/duringPhase2/slide5.jpg";
+import SlideP26 from "./assets/slides/duringPhase2/slide6.jpg";
+import SlideB1 from "./assets/slides/duringPhase2/slideb1.jpg";
+import SlideB2 from "./assets/slides/duringPhase2/slideb2.jpg";
+import SlideB3 from "./assets/slides/duringPhase2/slideb3.jpg";
+import Slide1 from "./assets/slides/phase1/slide1.jpg";
+import Slide2 from "./assets/slides/phase1/slide2.jpg";
+import Slide5 from "./assets/slides/phase1/slide5.jpg";
+import Slide6 from "./assets/slides/phase1/slide6.jpg";
+import Slide7_10 from "./assets/slides/phase1/slide7_10.jpg";
+import Slide7_15 from "./assets/slides/phase1/slide7_15.jpg";
+import Slide8 from "./assets/slides/phase1/slide8.jpg";
+import Slide9_10 from "./assets/slides/phase1/slide9_10.jpg";
+import Slide9_15 from "./assets/slides/phase1/slide9_15.jpg";
+import Slide12 from "./assets/slides/phase2/slide12.jpg";
+import Slide13 from "./assets/slides/phase2/slide13.jpg";
+import Slide14 from "./assets/slides/phase2/slide14.jpg";
+import Slide16 from "./assets/slides/phase2/slide16.jpg";
+import Slide17 from "./assets/slides/phase2/slide17.jpg";
+import Slide18 from "./assets/slides/phase2/slide18.jpg";
+import Slide19 from "./assets/slides/phase2/slide19.jpg";
+import Slide20 from "./assets/slides/phase2/slide20.jpg";
+import Slide21 from "./assets/slides/phase2/slide21.jpg";
+import Slide25 from "./assets/slides/phase3/slide25.jpg";
+import Slide26 from "./assets/slides/phase3/slide26.jpg";
+import Slide27 from "./assets/slides/phase3/slide27.jpg";
+import Slide28 from "./assets/slides/phase3/slide28.jpg";
+import Slide29 from "./assets/slides/phase3/slide29.jpg";
+import Slide30 from "./assets/slides/phase3/slide30.jpg";
+import SlideS10 from "./assets/slides/shop/slide10.jpg";
+import SlideS11 from "./assets/slides/shop/slide11.jpg";
+import VasSlide from "./assets/slides/vasslide.jpg";
+import White from "./assets/slides/white.jpg";
+import { preloadImage } from "./util/functions";
 
-// const taskSlides = [
-//   {
-//     slidePath: Slide1,
-//     type: "checkboxShopping",
-//     setPhase: "Shopping",
-//     setPhaseNumber: 1,
-//     setBlock: "shopping",
-//     setBlockNumber: 1,
-//   },
-//   { showIf: "group!=Control", slidePath: Slide2, type: "checkboxDrugs" },
-//   { type: "drugCravingPre" },
-//   { slidePath: Slide5, keyPress: "any" },
-//   { slidePath: Slide6 },
-//   { slidePath: Slide7 },
-//   { slidePath: Slide8 },
-//   { slidePath: Slide9 },
-//   { type: "onlineShop" },
-//   { slidePath: Slide12, delay: 3000 },
-//   { type: "exportData", variableName: "_phase1" },
-//   { showIf: "time!=15", slidePath: Slide30, keyPress: "c" },
-//   {
-//     slidePath: Slide13,
-//     type: "VAS",
-//     variableName: "VAS_shopping_satisfaction",
-//     minLabel: "Not at all satisfied",
-//     maxLabel: "Very satisfied",
-//   },
-//   {
-//     slidePath: Slide14,
-//     type: "VAS",
-//     variableName: "VAS_shopping_continuation",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   { type: "drugCravingPost" },
-//   { slidePath: Slide16 },
-//   { slidePath: Slide17 },
-//   { slidePath: Slide18 },
-//   { slidePath: Slide19 },
-//   { slidePath: Slide20 },
-//   { slidePath: Slide21, setPhase: "CoDe", setPhaseNumber: 2 },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0",
-//     setBlockNumber: 1,
-//     probabilityGetItemNoPress: 0,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS1",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0",
-//     setBlockNumber: 2,
-//     probabilityGetItemNoPress: 0,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS2",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0",
-//     setBlockNumber: 3,
-//     probabilityGetItemNoPress: 0,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS3",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0.3",
-//     setBlockNumber: 4,
-//     probabilityGetItemNoPress: 0.3,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS4",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0.6",
-//     setBlockNumber: 5,
-//     probabilityGetItemNoPress: 0.6,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS5",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0",
-//     setBlockNumber: 6,
-//     probabilityGetItemNoPress: 0,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS6",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0.3",
-//     setBlockNumber: 7,
-//     probabilityGetItemNoPress: 0.3,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS7",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   {
-//     type: "contingency",
-//     setBlock: "p(0|-A)=0.6",
-//     setBlockNumber: 8,
-//     probabilityGetItemNoPress: 0.6,
-//   },
-//   {
-//     slidePath: SlideB1,
-//     type: "VAS",
-//     variableName: "CoDe_VAS8",
-//     minLabel: "Not at all",
-//     maxLabel: "Very much",
-//   },
-//   {
-//     slidePath: SlideB2,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_other",
-//   },
-//   {
-//     slidePath: SlideB3,
-//     type: "checkboxBulb",
-//     variableName: "Association_Color_own",
-//   },
-//   { slidePath: Slide25 },
-//   {
-//     slidePath: Slide26,
-//     type: "VAS",
-//     variableName: "VAS_claim_satisfaction",
-//     minLabel: "Not at all satisfied",
-//     maxLabel: "Very satisfied",
-//   },
-//   { type: "exportData", variableName: "_phase2" },
-//   { slidePath: Slide27 },
-//   { type: "quiz" },
-//   { type: "onlineShopControl" },
-//   { type: "exportData", variableName: "_final" },
-//   { slidePath: Slide29 },
-//   { slidePath: Slide30 },
-// ];
+// mapping dict that mapps all file paths starting after slides/ to the imported slide
+const slideMapping: Record<string, string> = {
+  "duringPhase2/slideb1.jpg": SlideB1,
+  "duringPhase2/slideb2.jpg": SlideB2,
+  "duringPhase2/slideb3.jpg": SlideB3,
+  "duringPhase2/slide1.jpg": SlideP21,
+  "duringPhase2/slide2.jpg": SlideP22,
+  "duringPhase2/slide3.jpg": SlideP23,
+  "duringPhase2/slide4.jpg": SlideP24,
+  "duringPhase2/slide5.jpg": SlideP25,
+  "duringPhase2/slide6.jpg": SlideP26,
+  "duringPhase2/slide22.jpg": SlideP222,
+  "phase1/slide1.jpg": Slide1,
+  "phase1/slide2.jpg": Slide2,
+  "phase1/slide5.jpg": Slide5,
+  "phase1/slide6.jpg": Slide6,
+  "phase1/slide7_10.jpg": Slide7_10,
+  "phase1/slide7_15.jpg": Slide7_15,
+  "phase1/slide8.jpg": Slide8,
+  "phase1/slide9_10.jpg": Slide9_10,
+  "phase1/slide9_15.jpg": Slide9_15,
+  "shop/slide10.jpg": SlideS10,
+  "shop/slide11.jpg": SlideS11,
+  "phase2/slide12.jpg": Slide12,
+  "phase2/slide13.jpg": Slide13,
+  "phase2/slide14.jpg": Slide14,
+  "phase2/slide16.jpg": Slide16,
+  "phase2/slide17.jpg": Slide17,
+  "phase2/slide18.jpg": Slide18,
+  "phase2/slide19.jpg": Slide19,
+  "phase2/slide20.jpg": Slide20,
+  "phase2/slide21.jpg": Slide21,
+  "phase3/slide25.jpg": Slide25,
+  "phase3/slide26.jpg": Slide26,
+  "phase3/slide27.jpg": Slide27,
+  "phase3/slide28.jpg": Slide28,
+  "phase3/slide29.jpg": Slide29,
+  "phase3/slide30.jpg": Slide30,
+  "white.jpg": White,
+  "cover.jpg": Cover,
+  "vasslide.jpg": VasSlide,
+};
 
 const App: React.FC = () => {
-  task.forEach((slide) => {
-    if (slide.slidePath) {
-      preloadImage(SLIDE_PATH + slide.slidePath);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [preload, setPreload] = useState<HTMLImageElement[]>([]);
+
+  useEffect(() => {
+    const images = [];
+    for (const key in slideMapping) {
+      images.push(preloadImage(slideMapping[key]));
     }
-  });
+    Promise.all(images)
+      .then((results) => {
+        setPreload(results);
+        setIsLoaded(true);
+      })
+      .catch((error) => {
+        console.error("Failed to preload images:", error);
+        setIsLoaded(true); // even on error, we consider it loaded to stop the waiting state
+      });
+  }, []);
 
   return (
     <div className="App">
@@ -287,12 +114,18 @@ const App: React.FC = () => {
         <Routes>
           <Route
             path="/slide/:slideNumberRaw/:trialNumberRaw?"
-            element={<SlideShow />}
+            element={<SlideShow slideMapping={slideMapping} />}
           />
           <Route path="/" element={<DataEntry />} />
           <Route path="/images" element={<ImageViewer />} />
         </Routes>
       </Router>
+      <div className="absolute top-0 left-0 scale-0">
+        {isLoaded &&
+          preload.map((img, index) => (
+            <img key={index} src={img.src} alt={`Slide ${index + 1}`} />
+          ))}
+      </div>
     </div>
   );
 };

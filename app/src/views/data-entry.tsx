@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 
 import classNames from "classnames";
 import config from "../assets/configs/config.json";
+import logo from "../assets/logo.jpg";
 import Button from "../components/button.tsx";
 import useTaskStore from "../store/store.ts";
-import { ASSETS_PATH } from "../util/constants.ts";
 
 interface RadioGroupProps {
   name: string;
@@ -163,7 +163,7 @@ const DataEntry: React.FC = () => {
     }
 
     // store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
-    store.setTime(10);
+    store.setTime(30);
 
     navigate("/slide/1");
   };
@@ -174,11 +174,7 @@ const DataEntry: React.FC = () => {
         onSubmit={handleSubmit}
         className="w-[300px] shadow-md border border-gray-400 p-4"
       >
-        <img
-          src={ASSETS_PATH + "logo.jpg"}
-          className="w-full max-w-xs mb-5"
-          alt="Cambridge Logo"
-        />
+        <img src={logo} className="w-full max-w-xs mb-5" alt="Cambridge Logo" />
         <div className={classNames(error.length === 0 ? "hidden" : "visible")}>
           {`Check your config - ${error} are not existing categories`}
         </div>

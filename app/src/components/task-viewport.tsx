@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { SLIDE_PATH } from "../util/constants";
 
 interface TaskViewportProps {
   backgroundImage?: string;
@@ -33,9 +32,7 @@ const TaskViewport: React.FC<TaskViewportProps> = ({
     const fontSize = newWidth * 0.05; // Example: 5% of the width
 
     const backgroundStyle = {
-      backgroundImage: `url(${
-        backgroundImage ? backgroundImage : SLIDE_PATH + "White.png"
-      })`,
+      backgroundImage: `url("${backgroundImage}")`,
       backgroundSize: "cover",
       backgroundRepeat: "no-repeat",
       backgroundPosition: "center center",

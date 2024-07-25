@@ -18,6 +18,10 @@ export interface ContingencySlice {
   nextTrialPhase: () => void;
   colorMapping: { self: string; other: string };
   contingencyOrder: Trial[][];
+  outcomeImage: string;
+  setOutcomeImage: (image: string) => void;
+  showImage: boolean;
+  setShowImage: (showImage: boolean) => void;
 }
 
 const createContingencySlice: StateCreator<
@@ -30,14 +34,17 @@ const createContingencySlice: StateCreator<
   selfItems: [],
   otherItems: [],
   trialPhase: "prepare",
-
+  showImage: false,
+  setShowImage: (showImage: boolean) => set(() => ({ showImage: showImage })),
+  outcomeImage: "",
+  setOutcomeImage: (image: string) => set(() => ({ outcomeImage: image })),
   colorMapping:
     Math.random() < 0.5
       ? { self: "orange", other: "blue" }
       : { self: "blue", other: "orange" },
 
   contingencyOrder: [0, 0, 0, 0.3, 0.6, 0, 0.3, 0.6].map((prob) =>
-    generateTrialsArray(60, 0.6, prob)
+    generateTrialsArray(100, 0.6, prob)
   ),
 
   popSelfItem: () => {
@@ -72,10 +79,10 @@ const createContingencySlice: StateCreator<
       return {
         selfItems: extendArray(
           selfItems.length === 0 ? ["Art/Art_1.jpeg"] : selfItems,
-          60 * 8,
+          100 * 8,
           true
         ),
-        otherItems: extendArray(otherItems, 60 * 8, true),
+        otherItems: extendArray(otherItems, 100 * 8, true),
       };
     }),
   nextTrialPhase: () =>

@@ -11,12 +11,12 @@ type TileProps = {
   imageUrl?: string;
   backgroundColor: string;
   tileState: TileState;
-  onClick: () => void;
+  onClick?: () => void;
+  onClickTimeout?: () => void;
   backgroundIsBlack?: boolean;
   showCheckbox?: boolean;
   onTileSelect?: (tileName: string, isSelected: boolean) => void; // Callback for managing selected tiles
   setChecked?: boolean;
-  delayAfterClick?: boolean;
 };
 
 const Tile: React.FC<TileProps> = ({
@@ -26,11 +26,11 @@ const Tile: React.FC<TileProps> = ({
   backgroundColor,
   tileState,
   onClick,
+  onClickTimeout,
   backgroundIsBlack,
   showCheckbox = false,
   onTileSelect = () => {},
   setChecked = false,
-  delayAfterClick = false,
 }) => {
   const store = useTaskStore();
 
@@ -69,13 +69,15 @@ const Tile: React.FC<TileProps> = ({
         } else {
           setTileStyle({ ...tileStyle, border: "2px solid black" });
         }
-        setTimeout(
-          () => {
-            onClick();
+        if (onClick) onClick();
+        if (onClickTimeout) {
+          setTimeout(() => {
+            onClickTimeout();
             if (actionName) store.logShopAction(actionName);
-          },
-          delayAfterClick ? 500 : 0
-        );
+          }, 500);
+        } else {
+          if (actionName) store.logShopAction(actionName);
+        }
       }}
       style={tileStyle}
     >

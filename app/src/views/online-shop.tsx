@@ -45,11 +45,10 @@ const GridPage: React.FC<{
                   ? "categoryClicked"
                   : "none"
               }
-              onClick={() => {
+              onClickTimeout={() => {
                 store.clickCategory(category);
                 store.navigateTo("items");
               }}
-              delayAfterClick={true}
               backgroundColor={config.colors.categoryTileColor}
             />
           ))}
@@ -70,10 +69,12 @@ const GridPage: React.FC<{
                 text={""}
                 tileState={tileItem ? "itemClicked" : "none"}
                 onClick={() => {
-                  store.clickItemTile(index);
+                  store.clickItemTile(index, true);
+                }}
+                onClickTimeout={() => {
+                  store.clickItemTile(index, false);
                   store.navigateTo("item");
                 }}
-                delayAfterClick={true}
                 backgroundColor={config.colors.itemTileColor}
                 imageUrl={
                   tileItem
@@ -119,13 +120,18 @@ const GridPage: React.FC<{
   );
 };
 
-const ItemPage: React.FC<{}> = ({}) => {
+const ItemPage: React.FC<{ hidden: boolean }> = ({ hidden = false }) => {
   const store = useTaskStore();
 
   return (
     store.currentCategory &&
     store.currentItem && (
-      <div className="flex flex-col items-center justify-evenly">
+      <div
+        className={classNames(
+          "flex flex-col items-center justify-evenly",
+          hidden ? "hidden" : "flex"
+        )}
+      >
         <img
           className="h-[6.5em] object-cover pb-2"
           src={`${getImagePath(
@@ -288,8 +294,9 @@ const OnlineShop: React.FC<{}> = () => {
       {/* Content */}
       <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
         <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
+          <ItemPage hidden={store.page !== "item"} />
           {store.page === "item" ? (
-            <ItemPage />
+            <></>
           ) : store.page === "shoppingList" ? (
             <ShoppingListPage></ShoppingListPage>
           ) : (

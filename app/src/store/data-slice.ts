@@ -150,7 +150,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       CoDe_outcome: outcome,
       CoDe_response: response,
       CoDe_item: outcome ? item : undefined,
-      // CoDe_RT: RT,
+      CoDe_RT: RT,
     });
   },
 
