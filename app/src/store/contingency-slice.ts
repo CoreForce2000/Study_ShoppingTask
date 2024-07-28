@@ -72,6 +72,7 @@ const createContingencySlice: StateCreator<
         (item) =>
           ![
             ...Object.values(config.shop.pathologicalCategories).flat(),
+            ...["Male erotica", "Female erotica", "Adult Toys"],
             ...state.clickedCategories,
           ].includes(item.category)
       );

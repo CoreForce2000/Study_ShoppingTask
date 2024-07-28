@@ -16,6 +16,7 @@ import {
   MEMORY_ALL_CORRECT_SOUND,
   MEMORY_CORRECT_SOUND,
   MEMORY_WRONG_SOUND,
+  SOUND_PATH,
 } from "../util/constants";
 import { exportCsv, getImagePath } from "../util/functions";
 import OnlineShop from "./online-shop";
@@ -38,6 +39,7 @@ type SlideJson = {
   setBlockNumber?: number;
   numTrials?: number;
   probabilityOutcomeNoAction?: number;
+  playSound?: string;
 };
 
 export interface Slide {
@@ -51,6 +53,8 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 }) => {
   const store = useTaskStore();
   const navigate = useNavigate();
+
+  const hasPlayedRef = useRef(false);
 
   const [buttonVisible, setButtonVisibleRaw] = useState(true);
   const [currentSlide, setCurrentSlide] = useState<Slide | null>(null);
@@ -117,19 +121,47 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     }, timeout);
   };
 
+  // listener that sets a variable true if space is pressed down, and false if it is released
+  const [initialPress, setInitialPress] = useState(true);
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === KEY_SPACE) {
+        setTimeout(() => {
+          setInitialPress(false);
+        }, 0);
+      }
+    };
+
+    const handleKeyUp = (event: KeyboardEvent) => {
+      if (event.key === KEY_SPACE) {
+        setTimeout(() => {
+          setInitialPress(true);
+        }, 0);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("keyup", handleKeyUp);
+    };
+  }, []);
+
   const waitKeyPress = (key?: string, customFunction?: () => void) => {
     keyPressHandlerRef.current = (event: KeyboardEvent) => {
       if (
         (!key || key === "any" || event.key === key) &&
         !(event.target instanceof HTMLButtonElement)
       ) {
-        (customFunction ? customFunction : incrementSlideIndex)();
+        if (initialPress) {
+          (customFunction ? customFunction : incrementSlideIndex)();
+        }
       }
     };
 
-    window.addEventListener("keydown", keyPressHandlerRef.current, {
-      once: true,
-    });
+    window.addEventListener("keydown", keyPressHandlerRef.current);
   };
 
   const drugCravingSlide = (stage: "pre" | "post") => {
@@ -497,6 +529,11 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       );
     }
 
+    if (currentSlideInfo.playSound && !hasPlayedRef.current) {
+      new Audio(`${SOUND_PATH}${currentSlideInfo.playSound}`).play();
+      hasPlayedRef.current = true;
+    }
+
     if (isCustomSlide) {
       switch (currentSlideInfo.type) {
         case "VAS":
@@ -577,6 +614,11 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
     if (slide.execute) slide.execute();
     if (slide.slide) setCurrentSlide(slide);
+
+    return () => {
+      clearListeners();
+      hasPlayedRef.current = false;
+    };
   }, [store.slideNumber, store.trialNumber, store.trialPhase]);
 
   // listener for moving forward and backward one slide, using ctrl+b for back and ctrl+f for forward

@@ -163,7 +163,7 @@ const DataEntry: React.FC = () => {
     }
 
     // store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
-    store.setTime(30);
+    store.setTime(5);
 
     navigate("/slide/1");
   };
@@ -274,6 +274,9 @@ const DataEntry: React.FC = () => {
           <Button variant="secondary" onClick={() => navigate("/images")}>
             View Categories
           </Button>
+        </div>
+        <div className="text-xs text-gray-500 absolute bottom-0 right-0 p-2">
+          {config.version}
         </div>
       </form>
     </div>
