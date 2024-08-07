@@ -1,8 +1,9 @@
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
-  ListTodoIcon,
+  CheckSquare,
   ShoppingCartIcon,
+  Square,
   SquareXIcon,
 } from "lucide-react";
 import React, { useEffect } from "react";
@@ -160,14 +161,33 @@ const ItemPage: React.FC<{ hidden: boolean }> = ({ hidden = false }) => {
 
 // ShoppingListPage: Simple page similar to itempage that contains just a list of four items taken from the config (same as quiz)
 // with a button to go back to the main page
-const ShoppingListPage: React.FC<{}> = ({}) => {
+const ShoppingListPage: React.FC = () => {
+  const store = useTaskStore();
+
   return (
-    <div className="flex flex-col items-center justify-evenly">
-      <div className="grid grid-cols-2 gap-x-14 text-base">
-        {config.memoryQuestionConfig.map((item) => [
-          <div className="font-bold"> {`${item.person}`}</div>,
-          <div className=""> {item.correct}</div>,
-        ])}
+    <div className="flex flex-col items-center">
+      <div className="grid grid-cols-1 text-base">
+        {config.memoryQuestionConfig.map((category) => {
+          const isInTrolley = store.trolley
+            .map((x) => x.item.category)
+            .some((x) => x.includes(category.correct));
+
+          return (
+            <div
+              key={category.correct}
+              className={`${
+                isInTrolley ? "line-through text-gray-500 flex" : "flex"
+              }`}
+            >
+              {isInTrolley ? (
+                <CheckSquare className="mr-2" />
+              ) : (
+                <Square className="mr-2" />
+              )}
+              {category.shoppingListLabel}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -260,11 +280,12 @@ const OnlineShop: React.FC<{}> = () => {
           secondChild={
             <Button
               actionName="open shopping list"
-              icon={ListTodoIcon}
-              variant="transparent"
-              suffixText="Show Shopping List"
+              variant="secondary"
+              suffixText="To Your Shopping List"
               visible={store.isPhase3 && store.page !== "shoppingList"}
-              onClick={() => store.navigateTo("shoppingList")}
+              onClick={() => {
+                store.navigateTo("shoppingList");
+              }}
             />
           }
           lastChild={

@@ -105,6 +105,11 @@ const DataEntry: React.FC = () => {
     (category) => !storeCategories.includes(category)
   );
 
+  const errorOtherCategories =
+    config.experimentConfig.excludeFromOtherTrolley.filter(
+      (category) => !storeCategories.includes(category)
+    );
+
   document.addEventListener("keydown", (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === "d") {
       event.preventDefault();
@@ -162,8 +167,8 @@ const DataEntry: React.FC = () => {
       return;
     }
 
-    // store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
-    store.setTime(5);
+    store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
+    // store.setTime(5);
 
     navigate("/slide/1");
   };
@@ -176,7 +181,8 @@ const DataEntry: React.FC = () => {
       >
         <img src={logo} className="w-full max-w-xs mb-5" alt="Cambridge Logo" />
         <div className={classNames(error.length === 0 ? "hidden" : "visible")}>
-          {`Check your config - ${error} are not existing categories`}
+          {`Check your shop config  - ${error} are not existing categories`}
+          {`Check your CoDe config  - ${errorOtherCategories} are not existing categories`}
         </div>
 
         <div className="flex justify-between w-full font-sans">

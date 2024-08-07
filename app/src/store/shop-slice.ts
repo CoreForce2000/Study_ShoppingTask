@@ -83,7 +83,10 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
   categories: pseudorandomize(),
   page: "categories",
   navigateTo: (page: ShopSlice["page"]) =>
-    set(() => {
+    set((state) => {
+      if (page === "trolley" || page === "shoppingList") {
+        state.logShopAction(`navigate_to_${page}`);
+      }
       if (
         page === "categories" ||
         page === "shoppingList" ||
@@ -158,17 +161,15 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
       };
 
       if (state.isPhase3) {
-        const itemsPurchased = ["Flowers", "Chocolates", "Toys", "Books"].every(
-          (requiredItem) =>
+        const itemsPurchased = config.memoryQuestionConfig
+          .map((x) => x.correct)
+          .every((requiredCategory) =>
             newState.trolley
-              .map(
-                (x) =>
-                  x.item.category.split(" ")[
-                    x.item.category.split(" ").length - 1
-                  ]
+              .map((x) => x.item.category)
+              .some((trolleyCategory) =>
+                trolleyCategory.includes(requiredCategory)
               )
-              .includes(requiredItem)
-        );
+          );
         if (itemsPurchased) {
           state.setTime(1);
         }

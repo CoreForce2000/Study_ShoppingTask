@@ -70,12 +70,11 @@ const createContingencySlice: StateCreator<
 
       const otherItems = state.items.filter(
         (item) =>
-          ![
-            ...Object.values(config.shop.pathologicalCategories).flat(),
-            ...["Male erotica", "Female erotica", "Adult Toys"],
-            ...state.clickedCategories,
-          ].includes(item.category)
+          !config.experimentConfig.excludeFromOtherTrolley.includes(
+            item.category
+          )
       );
+      console.log("othersCategories", otherItems);
 
       return {
         selfItems: extendArray(

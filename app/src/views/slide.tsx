@@ -249,6 +249,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           outcome: positiveOutcome ? "TRUE" : "FALSE",
           response: store.reacted ? "TRUE" : "FALSE",
           item: item?.image_name ?? "none",
+          category: item?.category ?? "none",
           RT: -1,
         });
 

@@ -32,6 +32,7 @@ export interface DataSlice {
     outcome: string;
     response: string;
     item: string;
+    category: string;
     RT: number;
   }) => void;
   setDrugCraving: (drug: string, value?: number) => void;
@@ -141,7 +142,15 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     );
   },
 
-  logExperimentAction: ({ cue, stimuli_type, outcome, response, item, RT }) => {
+  logExperimentAction: ({
+    cue,
+    stimuli_type,
+    outcome,
+    response,
+    item,
+    category,
+    RT,
+  }) => {
     const state = get();
     state.logAction({
       Trial: state.data.actionLog.length + 1,
@@ -150,6 +159,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       CoDe_outcome: outcome,
       CoDe_response: response,
       CoDe_item: outcome ? item : undefined,
+      CoDe_category: outcome ? category : undefined,
       CoDe_RT: RT,
     });
   },
