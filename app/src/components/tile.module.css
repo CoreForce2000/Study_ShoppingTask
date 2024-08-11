@@ -1,39 +1,39 @@
 .tile {
-    box-shadow: 0.05em 0.05em 0.25em 0.05em lightgrey;
-    background-image: url('https://www.transparenttextures.com/patterns/45-degree-fabric-light.png');
-    background-size: cover;
+  box-shadow: 0.05em 0.05em 0.25em 0.05em lightgrey;
+  background-image: url("https://www.transparenttextures.com/patterns/45-degree-fabric-light.png");
+  background-size: cover;
 
-    font-weight: 500;
+  font-weight: 500;
 
-    border: 0 none black;
-    margin: 0.2em;
-    aspect-ratio: 1/1;
-    font-size: 0.3em;
-    text-align: center;
-    cursor: pointer;
-    border-radius: 0.6em;
-    white-space: pre-line;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position:relative;
-    filter: brightness(100%);
-    transition: filter 0.1s ease;
+  border: 0 none black;
+  margin: 0.2em;
+  aspect-ratio: 1/1;
+  font-size: 0.3em;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 0.6em;
+  white-space: pre-line;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  filter: brightness(100%);
+  transition: filter 0.1s ease;
 }
 
 .tile:hover {
-    filter: brightness(85%);
+  filter: brightness(85%);
 }
 
 .tickBox {
-    position: absolute;
-    top: -0.15em;
-    right: -0.15em;
-    width: 1em;
-    height: 1em;
-    border: black 1px solid;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
+  position: absolute;
+  top: -0.15em;
+  right: -0.15em;
+  width: 1em;
+  height: 1em;
+  border: black 1px solid;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
 }

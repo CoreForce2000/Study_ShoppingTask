@@ -168,7 +168,6 @@ const DataEntry: React.FC = () => {
     }
 
     store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
-    // store.setTime(5);
 
     navigate("/slide/1");
   };
@@ -212,7 +211,7 @@ const DataEntry: React.FC = () => {
           />
         </fieldset>
 
-        <fieldset className="border border-gray-300 p-2 mb-4">
+        <fieldset className="border border-gray-300 p-2 mb-4 hidden">
           <legend className="text-xl">Group</legend>
           <Dropdown
             required
@@ -258,28 +257,15 @@ const DataEntry: React.FC = () => {
           />
         </fieldset>
 
-        <div>
-          <fieldset className="border border-gray-300 p-2 mb-4">
-            <legend className="text-xl">Shopping time</legend>
-            <RadioGroup
-              required
-              name="time"
-              values={["15", "10"]}
-              labels={["Basic (15min)", "Retest (10min)"]}
-              value={store.data.survey.time}
-              onChange={handleChange}
-            />
-          </fieldset>
-        </div>
         <hr className="h-px border-none bg-gray-600 mb-4" />
 
         <div className="mx-auto w-fit flex flex-col">
           <Button type="submit" variant="primary">
             Run Task
           </Button>
-          <Button variant="secondary" onClick={() => navigate("/images")}>
+          {/* <Button variant="secondary" onClick={() => navigate("/images")}>
             View Categories
-          </Button>
+          </Button> */}
         </div>
         <div className="text-xs text-gray-500 absolute bottom-0 right-0 p-2">
           {config.version}

@@ -5,7 +5,12 @@ import {
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
-import { addUnique, pseudorandomize, shuffleArray } from "../util/functions";
+import {
+  addUnique,
+  extendArray,
+  pseudorandomize,
+  shuffleArray,
+} from "../util/functions";
 import { TaskStore } from "./store";
 
 export type Category = keyof typeof imageData;
@@ -262,22 +267,20 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
   clickItemTile: (tile_id: number, beforeTimeout: boolean) =>
     set((state) => {
-      // Get the number of clicked items in the current category
       const clickedItems = state.clickedItemTiles[state.currentCategory] || [];
 
-      // Get the items in the current category
-      const items = state.items.filter(
-        (item) => item.category === state.currentCategory
+      const items = extendArray(
+        state.items.filter((item) => item.category === state.currentCategory),
+        config.shop.randomization.numberOfItemTiles
       );
 
-      //If the index is already in clicked items, use that index, if not, If the number of clicked items is the number of items in that category in total, reset to 0
       const clickedItemIndex = clickedItems.findIndex(
         (item) => item.tile_id === tile_id
       );
 
       const itemIndex =
         clickedItemIndex !== -1
-          ? clickedItemIndex
+          ? clickedItemIndex % items.length
           : clickedItems.length === items.length
           ? 0
           : clickedItems.length;

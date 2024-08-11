@@ -88,7 +88,7 @@ const Tile: React.FC<TileProps> = ({
           visibility: showCheckbox ? "visible" : "hidden",
         }}
       >
-        {isChecked && <span>X</span>} {/* Display an X if checked */}
+        {isChecked && <span>X</span>}
       </div>
       <span>{displayText}</span>
     </div>
