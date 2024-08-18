@@ -18,6 +18,9 @@ export const TIME_IS_RUNNING_OUT_SOUND = new Audio(
 export const LUCKY_CUSTOMER_SOUND = new Audio(
   `${SOUND_PATH}Lucky customer.mp3`
 );
+export const CONSTANT_PRESSING_SOUND = new Audio(
+  `${SOUND_PATH}constantpressing.mp3`
+);
 
 export const KEY_SPACE = " ";
 

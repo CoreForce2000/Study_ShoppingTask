@@ -12,6 +12,7 @@ import TaskViewport from "../components/task-viewport";
 import { SurveyData } from "../store/data-slice";
 import useTaskStore from "../store/store";
 import {
+  CONSTANT_PRESSING_SOUND,
   KEY_SPACE,
   MEMORY_ALL_CORRECT_SOUND,
   MEMORY_CORRECT_SOUND,
@@ -124,18 +125,31 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   // listener that sets a variable true if space is pressed down, and false if it is released
   const [initialPress, setInitialPress] = useState(true);
   useEffect(() => {
+    let spaceHeldTimeout: NodeJS.Timeout | undefined;
+
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === KEY_SPACE) {
+      if (event.key === KEY_SPACE && spaceHeldTimeout === undefined) {
         setTimeout(() => {
           setInitialPress(false);
         }, 0);
+        console.log("Space pressed");
+
+        spaceHeldTimeout = setTimeout(() => {
+          console.log("Nasty sound");
+          CONSTANT_PRESSING_SOUND.play();
+        }, 3000);
       }
     };
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (event.key === KEY_SPACE) {
         setTimeout(() => {
+          spaceHeldTimeout = undefined;
           setInitialPress(true);
+
+          console.log("Key up");
+          clearTimeout(spaceHeldTimeout);
+          CONSTANT_PRESSING_SOUND.pause();
         }, 0);
       }
     };
@@ -225,32 +239,41 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               : "duringPhase2/slide3.jpg",
           execute: () => {
             clearListeners();
+            const startTime = performance.now();
+
             waitKeyPress(KEY_SPACE, () => {
-              store.setReacted(true);
+              store.setReactionTime(Math.round(performance.now() - startTime));
               store.nextTrialPhase();
             });
             waitTimeout(
               config.experimentConfig.slideTimings.coloredLightbulb.minValue,
               config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
-              store.nextTrialPhase
+              () => {
+                store.nextTrialPhase();
+                store.setReactionTime(
+                  Math.round(performance.now() - startTime)
+                );
+              }
             );
           },
         };
       case "outcome":
         const positiveOutcome =
-          (trialInfo.spacePressedCorrect && store.reacted) ||
-          (trialInfo.noSpacePressedCorrect && !store.reacted);
+          (trialInfo.spacePressedCorrect && store.reactionTime !== -1) ||
+          (trialInfo.noSpacePressedCorrect && store.reactionTime === -1);
 
         store.setShowImage(positiveOutcome);
+
+        console.log(store.reactionTime);
 
         store.logExperimentAction({
           cue: trialInfo.color,
           stimuli_type: isSelfItem ? "self" : "other",
           outcome: positiveOutcome ? "TRUE" : "FALSE",
-          response: store.reacted ? "TRUE" : "FALSE",
+          response: store.reactionTime !== -1 ? "TRUE" : "FALSE",
           item: item?.image_name ?? "none",
           category: item?.category ?? "none",
-          RT: -1,
+          RT: store.reactionTime,
         });
 
         return positiveOutcome
@@ -264,7 +287,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
                   () => {
                     store.nextTrialPhase();
                     incrementTrialIndex(config.experimentConfig.numberOfTrials);
-                    store.setReacted(false);
+                    store.setReactionTime(-1);
                   }
                 );
               },
@@ -281,7 +304,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
                   () => {
                     store.nextTrialPhase();
                     incrementTrialIndex(config.experimentConfig.numberOfTrials);
-                    store.setReacted(false);
+                    store.setReactionTime(-1);
                   }
                 );
               },
@@ -294,11 +317,12 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     children: (
       <div
         key={`column1234`}
-        className="text-base mt-[4em] w-[95%] pl-2.5 grid grid-cols-4 gap-0"
+        className="text-[0.7em] mt-[6.5em] w-[95%] pl-2.5 grid grid-cols-4 gap-0"
       >
         {config.memoryQuestionConfig.map((person, index) => (
           <div key={`checkbox-${index}`} className="bg-white w-[80%]">
             <Checkbox
+              gap="0.7em"
               key={`column${index}`}
               initialOptions={person.options}
               columnLayout="single"

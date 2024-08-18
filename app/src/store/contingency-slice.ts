@@ -7,8 +7,8 @@ import { TaskStore } from "./store";
 export type TrialPhase = "prepare" | "react" | "outcome";
 
 export interface ContingencySlice {
-  reacted: boolean;
-  setReacted: (newReacted: boolean) => void;
+  reactionTime: number;
+  setReactionTime: (newReactionTime: number) => void;
   generateSelfOtherSequence: () => void;
   popSelfItem: () => Item | undefined;
   popOtherItem: () => Item | undefined;
@@ -30,7 +30,7 @@ const createContingencySlice: StateCreator<
   [],
   ContingencySlice
 > = (set, get) => ({
-  reacted: false,
+  reactionTime: -1,
   selfItems: [],
   otherItems: [],
   trialPhase: "prepare",
@@ -61,7 +61,8 @@ const createContingencySlice: StateCreator<
     return get().otherItems.pop();
   },
 
-  setReacted: (newReacted: boolean) => set(() => ({ reacted: newReacted })),
+  setReactionTime: (newReactionTime: number) =>
+    set(() => ({ reactionTime: newReactionTime })),
   generateSelfOtherSequence: () =>
     set((state) => {
       const selfItems = Object.values(state.clickedItemTiles)

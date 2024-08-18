@@ -141,7 +141,7 @@ const ItemPage: React.FC<{ hidden: boolean }> = ({ hidden = false }) => {
           )}`}
           alt={store.currentItem.item.image_name}
         />
-        <div className="grid grid-cols-2 text-sm">
+        <div className="grid grid-cols-2 text-[0.4em]">
           <Button actionName="back" onClick={store.backPressed}>
             Back
           </Button>
@@ -166,7 +166,7 @@ const ShoppingListPage: React.FC = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <div className="grid grid-cols-1 text-base">
+      <div className="grid grid-cols-1">
         {config.memoryQuestionConfig.map((category) => {
           const isInTrolley = store.trolley
             .map((x) => x.item.category)
@@ -175,9 +175,9 @@ const ShoppingListPage: React.FC = () => {
           return (
             <div
               key={category.correct}
-              className={`${
-                isInTrolley ? "line-through text-gray-500 flex" : "flex"
-              }`}
+              className={classNames("flex items-center text-[0.5em] italic", {
+                "line-through text-gray-500 italic": isInTrolley,
+              })}
             >
               {isInTrolley ? (
                 <CheckSquare className="mr-2" />
@@ -222,6 +222,8 @@ const Timer: React.FC<{}> = ({}) => {
 const OnlineShop: React.FC<{}> = () => {
   const store = useTaskStore();
 
+  const showScrollDownForMore = ["items", "categories"].includes(store.page);
+
   const scrollRef = useScrollRestoration(
     "category_" + store.currentCategory,
     false
@@ -241,7 +243,7 @@ const OnlineShop: React.FC<{}> = () => {
     <div className="w-full h-full flex flex-col items-center">
       {/* Header */}
       <div
-        className="w-full p-4 pb-2 text-white bg-black text-xs box-border"
+        className="w-full p-4 pb-2 text-white bg-black box-border text-[0.2em]"
         style={{ borderBottom: `7px solid ${config.colors.lineColor}` }}
       >
         <EvenlySpacedRow
@@ -262,7 +264,7 @@ const OnlineShop: React.FC<{}> = () => {
       </div>
 
       {/* Second Header  */}
-      <div className="w-full p-4 text-xs box-border pt-0.5 pb-2">
+      <div className="w-full p-4 box-border pt-0.5 pb-2 text-[0.2em]">
         <EvenlySpacedRow
           firstChild={
             <Button
@@ -295,7 +297,7 @@ const OnlineShop: React.FC<{}> = () => {
                 icon={SquareXIcon}
                 variant="transparent"
                 color="black"
-                prefixText="Remove from Trolley"
+                prefixText="Add to Remove from Trolley"
                 onClick={() => store.removeTrolleyItems()}
               />
             ) : (
@@ -309,38 +311,57 @@ const OnlineShop: React.FC<{}> = () => {
               />
             )
           }
+          secondSize={store.page === "trolley" ? "flex-0" : "flex-1"}
+          lastSize={store.page === "trolley" ? "flex-2" : "flex-1"}
         />
       </div>
 
       {/* Content */}
-      <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
-        <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
-          <ItemPage hidden={store.page !== "item"} />
-          {store.page === "item" ? (
-            <></>
-          ) : store.page === "shoppingList" ? (
-            <ShoppingListPage></ShoppingListPage>
-          ) : (
-            <GridPage view={store.page} category={store.currentCategory} />
-          )}
-          <EvenlySpacedRow
-            firstChild={<div></div>}
-            secondChild={
-              <Button
-                actionName="remove trolley items"
-                onClick={store.removeTrolleyItems}
-                className="text-[0.25em]"
-                visible={
-                  store.page === "trolley" &&
-                  store.selectedTrolleyItems.length > 0
-                }
-              >
-                Remove
-              </Button>
-            }
-            lastChild={<div></div>}
-          ></EvenlySpacedRow>
+      <div className="flex justify-start">
+        {showScrollDownForMore ? (
+          <div className="w-[1.8em] object-contain"></div>
+        ) : (
+          <></>
+        )}
+
+        <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
+          <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
+            <ItemPage hidden={store.page !== "item"} />
+            {store.page === "item" ? (
+              <></>
+            ) : store.page === "shoppingList" ? (
+              <ShoppingListPage></ShoppingListPage>
+            ) : (
+              <GridPage view={store.page} category={store.currentCategory} />
+            )}
+            <EvenlySpacedRow
+              secondChild={
+                <Button
+                  actionName="remove trolley items"
+                  onClick={store.removeTrolleyItems}
+                  className="text-[0.25em]"
+                  visible={
+                    store.page === "trolley" &&
+                    store.selectedTrolleyItems.length > 0
+                  }
+                >
+                  Remove
+                </Button>
+              }
+            ></EvenlySpacedRow>
+          </div>
         </div>
+        {showScrollDownForMore ? (
+          <div>
+            <img
+              src="/assets/scroll_down.jpg"
+              className="w-[1.8em] object-contain"
+              alt="scroll down"
+            ></img>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

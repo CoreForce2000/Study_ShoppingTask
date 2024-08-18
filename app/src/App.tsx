@@ -15,6 +15,7 @@ import SlideP26 from "./assets/slides/duringPhase2/slide6.jpg";
 import SlideB1 from "./assets/slides/duringPhase2/slideb1.jpg";
 import SlideB2 from "./assets/slides/duringPhase2/slideb2.jpg";
 import SlideB3 from "./assets/slides/duringPhase2/slideb3.jpg";
+import SlideB4 from "./assets/slides/duringPhase2/slideb4.jpg";
 import Slide1 from "./assets/slides/phase1/slide1.jpg";
 import Slide2 from "./assets/slides/phase1/slide2.jpg";
 import Slide5 from "./assets/slides/phase1/slide5.jpg";
@@ -51,6 +52,7 @@ const slideMapping: Record<string, string> = {
   "duringPhase2/slideb1.jpg": SlideB1,
   "duringPhase2/slideb2.jpg": SlideB2,
   "duringPhase2/slideb3.jpg": SlideB3,
+  "duringPhase2/slideb4.jpg": SlideB4,
   "duringPhase2/slide1.jpg": SlideP21,
   "duringPhase2/slide2.jpg": SlideP22,
   "duringPhase2/slide3.jpg": SlideP23,
