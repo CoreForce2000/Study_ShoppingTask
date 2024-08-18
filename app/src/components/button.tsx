@@ -68,7 +68,7 @@ const Button: React.FC<ButtonProps> = ({
       style={combinedStyle}
     >
       {prefixText && <span className="mr-2">{prefixText}</span>}
-      {Icon && <Icon className="mr-2" {...iconProps} />}
+      {Icon && <Icon {...iconProps} />}
       {children}
       {suffixText && <span className="ml-2">{suffixText}</span>}
     </button>

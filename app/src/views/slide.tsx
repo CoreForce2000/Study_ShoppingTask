@@ -218,7 +218,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     switch (store.trialPhase) {
       case "prepare":
         return {
-          slide: `duringPhase2/slide1.jpg`,
+          slide: `phase2/slide1.jpg`,
           execute: () => {
             store.setShowImage(false);
 
@@ -235,8 +235,8 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
         return {
           slide:
             trialInfo.color === "orange"
-              ? "duringPhase2/slide2.jpg"
-              : "duringPhase2/slide3.jpg",
+              ? "phase2/slide2.jpg"
+              : "phase2/slide3.jpg",
           execute: () => {
             clearListeners();
             const startTime = performance.now();
@@ -278,7 +278,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
         return positiveOutcome
           ? {
-              slide: `duringPhase2/slide4.jpg`,
+              slide: `phase2/slide4.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(
@@ -293,7 +293,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               },
             }
           : {
-              slide: `duringPhase2/slide1.jpg`,
+              slide: `phase2/slide1.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(
@@ -313,7 +313,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const quizSlide = () => ({
-    slide: `phase3/slide28.jpg`,
+    slide: `instructionsPhase3/slide28.jpg`,
     children: (
       <div
         key={`column1234`}
@@ -588,10 +588,10 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           return quizSlide();
         case "onlineShop":
           if (store.trialNumber === 2) {
-            return interSlideTime("shop/slide10.jpg");
+            return interSlideTime("phase1_and_3slide10.jpg");
           }
           if (store.trialNumber === 3) {
-            return interSlideBudget("shop/slide11.jpg");
+            return interSlideBudget("phase1_and_3slide11.jpg");
           }
           return {
             slide: "white.jpg",
@@ -603,10 +603,10 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           store.switchToPhase3();
           store.setTime(config.shop.general.time.phase3);
           if (store.trialNumber === 2) {
-            return interSlideTime("shop/slide10.jpg");
+            return interSlideTime("phase1_and_3slide10.jpg");
           }
           if (store.trialNumber === 3) {
-            return interSlideBudget("shop/slide11.jpg");
+            return interSlideBudget("phase1_and_3slide11.jpg");
           }
           return {
             slide: "white.jpg",

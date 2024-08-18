@@ -75,7 +75,6 @@ const createContingencySlice: StateCreator<
             item.category
           )
       );
-      console.log("othersCategories", otherItems);
 
       return {
         selfItems: extendArray(
