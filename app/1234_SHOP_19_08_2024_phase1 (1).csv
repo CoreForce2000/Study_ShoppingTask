@@ -1,0 +1,17 @@
+data:text/csv;charset=utf-8,participantId,1234,age,34,group,Control,gender,female,handedness,left,onlineShoppingFrequency,a few times a week,test_shopTime,15
+
+
+Phase,Phase_name,Block,Block_name,Frequency_online_shopping,Trial,Shopping_budget,Shopping_event,Shopping_item,Shopping_category,Shopping_price,Shopping_time_stamp,Shopping_time_action
+1,Shopping,1,shopping,a few times a week,,,,,,,,
+1,Shopping,1,shopping,,2,1000,open category,,Baskets,0,00:12:21 GMT+0200 (Central European Summer Time),9
+1,Shopping,1,shopping,,3,1000,select item,basket4.jpg,Baskets,15,00:12:22 GMT+0200 (Central European Summer Time),8
+1,Shopping,1,shopping,,4,985,add item to trolley,,Baskets,0,00:12:22 GMT+0200 (Central European Summer Time),8
+1,Shopping,1,shopping,,5,985,select item,basket26.jpg,Baskets,30,00:12:23 GMT+0200 (Central European Summer Time),7
+1,Shopping,1,shopping,,6,955,add item to trolley,,Baskets,0,00:12:23 GMT+0200 (Central European Summer Time),6
+1,Shopping,1,shopping,,7,955,select item,basket27.jpg,Baskets,30,00:12:24 GMT+0200 (Central European Summer Time),6
+1,Shopping,1,shopping,,8,925,add item to trolley,,Baskets,0,00:12:24 GMT+0200 (Central European Summer Time),5
+1,Shopping,1,shopping,,9,925,back,,,0,00:12:25 GMT+0200 (Central European Summer Time),4
+1,Shopping,1,shopping,,10,925,open category,,Art Books,0,00:12:27 GMT+0200 (Central European Summer Time),3
+1,Shopping,1,shopping,,11,925,select item,Art_book_23.jpeg,Art Books,17,00:12:28 GMT+0200 (Central European Summer Time),2
+1,Shopping,1,shopping,,12,908,add item to trolley,,Art Books,0,00:12:28 GMT+0200 (Central European Summer Time),1
+1,Shopping,1,shopping,,13,908,select item,Art_book_1.jpeg,Art Books,20,00:12:29 GMT+0200 (Central European Summer Time),300

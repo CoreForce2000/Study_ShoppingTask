@@ -24,7 +24,7 @@ import OnlineShop from "./online-shop";
 
 const quickNext = false;
 
-type SlideJson = {
+export type SlideJson = {
   type?: string;
   slidePath?: string;
   index?: number;
@@ -124,7 +124,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
   // listener that sets a variable true if space is pressed down, and false if it is released
   const [initialPress, setInitialPress] = useState(true);
-  useEffect(() => {
+  const initNastySound = () => {
     let spaceHeldTimeout: NodeJS.Timeout | undefined;
 
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -132,7 +132,6 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
         setTimeout(() => {
           setInitialPress(false);
         }, 0);
-        console.log("Space pressed");
 
         spaceHeldTimeout = setTimeout(() => {
           console.log("Nasty sound");
@@ -161,7 +160,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  };
 
   const waitKeyPress = (key?: string, customFunction?: () => void) => {
     keyPressHandlerRef.current = (event: KeyboardEvent) => {
@@ -490,12 +489,12 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
   const renderSlide: () => Slide = () => {
     if (!store.slideNumber) return { slide: "white.jpg" };
-    const currentSlideInfo: SlideJson =
+    const currentSlideJson =
       typeof task[store.slideNumber - 1] === "string"
         ? ({ slidePath: task[store.slideNumber - 1] } as unknown as SlideJson)
         : (task[store.slideNumber - 1] as SlideJson);
 
-    const isCustomSlide = currentSlideInfo.type !== undefined;
+    const isCustomSlide = currentSlideJson.type !== undefined;
 
     const showIf = (expression: string) => {
       const splitter = expression.includes("!=") ? "!=" : "=";
@@ -526,47 +525,47 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
     const getExecuteFunction = () => {
       setButtonVisible(true);
-      if ("keyPress" in currentSlideInfo) {
-        waitKeyPress(currentSlideInfo.keyPress!);
+      if ("keyPress" in currentSlideJson) {
+        waitKeyPress(currentSlideJson.keyPress!);
         setButtonVisible(false);
       }
-      if ("delay" in currentSlideInfo) {
-        waitTimeout(currentSlideInfo.delay!);
+      if ("delay" in currentSlideJson) {
+        waitTimeout(currentSlideJson.delay!);
         setButtonVisible(false);
       }
     };
 
-    if (currentSlideInfo.showIf) showIf(currentSlideInfo.showIf!);
+    if (currentSlideJson.showIf) showIf(currentSlideJson.showIf!);
 
-    const slidePath = currentSlideInfo.slidePath
-      ? renderSlideString(currentSlideInfo.slidePath!)
+    const slidePath = currentSlideJson.slidePath
+      ? renderSlideString(currentSlideJson.slidePath!)
       : "";
 
-    if (currentSlideInfo.setPhase)
+    if (currentSlideJson.setPhase)
       store.setPhase(
-        currentSlideInfo.setPhase,
-        currentSlideInfo.setPhaseNumber!
+        currentSlideJson.setPhase,
+        currentSlideJson.setPhaseNumber!
       );
-    if (currentSlideInfo.setBlock) {
+    if (currentSlideJson.setBlock) {
       store.setBlock(
-        currentSlideInfo.setBlock,
-        currentSlideInfo.setBlockNumber!
+        currentSlideJson.setBlock,
+        currentSlideJson.setBlockNumber!
       );
     }
 
-    if (currentSlideInfo.playSound && !hasPlayedRef.current) {
-      new Audio(`${SOUND_PATH}${currentSlideInfo.playSound}`).play();
+    if (currentSlideJson.playSound && !hasPlayedRef.current) {
+      new Audio(`${SOUND_PATH}${currentSlideJson.playSound}`).play();
       hasPlayedRef.current = true;
     }
 
     if (isCustomSlide) {
-      switch (currentSlideInfo.type) {
+      switch (currentSlideJson.type) {
         case "VAS":
           return vas(
             slidePath,
-            currentSlideInfo.variableName!,
-            currentSlideInfo.minLabel!,
-            currentSlideInfo.maxLabel!
+            currentSlideJson.variableName!,
+            currentSlideJson.minLabel!,
+            currentSlideJson.maxLabel!
           );
         case "checkboxShopping":
           return checkboxShopping(slidePath);
@@ -576,13 +575,14 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           return checkboxBulb(
             slidePath,
             store.slideNumber,
-            currentSlideInfo.variableName!
+            currentSlideJson.variableName!
           );
         case "drugCravingPre":
           return drugCravingSlide("pre");
         case "drugCravingPost":
           return drugCravingSlide("post");
         case "contingency":
+          initNastySound();
           return contingencySlide();
         case "quiz":
           return quizSlide();
@@ -614,7 +614,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
             execute: () => setButtonVisible(quickNext ? true : false),
           };
         case "exportData":
-          exportCsv(store, currentSlideInfo.variableName!);
+          exportCsv(store, currentSlideJson.variableName!);
           store.generateSelfOtherSequence();
           incrementSlideIndex();
           return { slide: "white.jpg" };
@@ -622,7 +622,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           incrementSlideIndex();
           return { slide: "white.jpg" };
         default:
-          console.error("Unknown slide type", currentSlideInfo.type);
+          console.error("Unknown slide type", currentSlideJson.type);
           setButtonVisible(false);
           return { slide: slidePath };
       }
