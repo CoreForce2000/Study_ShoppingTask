@@ -588,10 +588,10 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           return quizSlide();
         case "onlineShop":
           if (store.trialNumber === 2) {
-            return interSlideTime("phase1_and_3slide10.jpg");
+            return interSlideTime("phase1_and_3/slide1.jpg");
           }
           if (store.trialNumber === 3) {
-            return interSlideBudget("phase1_and_3slide11.jpg");
+            return interSlideBudget("phase1_and_3/slide2.jpg");
           }
           return {
             slide: "white.jpg",
@@ -603,10 +603,10 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           store.switchToPhase3();
           store.setTime(config.shop.general.time.phase3);
           if (store.trialNumber === 2) {
-            return interSlideTime("phase1_and_3slide10.jpg");
+            return interSlideTime("phase1_and_3/slide1.jpg");
           }
           if (store.trialNumber === 3) {
-            return interSlideBudget("phase1_and_3slide11.jpg");
+            return interSlideBudget("phase1_and_3/slide2.jpg");
           }
           return {
             slide: "white.jpg",

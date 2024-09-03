@@ -1,6 +1,11 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
-import { extendArray, generateTrialsArray, Trial } from "../util/functions";
+import {
+  exportCsvFromListOfObjects,
+  extendArray,
+  generateTrialsArray,
+  Trial,
+} from "../util/functions";
 import { Item } from "./shop-slice";
 import { TaskStore } from "./store";
 
@@ -69,14 +74,15 @@ const createContingencySlice: StateCreator<
         .flat()
         .map((tileItem) => tileItem.item);
 
+      // shall not contain selfItems
       const otherItems = state.items.filter(
         (item) =>
           !config.experimentConfig.excludeFromOtherTrolley.includes(
             item.category
-          )
+          ) && !selfItems.map((x) => x.category).includes(item.category)
       );
 
-      return {
+      const sequence = {
         selfItems: extendArray(
           selfItems.length === 0 ? ["Art/Art_1.jpeg"] : selfItems,
           100 * 8,
@@ -84,6 +90,9 @@ const createContingencySlice: StateCreator<
         ),
         otherItems: extendArray(otherItems, 100 * 8, true),
       };
+      exportCsvFromListOfObjects(sequence.selfItems, "selfItems");
+      exportCsvFromListOfObjects(sequence.otherItems, "otherItems");
+      return sequence;
     }),
   nextTrialPhase: () =>
     set((state) => {

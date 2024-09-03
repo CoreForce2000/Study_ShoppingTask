@@ -1,0 +1,194 @@
+{
+  "version": "0.9.5-15",
+  "dataExport": {
+    "fileName": "data"
+  },
+
+  "general": {
+    "phase": {
+      "1": "Shopping",
+      "2": "CoDe",
+      "3": "Control"
+    }
+  },
+
+  "colors": {
+    "backgroundColor": "black",
+    "lineColor": "#FFB904",
+    "categoryTileColor": "#FFDB80",
+    "clickedCategoryTileColor": "#FFB904",
+    "itemTileColor": "#FFB904",
+    "checkboxColorInCart": "white",
+    "backButtonColor": "#D9D9D9",
+    "addToCartButtonColor": "#D9D9D9",
+    "experimentBackgroundColor": "white"
+  },
+
+  "options": {
+    "shoppingFrequency": ["several times a day", "once a day", "a few times a week", "once a week", "once a month or less", "very rarely / not at all"],
+    "drugScreening": {
+      "drugs": ["Cocaine", "Tobacco", "Crack-Cocaine", "Alcohol", "Heroin", "Cannabis", "Ecstasy", "Amphetamines", "Other", "Methamphetamine"],
+      "other": "Other",
+      "none": "None of these"
+    }
+  },
+
+  "shop": {
+    "general": {
+      "time": { "phase1": 600, "phase3": 300 },
+      "initialBudget": 1000,
+
+      "initialVisilbeRows": 30,
+      "newVisibleRowsOnScroll": 10,
+
+      "alarmBell": {
+        "phase1": [
+          { "time": 300, "itemsLessOrEqualTo": 0 },
+          { "time": 550, "itemsLessOrEqualTo": 10 }
+        ],
+        "phase3": [
+          { "time": 300, "itemsLessOrEqualTo": 0 },
+          { "time": 550, "itemsLessOrEqualTo": 10 }
+        ]
+      },
+      "alarmBellDuration": 5000,
+      "repeatCategories": 1,
+      "minimumPriceThreshold": 100
+    },
+
+    "randomization": {
+      "initialScreenCategories": ["Cocaine", "Crack", "Heroin"],
+      "numberOfItemTiles": 301
+    },
+
+    "pathologicalCategories": {
+      "initialScreenCategories": ["Cocaine", "Crack", "Heroin"],
+
+      "categories": [
+        {
+          "name": "addition",
+          "partsPerTen": 2,
+          "items": [
+            "Cannabis Products",
+            "Cigarettes",
+            "Cigars",
+            "Cocaine",
+            "Crack",
+            "Ecstasy",
+            "Hashish",
+            "Heroin",
+            "Hookah",
+            "Rolling Tobacco",
+            "Vaping",
+            "Alcopops",
+            "Beer",
+            "Brandy",
+            "Champagne",
+            "Cider",
+            "Cocktails",
+            "Gin",
+            "Prosecco",
+            "Red Wine",
+            "Rum",
+            "Vodka",
+            "Whiskey",
+            "White Wine"
+          ]
+        }
+      ]
+    }
+  },
+
+  "memoryQuestionConfig": [
+    {
+      "person": "Mother",
+      "options": ["Perfume", "Flower", "Umbrella", "Make-up", "Handbag"],
+      "correct": "Flower",
+      "shoppingListLabel": "A bunch of flowers"
+    },
+    {
+      "person": "Neighbour",
+      "options": ["Sunglasses", "Wine", "Chocolate", "Penknife", "Wallet"],
+      "correct": "Chocolate",
+      "shoppingListLabel": "A box of chocolates"
+    },
+    {
+      "person": "Girl",
+      "options": ["Lego", "Playmobile", "Barbie", "Chocolate", "Cuddly Toy"],
+      "correct": "Cuddly Toy",
+      "shoppingListLabel": "A cuddly toy"
+    },
+    {
+      "person": "Friend",
+      "options": ["BBQ", "Binoculars", "Book", "Plants", "Mug"],
+      "correct": "Book",
+      "shoppingListLabel": "A book"
+    }
+  ],
+
+  "experimentConfig": {
+    "numberOfTrials": 100,
+
+    "slideTimings": {
+      "offLightbulb": {
+        "minValue": 1000,
+        "maxValue": 1200
+      },
+      "coloredLightbulb": {
+        "minValue": 1000,
+        "maxValue": 1000
+      },
+      "receiveItem": {
+        "minValue": 1000,
+        "maxValue": 1000
+      },
+      "offLightbulbNoItem": {
+        "minValue": 500,
+        "maxValue": 700
+      }
+    },
+    "inputKey": "Space",
+    "excludeFromOtherTrolley": [
+      "Adult Toys",
+      "Alcopops",
+      "Beer",
+      "Beer Books",
+      "Brandy",
+      "Cannabis Books",
+      "Cannabis Products",
+      "Champagne",
+      "Cider",
+      "Cigarettes",
+      "Cigars",
+      "Cocaine",
+      "Cocktail Books",
+      "Cocktails",
+      "Computing Accessories",
+      "Crack",
+      "Ecstasy",
+      "Female Erotica",
+      "Gambling Accessories",
+      "Gin",
+      "Hashish",
+      "Headphones",
+      "Heroin",
+      "Hookah",
+      "Male Erotica",
+      "Marijuana",
+      "Pipes",
+      "Prosecco",
+      "Red wine",
+      "Rolling Tobacco",
+      "Rum",
+      "Vapes",
+      "Video Games",
+      "Vodka",
+      "Webcams",
+      "Whisky",
+      "White wine",
+      "Wine Books",
+      "Methamphetamine",
+      "Amphetamines"
+    ]
+  }
+}

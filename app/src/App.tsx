@@ -31,6 +31,8 @@ import Slide17 from "./assets/slides/instructionsPhase2/slide9.jpg";
 import Slide26 from "./assets/slides/instructionsPhase3/slide1.jpg";
 import Slide27 from "./assets/slides/instructionsPhase3/slide2.jpg";
 import Slide28 from "./assets/slides/instructionsPhase3/slide3.jpg";
+import Slide31 from "./assets/slides/phase1_and_3/slide1.jpg";
+import Slide32 from "./assets/slides/phase1_and_3/slide2.jpg";
 import Slide22 from "./assets/slides/phase2/slide1.jpg";
 import Slide23 from "./assets/slides/phase2/slide2.jpg";
 import Slide24 from "./assets/slides/phase2/slide3.jpg";
@@ -75,6 +77,8 @@ const slideMapping: Record<string, string> = {
   "end/slide2.jpg": Slide30,
   "white.jpg": White,
   "vasslide.jpg": VasSlide,
+  "phase1_and_3/slide1.jpg": Slide31,
+  "phase1_and_3/slide2.jpg": Slide32,
 };
 
 const App: React.FC = () => {

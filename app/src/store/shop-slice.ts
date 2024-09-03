@@ -5,12 +5,7 @@ import {
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
-import {
-  addUnique,
-  extendArray,
-  pseudorandomize,
-  shuffleArray,
-} from "../util/functions";
+import { addUnique, pseudorandomize, shuffleArray } from "../util/functions";
 import { TaskStore } from "./store";
 
 export type Category = keyof typeof imageData;
@@ -182,9 +177,16 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
       let newBudget = state.budget - price;
       if (state.budget < price) {
-        LUCKY_CUSTOMER_SOUND.play();
-        state.setTrialIndex(3);
-        newBudget = config.shop.general.initialBudget;
+        // sum of trolley items plus budget is above initial budget value
+        if (
+          state.trolley.map((x) => x.price).reduce((a, b) => a + b, 0) +
+            state.budget ===
+          config.shop.general.initialBudget
+        ) {
+          LUCKY_CUSTOMER_SOUND.play();
+          state.setTrialIndex(3);
+        }
+        newBudget = config.shop.general.initialBudget + state.budget - price;
       }
 
       return {
@@ -249,14 +251,16 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
   clickedCategories: [],
   clickCategory: (category) =>
-    set((state) => ({
-      clickedItemTiles: {
-        ...state.clickedItemTiles,
-        [category]: [...(state.clickedItemTiles[category] || [])],
-      },
-      clickedCategories: addUnique(state.clickedCategories, category),
-      currentCategory: category,
-    })),
+    set((state) => {
+      return {
+        clickedItemTiles: {
+          ...state.clickedItemTiles,
+          [category]: [...(state.clickedItemTiles[category] || [])],
+        },
+        clickedCategories: addUnique(state.clickedCategories, category),
+        currentCategory: category,
+      };
+    }),
 
   clickedItemTiles: {},
 
@@ -269,23 +273,21 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
     set((state) => {
       const clickedItems = state.clickedItemTiles[state.currentCategory] || [];
 
-      const items = extendArray(
-        state.items.filter((item) => item.category === state.currentCategory),
-        config.shop.randomization.numberOfItemTiles
-      );
-
       const clickedItemIndex = clickedItems.findIndex(
         (item) => item.tile_id === tile_id
       );
 
-      const itemIndex =
-        clickedItemIndex !== -1
-          ? clickedItemIndex % items.length
-          : clickedItems.length === items.length
-          ? 0
-          : clickedItems.length;
+      const newItem = clickedItemIndex === -1;
 
-      const item = items[itemIndex];
+      const items = state.items.filter(
+        (item) => item.category === state.currentCategory
+      );
+
+      const item = newItem
+        ? items[clickedItems.length % items.length]
+        : clickedItems[clickedItemIndex].item;
+
+      const tileItem: TileItem = { tile_id: tile_id, item: item };
 
       return beforeTimeout
         ? {
@@ -294,13 +296,9 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
         : {
             clickedItemTiles: {
               ...state.clickedItemTiles,
-              [state.currentCategory]: addUnique(
-                state.clickedItemTiles[state.currentCategory] || [],
-                {
-                  tile_id: tile_id,
-                  item: item,
-                }
-              ),
+              [state.currentCategory]: newItem
+                ? [...clickedItems, tileItem]
+                : clickedItems,
             },
           };
     }),

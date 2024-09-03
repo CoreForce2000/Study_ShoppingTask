@@ -1,0 +1,120 @@
+{
+  "task": [
+    { "slidePath": "instructionsPhase1/slide1.jpg", "type": "checkboxShopping", "setPhase": "Shopping", "setPhaseNumber": 1, "setBlock": "shopping", "setBlockNumber": 1 },
+    { "showIf": "group!=Control", "slidePath": "instructionsPhase1/slide2.jpg", "type": "checkboxDrugs" },
+    { "slidePath": "vasslide.jpg", "type": "drugCravingPre" },
+    { "slidePath": "instructionsPhase1/slide3.jpg", "keyPress": "any" },
+    { "slidePath": "instructionsPhase1/slide4.jpg" },
+    { "slidePath": "instructionsPhase1/slide5_{time}.jpg" },
+    { "slidePath": "instructionsPhase1/slide6.jpg" },
+    { "slidePath": "instructionsPhase1/slide7_{time}.jpg" },
+    { "type": "onlineShop" },
+    { "slidePath": "instructionsPhase2/slide1.jpg", "delay": 3000, "playSound": "End of phase1 - thank you.mp3" },
+    { "type": "exportData", "variableName": "_phase1" },
+
+    { "slidePath": "instructionsPhase2/slide2.jpg", "type": "VAS", "variableName": "VAS_shopping_satisfaction", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
+    { "slidePath": "instructionsPhase2/slide3.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "vasslide.jpg", "type": "drugCravingPost" },
+    { "slidePath": "end/slide2.jpg", "keyPress": "c", "playSound": "Final.mp3" },
+
+    { "slidePath": "instructionsPhase2/slide5.jpg" },
+    { "slidePath": "instructionsPhase2/slide6.jpg" },
+    { "slidePath": "instructionsPhase2/slide7.jpg" },
+    { "slidePath": "instructionsPhase2/slide8.jpg" },
+    { "slidePath": "instructionsPhase2/slide9.jpg" },
+    { "slidePath": "instructionsPhase2/slide10.jpg" },
+    { "slidePath": "instructionsPhase2/slide11.jpg" },
+    { "slidePath": "instructionsPhase2/slide12.jpg" },
+    { "slidePath": "instructionsPhase2/slide13.jpg", "setPhase": "CoDe", "setPhaseNumber": 2, "setBlock": "p(0|-A)=0", "setBlockNumber": 1 },
+    { "type": "contingency", "probabilityOutcomeNoAction": 0 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS1",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "slidePath": "phase2/slide2.jpg", "type": "checkboxBulb", "variableName": "Association_Color_other" },
+    { "slidePath": "phase2/slide3.jpg", "type": "checkboxBulb", "variableName": "Association_Color_own" },
+    { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 2, "probabilityOutcomeNoAction": 0 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS2",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 3, "probabilityOutcomeNoAction": 0 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS3",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "type": "contingency", "setBlock": "p(0|-A)=0.3", "setBlockNumber": 4, "probabilityOutcomeNoAction": 0.3 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS4",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "type": "contingency", "setBlock": "p(0|-A)=0.6", "setBlockNumber": 5, "probabilityOutcomeNoAction": 0.6 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS5",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 6, "probabilityOutcomeNoAction": 0 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS6",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "type": "contingency", "setBlock": "p(0|-A)=0.3", "setBlockNumber": 7, "probabilityOutcomeNoAction": 0.3 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS7",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "slidePath": "phase2/slide4.jpg" },
+    { "type": "contingency", "setBlock": "p(0|-A)=0.6", "setBlockNumber": 8, "probabilityOutcomeNoAction": 0.6 },
+    {
+      "slidePath": "phase2/slide1.jpg",
+      "type": "VAS",
+      "variableName": "CoDe_VAS8",
+      "minLabel": "Not at all",
+      "maxLabel": "Very much",
+      "playSound": "rating_phase_2.mp3"
+    },
+    { "slidePath": "phase2/slide4.jpg" },
+
+    { "slidePath": "instructionsPhase3/slide1.jpg" },
+    { "slidePath": "instructionsPhase3/slide2.jpg", "type": "VAS", "variableName": "VAS_claim_satisfaction", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
+
+    { "type": "exportData", "variableName": "_phase2" },
+
+    { "slidePath": "instructionsPhase3/slide3.jpg" },
+    { "type": "quiz" },
+    { "type": "onlineShopControl" },
+
+    { "type": "exportData", "variableName": "_final" },
+
+    { "slidePath": "end/slide1.jpg", "delay": 5000, "playSound": "Final.mp3" },
+    { "slidePath": "end/slide2.jpg", "delay": 99999999 }
+  ]
+}
