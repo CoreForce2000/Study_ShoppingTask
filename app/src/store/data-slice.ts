@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
-import { unique } from "../util/functions";
+import { getGenericCategory, sumArray, unique } from "../util/functions";
 import { TaskStore } from "./store";
 
 export type SurveyData = {
@@ -122,7 +122,13 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
             Control_category: state.currentCategory
               ? state.currentCategory
               : "",
+            Control_generic_category: true
+              ? ""
+              : state.currentCategory
+              ? getGenericCategory(state.currentCategory)
+              : "",
             Control_price: state.getItemPrice(state.currentItem?.item!) ?? 0,
+            Control_trolley: sumArray(state.trolley.map((item) => item.price)),
             Control_time_stamp: new Date().toTimeString(),
             Control_time_action: state.time,
           }
@@ -136,7 +142,14 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
             Shopping_category: state.currentCategory
               ? state.currentCategory
               : "",
+
+            Shopping_generic_category: true
+              ? ""
+              : state.currentCategory
+              ? getGenericCategory(state.currentCategory)
+              : "",
             Shopping_price: state.getItemPrice(state.currentItem?.item!) ?? 0,
+            Shopping_trolley: sumArray(state.trolley.map((item) => item.price)),
             Shopping_time_stamp: new Date().toTimeString(),
             Shopping_time_action: state.time,
           }

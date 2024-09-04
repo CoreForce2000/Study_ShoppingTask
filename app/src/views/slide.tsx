@@ -135,7 +135,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
         spaceHeldTimeout = setTimeout(() => {
           console.log("Nasty sound");
-          CONSTANT_PRESSING_SOUND.play();
+          // CONSTANT_PRESSING_SOUND.play();
         }, 3000);
       }
     };
@@ -217,7 +217,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     switch (store.trialPhase) {
       case "prepare":
         return {
-          slide: `phase2/slide1.jpg`,
+          slide: `phase2/trial/slide1.jpg`,
           execute: () => {
             store.setShowImage(false);
 
@@ -234,8 +234,8 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
         return {
           slide:
             trialInfo.color === "orange"
-              ? "phase2/slide2.jpg"
-              : "phase2/slide3.jpg",
+              ? "phase2/trial/slide2.jpg"
+              : "phase2/trial/slide3.jpg",
           execute: () => {
             clearListeners();
             const startTime = performance.now();
@@ -277,7 +277,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
         return positiveOutcome
           ? {
-              slide: `phase2/slide4.jpg`,
+              slide: `phase2/trial/slide4.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(
@@ -292,7 +292,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               },
             }
           : {
-              slide: `phase2/slide1.jpg`,
+              slide: `phase2/trial/slide1.jpg`,
               execute: () => {
                 clearListeners();
                 waitTimeout(

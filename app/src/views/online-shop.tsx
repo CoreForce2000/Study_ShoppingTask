@@ -297,7 +297,7 @@ const OnlineShop: React.FC<{}> = () => {
                 icon={SquareXIcon}
                 variant="transparent"
                 color="black"
-                prefixText="Add to Remove from Trolley"
+                suffixText="Remove from Trolley"
                 onClick={() => store.removeTrolleyItems()}
               />
             ) : (
@@ -325,7 +325,11 @@ const OnlineShop: React.FC<{}> = () => {
         )}
 
         <div className="flex flex-col w-[15em] h-[calc((5/7)*(15em+0.4em))]">
-          <div className="overflow-y-auto" ref={scrollRef} onScroll={onScroll}>
+          <div
+            className="overflow-y-auto overflow-x-hidden"
+            ref={scrollRef}
+            onScroll={onScroll}
+          >
             <ItemPage hidden={store.page !== "item"} />
             {store.page === "item" ? (
               <></>

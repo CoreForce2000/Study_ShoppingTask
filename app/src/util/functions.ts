@@ -17,6 +17,16 @@ export const preloadImage = (path: string) => {
   });
 };
 
+export const getGenericCategory = (category: string) => {
+  const genericCategory = config.shop.genericCategoryMapping.find(
+    (mappedCategory) => mappedCategory.name === category
+  )?.genericCategory;
+  if (!genericCategory) {
+    throw new Error(`No generic category found for ${category}`);
+  }
+  return genericCategory!;
+};
+
 export const getImagePath = (category: string, imageName: string) => {
   return IMAGE_BASE_PATH + category + "/" + imageName;
 };
@@ -104,7 +114,7 @@ export function extendArray(
     .flat();
 }
 
-function sumArray(array: number[]): number {
+export function sumArray(array: number[]): number {
   return array.reduce((a, b) => a + b, 0);
 }
 

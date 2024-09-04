@@ -27,12 +27,21 @@ def process_excel_file(excel_path: str) -> pd.DataFrame:
     df = pd.read_excel(excel_path)
 
     # Lowercase all column names
-    df.columns = [col.lower() for col in df.columns]
+    df.columns = [col.lower().strip() for col in df.columns]
 
     # Find column names containing 'item', 'min', 'max' to identify the correct columns
+    other_names = ["item", "picture", "bath", "travel"]
+    # Now add strings included in the excel file name
+    excel_file_name = os.path.basename(excel_path).lower()
+    other_names.extend(re.findall(r"\w+", excel_file_name))
+
+    # filter out pricing and xlsx, and remove any trailing "s"
+    other_names = [name[:-1] if name.endswith("s") else name for name in other_names]
+    other_names = [name for name in other_names if name not in ["pricing", "xlsx", ""]]
+
     col_mappings = {}
     for col in df.columns:
-        if "drug picture" in col or "item" in col:
+        if any(name in col for name in other_names):
             col_mappings[col] = "item"
         elif "min" in col or "mim" in col:
             col_mappings[col] = "minimum"
@@ -53,9 +62,13 @@ def process_excel_file(excel_path: str) -> pd.DataFrame:
     # Rename the columns to standard names
     df.rename(columns=col_mappings, inplace=True)
 
+    df = df[["item", "minimum", "maximum"]]
+    
+    df.dropna(how="all", inplace=True)
+
     df["item"] = find_item_id(df["item"])
 
-    return df[["item", "minimum", "maximum"]]
+    return df
 
 
 def create_image_dataframe(image_files: list) -> pd.DataFrame:
@@ -83,8 +96,8 @@ def process_category(
         file for file in files_in_category if file.lower().endswith((".xls", ".xlsx"))
     ]
 
-    if not excel_files:
-        raise ValueError(f"No Excel file found in category {category_name}.")
+    if len(excel_files) != 1:
+        raise ValueError(f"There must be exactly one Excel file in category {category_name}. Found {len(excel_files)}.")
 
     excel_path = os.path.join(category_path, excel_files[0])
 
@@ -108,11 +121,16 @@ def process_category(
 
     df_merged["category"] = category_name  # Add a category column
 
-    highlight = "Err >>" if len(df_merged) > 5 or len(excel_files) > 1 else ""
+    highlight = "Err >>" if len(unmatched_images) > 0 or len(unmatched_excel_rows) > 0 else ""
 
     # print(category_name, sep="\t")
-    print(f"{highlight} images:", len(image_files), "excel files:", len(excel_files), "total:", len(df_merged), "unmatched images:", len(unmatched_images), "unmatched excel rows:", len(unmatched_excel_rows), category_name, sep="\t")
+    global counter
+    counter = 1 if "counter" not in globals() else counter
+    counter += 1
 
+    if(highlight):
+        print(f"unmatched images: {len(unmatched_images)} (N={len(image_files)})\tunmatched excel rows: {len(unmatched_excel_rows)} (N={len(df_merged)})\t{category_name}")
+# {highlight}
     return df_merged, unmatched_images, unmatched_excel_rows
 
 
@@ -130,8 +148,11 @@ def combine_all_categories(categories_path: str) -> pd.DataFrame:
 
         remove_apple_double_files(os.path.join(categories_path, category_folder))
 
-        merged_df, _, _ = process_category(category_folder, categories_path)
-        all_dataframes.append(merged_df)
+        try:    
+            merged_df, _, _ = process_category(category_folder, categories_path)
+            all_dataframes.append(merged_df)
+        except Exception as e:
+            print(f"Error processing category {category_folder}: {e}")
 
     # Combine all dataframes into one
     combined_df = pd.concat(all_dataframes, ignore_index=True)
@@ -182,7 +203,7 @@ for category in combined_categories_df["category"].unique():
 
 
 # Write the dictionary to a JSON file
-with open("image_data.json", "w") as f:
+with open("../../../src/assets/categories/image_data.json", "w") as f:
     json.dump(data, f)
 
 # %%

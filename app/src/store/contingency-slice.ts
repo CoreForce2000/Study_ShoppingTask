@@ -1,9 +1,9 @@
 import { StateCreator } from "zustand";
 import config from "../assets/configs/config.json";
 import {
-  exportCsvFromListOfObjects,
   extendArray,
   generateTrialsArray,
+  getGenericCategory,
   Trial,
 } from "../util/functions";
 import { Item } from "./shop-slice";
@@ -77,9 +77,13 @@ const createContingencySlice: StateCreator<
       // shall not contain selfItems
       const otherItems = state.items.filter(
         (item) =>
-          !config.experimentConfig.excludeFromOtherTrolley.includes(
+          !config.experimentConfig.genericCategoryToExcludeFromOtherTrolley.includes(
+            getGenericCategory(item.category)
+          ) &&
+          !config.experimentConfig.individualCategoriesToExcludeFromOtherTrolley.includes(
             item.category
-          ) && !selfItems.map((x) => x.category).includes(item.category)
+          ) &&
+          !selfItems.map((x) => x.category).includes(item.category)
       );
 
       const sequence = {
@@ -90,8 +94,8 @@ const createContingencySlice: StateCreator<
         ),
         otherItems: extendArray(otherItems, 100 * 8, true),
       };
-      exportCsvFromListOfObjects(sequence.selfItems, "selfItems");
-      exportCsvFromListOfObjects(sequence.otherItems, "otherItems");
+      // exportCsvFromListOfObjects(sequence.selfItems, "selfItems");
+      // exportCsvFromListOfObjects(sequence.otherItems, "otherItems");
       return sequence;
     }),
   nextTrialPhase: () =>

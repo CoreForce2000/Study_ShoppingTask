@@ -5,7 +5,12 @@ import {
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
-import { addUnique, pseudorandomize, shuffleArray } from "../util/functions";
+import {
+  addUnique,
+  pseudorandomize,
+  shuffleArray,
+  sumArray,
+} from "../util/functions";
 import { TaskStore } from "./store";
 
 export type Category = keyof typeof imageData;
@@ -179,8 +184,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
       if (state.budget < price) {
         // sum of trolley items plus budget is above initial budget value
         if (
-          state.trolley.map((x) => x.price).reduce((a, b) => a + b, 0) +
-            state.budget ===
+          sumArray(state.trolley.map((item) => item.price)) + state.budget ===
           config.shop.general.initialBudget
         ) {
           LUCKY_CUSTOMER_SOUND.play();

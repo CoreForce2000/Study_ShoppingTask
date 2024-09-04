@@ -10,12 +10,11 @@
     { "slidePath": "instructionsPhase1/slide7_{time}.jpg" },
     { "type": "onlineShop" },
     { "slidePath": "instructionsPhase2/slide1.jpg", "delay": 3000, "playSound": "End of phase1 - thank you.mp3" },
-    { "type": "exportData", "variableName": "_phase1" },
 
     { "slidePath": "instructionsPhase2/slide2.jpg", "type": "VAS", "variableName": "VAS_shopping_satisfaction", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
     { "slidePath": "instructionsPhase2/slide3.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation", "minLabel": "Not at all", "maxLabel": "Very much" },
     { "slidePath": "vasslide.jpg", "type": "drugCravingPost" },
-    { "slidePath": "end/slide2.jpg", "keyPress": "c", "playSound": "Final.mp3" },
+    { "type": "exportData", "variableName": "_phase1" },
 
     { "slidePath": "instructionsPhase2/slide5.jpg" },
     { "slidePath": "instructionsPhase2/slide6.jpg" },

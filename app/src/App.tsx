@@ -37,6 +37,10 @@ import Slide22 from "./assets/slides/phase2/slide1.jpg";
 import Slide23 from "./assets/slides/phase2/slide2.jpg";
 import Slide24 from "./assets/slides/phase2/slide3.jpg";
 import Slide25 from "./assets/slides/phase2/slide4.jpg";
+import Slide221 from "./assets/slides/phase2/trial/slide1.jpg";
+import Slide232 from "./assets/slides/phase2/trial/slide2.jpg";
+import Slide243 from "./assets/slides/phase2/trial/slide3.jpg";
+import Slide254 from "./assets/slides/phase2/trial/slide4.jpg";
 
 import VasSlide from "./assets/slides/vasslide.jpg";
 import White from "./assets/slides/white.jpg";
@@ -70,6 +74,10 @@ const slideMapping: Record<string, string> = {
   "phase2/slide2.jpg": Slide23,
   "phase2/slide3.jpg": Slide24,
   "phase2/slide4.jpg": Slide25,
+  "phase2/trial/slide1.jpg": Slide221,
+  "phase2/trial/slide2.jpg": Slide232,
+  "phase2/trial/slide3.jpg": Slide243,
+  "phase2/trial/slide4.jpg": Slide254,
   "instructionsPhase3/slide1.jpg": Slide26,
   "instructionsPhase3/slide2.jpg": Slide27,
   "instructionsPhase3/slide3.jpg": Slide28,
