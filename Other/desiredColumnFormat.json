@@ -1,0 +1,202 @@
+{
+  "ColumnProperties": {
+    "Phase": {
+      "Description": "Phase id",
+      "ValuesDTypes": "int",
+      "Values": [1, 2, 3, 4]
+    },
+    "Phase_name": {
+      "Description": "Name of the Phase",
+      "ValuesDTypes": "string",
+      "Values": ["Shopping", "CoDe", "Control"]
+    },
+    "Block_num": {
+      "Description": "Important for CoDe",
+      "ValuesDTypes": "string",
+      "Values": [1, 2, 3, 4, 5, 6]
+    },
+    "Block_name": {
+      "Description": "Name of Block / Condition in CoDe",
+      "ValuesDTypes": "",
+      "Values": [
+        "Shopping",
+        "questions",
+        "p(0|-A)=0",
+        "p(0|-A)=0.3",
+        "p(0|-A)=0.6",
+        "p(0|-A)=0"
+      ]
+    },
+    "Shopping_event": {
+      "Description": "Behaviour",
+      "ValuesDTypes": "string",
+      "Values": [
+        "open category",
+        "select item",
+        "back",
+        "check trolley",
+        "select item trolley",
+        "remove"
+      ]
+    },
+    "Shopping_category": {
+      "Description": "Item Category, where the behaviour was exhibited",
+      "ValuesDTypes": "string",
+      "Values": ["anyOfList(category_names)"]
+    },
+    "Shopping_item": {
+      "Description": "Item that was selected (if applicable)",
+      "ValuesDTypes": "string",
+      "Values": ["", "anyOfList(item_names)"]
+    },
+    "Shopping_time_stamp": {
+      "Description": "Time of the event (since start of phase in minutes)",
+      "ValuesDTypes": "datetime(mm:ss)",
+      "Values": ["anyOfType(datetime(mm:ss))"]
+    },
+    "Shopping_time_action": {
+      "Description": "Time between this and last event",
+      "ValuesDTypes": "datetime(ms)",
+      "Values": ["anyOfType(int)"]
+    },
+    "Shopping_price": {
+      "Description": "Price of item (if item selected)",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "Shopping_budget": {
+      "Description": "Budget before execution of event",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "CoDe_cue": {
+      "Description": "Color of Lamp",
+      "ValuesDTypes": "string",
+      "Values": ["blue", "orange"]
+    },
+    "CoDe_stimuli_type": {
+      "Description": "Own or other items",
+      "ValuesDTypes": "string",
+      "Values": ["own", "others"]
+    },
+    "CoDe_response": {
+      "Description": "If SPACE was pressed or not",
+      "ValuesDTypes": "string",
+      "Values": ["TRUE", "FALSE"]
+    },
+    "CoDe_outcome": {
+      "Description": "Whether they received an item or not",
+      "ValuesDTypes": "string",
+      "Values": ["TRUE", "FALSE"]
+    },
+    "CoDe_item": {
+      "Description": "name of item shown",
+      "ValuesDTypes": "string",
+      "Values": ["anyOfList(item_names)"]
+    },
+    "CoDe_RT": {
+      "Description": "Reaction time",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "CoDe_VAS": {
+      "Description": "VAS rating",
+      "ValuesDTypes": "int",
+      "Values": ["(1,100)"]
+    },
+    "Control_qs_person": {
+      "Description": "Person for which they selected the item",
+      "ValuesDTypes": "string",
+      "Values": ["mother", "neighbour", "girl", "friend"]
+    },
+    "Control_qs_item": {
+      "Description": "Item that was selected",
+      "ValuesDTypes": "string",
+      "Values": ["anyOfList(item_names)"]
+    },
+    "Control_qs_correct": {
+      "Description": "Whether they selected the correct category or not",
+      "ValuesDTypes": "string",
+      "Values": ["TRUE", "FALSE"]
+    },
+    "Control_qs_attempts": {
+      "Description": "Number of attempts",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "Control_qs_RT": {
+      "Description": "Time taken to respond to questions",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "Control_event": {
+      "Description": "Behaviour",
+      "ValuesDTypes": "string",
+      "Values": [
+        "open category",
+        "select item",
+        "back",
+        "check trolley",
+        "select item trolley",
+        "remove"
+      ]
+    },
+    "Control_category": {
+      "Description": "Item Category, where the behaviour was exhibited",
+      "ValuesDTypes": "string",
+      "Values": ["anyOfList(category_names)"]
+    },
+    "Control_item": {
+      "Description": "Item that was selected (if applicable)",
+      "ValuesDTypes": "string",
+      "Values": ["anyOfList(item_names)"]
+    },
+    "Control_time_stamp": {
+      "Description": "Time of the event (since start of phase in minutes)",
+      "ValuesDTypes": "datetime(mm:ss)",
+      "Values": ["anyOfType(datetime(mm:ss))"]
+    },
+    "Control_time_action": {
+      "Description": "Time between this and last event",
+      "ValuesDTypes": "datetime(ms)",
+      "Values": ["anyOfType(int)"]
+    },
+    "Control_price": {
+      "Description": "Price of item (if item selected)",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    },
+    "Control_budget": {
+      "Description": "Budget before execution of event",
+      "ValuesDTypes": "int",
+      "Values": ["anyOfType(int)"]
+    }
+  },
+
+  "CodependentColumnProperties": {
+    "Phase_name+Block_num": {
+      "Description": "Association between phase name and block number",
+      "ValuesDTypes": "string",
+      "Values": ["Shopping+1", "CoDe+(1,6)", "Control+1"]
+    },
+    "Shopping_item+Shopping_price": {
+      "Description": "Onyl show price if item is specified",
+      "ValuesDTypes": "string+int",
+      "Values": ["+", "anyOfList(item_names)+anyOfType(int)"]
+    },
+    "Shopping_item+Shopping_category": {
+      "Description": "Possible combinations of cataegory and item",
+      "ValuesDTypes": "string+string",
+      "Values": [
+        "+",
+        "anyOfList(category_names)+",
+        "anyOfList(category_names)+anyOfList(item_names)"
+      ]
+    },
+    "Phase_name+CoDe_stimulus": {
+      "Description": "Association between phase name and CoDe stimulus",
+      "ValuesDTypes": "string",
+      "Values": ["Shopping+1", "CoDe+(1,6)", "Control+1"]
+    }
+  }
+}

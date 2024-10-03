@@ -30,7 +30,6 @@ def convert_to_jpg(folder_path):
                 with Image.open(file_path) as img:
                     # Check if the image is already in JPG format
                     if img.format == 'JPEG' and file_path.endswith('.jpg'):
-                        print(f"{filename} is already in JPG format and correctly named.")
                         continue
                     
                     # Convert the image to RGB mode if it's not already
@@ -50,6 +49,25 @@ def convert_to_jpg(folder_path):
                     print(f"Removed the original file {filename}.")
             except Exception as e:
                 print(f"Failed to convert {filename}: {e}")
+
+
+    # Additional logic to find and adjust slide numbers
+    slide_filenames = [f for f in os.listdir(folder_path) if "slide" in f]
+    slide_numbers = [int(f.split('slide')[1].split('_')[0].split('.')[0]) for f in slide_filenames if f.split('slide')[1].split('_')[0].split('.')[0].isdigit()]
+    print(slide_filenames)
+
+    if slide_numbers:
+        min_slide_number = min(slide_numbers)
+        print(min_slide_number) 
+
+        for filename in slide_filenames:
+            slide_num_str = filename.split('slide')[1].split('_')[0].split('.')[0]
+            if slide_num_str.isdigit():
+                slide_num = int(slide_num_str)
+                new_slide_num = slide_num - (min_slide_number - 1)
+                new_filename = filename.replace(f"slide{slide_num}", f"slide{new_slide_num}")
+                os.rename(os.path.join(folder_path, filename), os.path.join(folder_path, new_filename))
+
 
 # Specify the folder path here
 folder_path = './'
