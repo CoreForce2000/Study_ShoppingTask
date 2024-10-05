@@ -37,7 +37,16 @@ const Tile: React.FC<TileProps> = ({
   const [tileStyle, setTileStyle] = useState<React.CSSProperties>({
     backgroundColor: backgroundColor,
   });
-  const [displayText, setDisplayText] = useState(text);
+
+  // Split text if it has two words, or if it is too long
+  let newText = text;
+  if (text.includes(" ")) {
+    newText = text.split(" ").join("\n");
+  } else if (text.length > 10) {
+    newText = text.slice(0, 10) + "\n" + text.slice(10);
+  }
+
+  const [displayText, setDisplayText] = useState(newText);
   const [isChecked, setIsChecked] = useState(setChecked); // New state for checkbox
 
   useEffect(() => {
@@ -59,6 +68,8 @@ const Tile: React.FC<TileProps> = ({
     setIsChecked(!isChecked);
     onTileSelect(text, !isChecked); // Update the list of selected tiles
   };
+
+  // Split text into two lines
 
   return (
     <div

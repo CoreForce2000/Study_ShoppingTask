@@ -1,3 +1,4 @@
+/* Existing tile styles */
 .tile {
   box-shadow: 0.05em 0.05em 0.25em 0.05em lightgrey;
   background-image: url("https://www.transparenttextures.com/patterns/45-degree-fabric-light.png");
@@ -12,7 +13,7 @@
   text-align: center;
   cursor: pointer;
   border-radius: 0.6em;
-  white-space: pre-line;
+  white-space: pre-line; /* This allows line breaks */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -21,10 +22,12 @@
   transition: filter 0.1s ease;
 }
 
+/* Hover effect */
 .tile:hover {
   filter: brightness(85%);
 }
 
+/* Checkbox styling */
 .tickBox {
   position: absolute;
   top: -0.15em;
@@ -36,4 +39,22 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+}
+
+/* Style for tiles with two words */
+.tileTwoWords span {
+  white-space: normal; /* This allows natural wrapping */
+  word-break: break-word;
+}
+
+/* Style for tiles with three words (especially handling '&') */
+.tileThreeWords span {
+  white-space: normal; /* Allow wrapping */
+  word-break: break-word;
+}
+
+/* Forcing the wrapping of text containing '&' */
+.tileThreeWords span:before {
+  content: "\A"; /* Insert a line break before the & */
+  white-space: pre; /* Respect the line break */
 }
