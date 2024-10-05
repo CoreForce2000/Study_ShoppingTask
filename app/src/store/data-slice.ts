@@ -12,6 +12,7 @@ export type SurveyData = {
   time: string;
   onlineShoppingFrequency: string;
   drugs: string[];
+  craving: string;
 };
 
 export interface DataSlice {
@@ -47,24 +48,29 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     survey: {
       gender: "",
       age: "",
-      // group: "Select group",
-      group: "Control",
+      group: "Select group",
       time: "15",
       participantId: "",
       handedness: "",
       onlineShoppingFrequency: "",
       drugs: [],
+      craving: "False",
     },
     actionLog: [],
     drugCraving: {},
   },
 
   getDrugsNow: () =>
-    get().data.survey.drugs.filter(
-      (drug: string) =>
-        drug !== config.options.drugScreening.other &&
-        drug !== config.options.drugScreening.none
-    ) ?? [],
+    [
+      ...new Set(
+        [...get().data.survey.drugs, get().data.survey.group].filter(
+          (drug: string) =>
+            drug !== config.options.drugScreening.other &&
+            drug !== config.options.drugScreening.none &&
+            drug !== "Control"
+        )
+      ),
+    ] ?? [],
 
   setSurveyResponse: (name: string, value: any) =>
     set((state) => ({

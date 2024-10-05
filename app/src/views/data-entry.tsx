@@ -184,18 +184,12 @@ const DataEntry: React.FC = () => {
           />
         </fieldset>
 
-        <fieldset className="border border-gray-300 p-2 mb-4 hidden">
+        <fieldset className="border border-gray-300 p-2 mb-4">
           <legend className="text-xl">Group</legend>
           <Dropdown
             required
             name="group"
-            options={[
-              "Select group",
-              "Alcohol",
-              "Cocaine",
-              "Heroin",
-              "Control",
-            ]}
+            options={["Select group", "Control", "Alcohol", "Cocaine", "Crack"]}
             value={store.data.survey.group}
             onChange={handleChange}
           />

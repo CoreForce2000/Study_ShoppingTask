@@ -2,6 +2,7 @@ import { StateCreator } from "zustand";
 import imageData from "../assets/categories/image_data.json";
 import config from "../assets/configs/config.json";
 import {
+  ADD_TROLLEY_SOUND,
   LUCKY_CUSTOMER_SOUND,
   TIME_IS_RUNNING_OUT_SOUND,
 } from "../util/constants";
@@ -69,6 +70,7 @@ export interface ShopSlice {
     person: string,
     sideEffect: (array: string[]) => void
   ) => void;
+  selectableDrugsPurchased: string[];
 }
 
 const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
@@ -156,6 +158,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
   addItemToCart: (item: Item) =>
     set((state) => {
       state.backPressed();
+      ADD_TROLLEY_SOUND.play();
       const price = state.getItemPrice(item);
       const newState = {
         trolleyCounter: state.trolleyCounter + 1,
@@ -193,9 +196,35 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
         }
       }
 
+      // "mappingCategoryToSelectableDrug": {
+      //   "Alcohol": ["Alcopops", "Beer", "Brandy", "Champagne", "Cider", "Cocktails", "Gin", "Prosecco", "Red Wine", "Rum", "Vodka", "Whiskey", "White Wine"]
+      // }
+      // variable represents the key if the item is in the list, else keeps original value. config.shop.general.mappingCategoryToSelectableDrug
+      const itemDrugCategory =
+        Object.keys(config.shop.general.mappingCategoryToSelectableDrug).find(
+          (key) =>
+            config.shop.general.mappingCategoryToSelectableDrug[
+              key as keyof typeof config.shop.general.mappingCategoryToSelectableDrug
+            ].includes(item.category)
+        ) || item.category;
+
+      console.log("itemDrugCategory", itemDrugCategory);
+
+      const selectableDrugsPurchased =
+        config.options.drugScreening.drugs.includes(itemDrugCategory)
+          ? addUnique(state.selectableDrugsPurchased, itemDrugCategory)
+          : state.selectableDrugsPurchased;
+
+      if (selectableDrugsPurchased.length > 0) {
+        state.setSurveyResponse("craving", "True");
+      }
+
+      console.log("surveyData", state.data.survey);
+
       return {
         ...newState,
         budget: newBudget,
+        selectableDrugsPurchased: selectableDrugsPurchased,
       };
     }),
 
@@ -343,6 +372,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
         quizCorrectPersons: newArray,
       };
     }),
+  selectableDrugsPurchased: [],
 });
 
 export default createShopSlice;

@@ -19,7 +19,7 @@ import {
   MEMORY_WRONG_SOUND,
   SOUND_PATH,
 } from "../util/constants";
-import { exportCsv, getImagePath } from "../util/functions";
+import { exportCsv, getImagePath, unique } from "../util/functions";
 import OnlineShop from "./online-shop";
 
 const quickNext = false;
@@ -100,8 +100,6 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
     if (keyPressHandlerRef.current)
       window.removeEventListener("keydown", keyPressHandlerRef.current);
-    if (navKeyPressHandlerRef.current)
-      window.removeEventListener("keydown", navKeyPressHandlerRef.current);
   };
 
   const changeSlideIndex = (newSlideNumber: number) => {
@@ -191,7 +189,12 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const drugCravingSlide = (stage: "pre" | "post") => {
-    const drugs = store.getDrugsNow();
+    const drugs = unique([
+      ...store.getDrugsNow(),
+      ...store.selectableDrugsPurchased,
+    ]);
+    console.log("Drugs", drugs);
+
     if (drugs.length === 0) return { execute: () => incrementSlideIndex() };
     const drug = drugs[store.trialNumber - 1];
     return {
@@ -262,9 +265,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               config.experimentConfig.slideTimings.coloredLightbulb.maxValue,
               () => {
                 store.nextTrialPhase();
-                store.setReactionTime(
-                  Math.round(performance.now() - startTime)
-                );
+                store.setReactionTime(-1);
               }
             );
           },
@@ -289,10 +290,8 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
         if (positiveOutcome) {
           if (isSelfItem) {
             store.incrementBidsSelf();
-            console.log("BidsSelf", store.bidsSelf);
           } else {
             store.incrementBidsOther();
-            console.log("BidsOther", store.bidsOther);
           }
         }
 
@@ -333,7 +332,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const quizSlide = () => ({
-    slide: `instructionsPhase3/slide28.jpg`,
+    slide: `instructionsPhase3/slide5.jpg`,
     children: (
       <div
         key={`column1234`}
@@ -408,16 +407,16 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           <Checkbox
             key="drugs"
             gap="0.7em"
-            initialOptions={[
-              ...config.options.drugScreening.drugs.filter(
-                (x) => x != config.options.drugScreening.none
-              ),
-            ]}
+            initialOptions={config.options.drugScreening.drugs}
             exclusiveOptions={[config.options.drugScreening.none]}
             allowMultiple={true}
             columnLayout="double"
             onChange={(values) => {
               store.setSurveyResponse("drugs", values);
+              store.setSurveyResponse(
+                "craving",
+                values.length > 0 ? "True" : "False"
+              );
 
               // index for each drugScreening drugs & other, one if in values, otherwise 0
               values.length === 0
@@ -499,7 +498,9 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           </div>
           {/* Font Color with #03007e */}
           <div className="absolute top-0 left-0 mt-[16.3em] ml-[22.3em] text-[0.7em] w-[2em] text-center text-[#03007e]">
-            {outcome}
+            {outcome < store.bidsSelf + store.bidsOther
+              ? outcome
+              : store.bidsSelf + store.bidsOther}
           </div>
         </div>
       ),
@@ -533,14 +534,15 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const renderSlide: () => Slide = () => {
+    if (navKeyPressHandlerRef.current) {
+      window.removeEventListener("keydown", navKeyPressHandlerRef.current);
+    }
     navKeyPressHandlerRef.current = (event: KeyboardEvent) => {
       if (event.key === "b") {
-        console.log("b Pressed");
         event.preventDefault();
         decrementSlideIndex();
       }
       if (event.key === "d") {
-        console.log("d Pressed");
         event.preventDefault();
         incrementSlideIndex();
       }

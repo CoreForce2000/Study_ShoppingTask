@@ -31,7 +31,7 @@
   "options": {
     "shoppingFrequency": ["several times a day", "once a day", "a few times a week", "once a week", "once a month or less", "very rarely / not at all"],
     "drugScreening": {
-      "drugs": ["Cocaine", "Tobacco", "Crack-Cocaine", "Alcohol", "Heroin", "Cannabis", "Ecstasy", "Amphetamines", "Other", "Methamphetamine"],
+      "drugs": ["Cocaine", "Tobacco", "Crack-cocaine", "Alcohol", "Heroin", "Marijuana", "Ecstasy", "Hashish", "Other", "Amphetamines", "None of these", "Methamphetamine"],
       "other": "Other",
       "none": "None of these"
     }
@@ -57,7 +57,11 @@
       },
       "alarmBellDuration": 5000,
       "repeatCategories": 1,
-      "minimumPriceThreshold": 100
+      "minimumPriceThreshold": 100,
+
+      "mappingCategoryToSelectableDrug": {
+        "Alcohol": ["Alcopops", "Beer", "Brandy", "Champagne", "Cider", "Cocktails", "Gin", "Prosecco", "Red Wine", "Rum", "Vodka", "Whiskey", "White Wine"]
+      }
     },
 
     "randomization": {

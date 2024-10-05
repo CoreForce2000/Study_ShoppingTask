@@ -70,11 +70,13 @@ export function generateTrialsArray(
     numTrials
   );
 
-  return lightColor.map((value, index) => ({
+  const shuffledArray = lightColor.map((value, index) => ({
     color: value,
     spacePressedCorrect: spacePressedCorrect[index],
     noSpacePressedCorrect: noSpacePressedCorrect[index],
   }));
+
+  return shuffledArray;
 }
 
 export function shuffleArray(array: any): any[] {

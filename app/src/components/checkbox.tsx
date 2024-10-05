@@ -18,6 +18,19 @@ export interface CheckboxOption {
   checked: boolean;
 }
 
+/**
+ * A custom checkbox component that allows for single or multiple selections
+ * @param initialOptions - The initial options to display
+ * @param exclusiveOptions - Options that can only be selected exclusively (must be contained in initialOptions)
+ * @param allowMultiple - Whether multiple options can be selected
+ * @param columnLayout - The layout of the checkboxes
+ * @param onChange - The function to call when the selection changes
+ * @param allowedOption - The option that is allowed to be selected
+ * @param gap - The gap between the checkboxes
+ * @param disableOnClick - Whether to disable the checkboxes after clicking
+ * @param hideLabel - Whether to hide the label of the checkboxes
+ * @returns The custom checkbox component
+ */
 const Checkbox: React.FC<CheckboxProps> = ({
   initialOptions,
   exclusiveOptions = [],
@@ -25,12 +38,12 @@ const Checkbox: React.FC<CheckboxProps> = ({
   columnLayout = "single",
   onChange,
   allowedOption,
-  gap = "0.3em",
+  gap = "0.5em",
   disableOnClick = false,
   hideLabel = false,
 }) => {
   const [options, setOptions] = useState<CheckboxOption[]>(
-    [...initialOptions, ...exclusiveOptions].map((label) => ({
+    initialOptions.map((label) => ({
       label,
       checked: false,
     }))

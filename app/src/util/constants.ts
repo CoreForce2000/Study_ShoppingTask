@@ -21,6 +21,7 @@ export const LUCKY_CUSTOMER_SOUND = new Audio(
 export const CONSTANT_PRESSING_SOUND = new Audio(
   `${SOUND_PATH}constantpressing.mp3`
 );
+export const ADD_TROLLEY_SOUND = new Audio(`${SOUND_PATH}Add to trolley.mp3`);
 
 export const KEY_SPACE = " ";
 
