@@ -24,11 +24,10 @@
     { "slidePath": "instructionsPhase2/slide10.jpg" },
     { "slidePath": "instructionsPhase2/slide11.jpg" },
     { "slidePath": "instructionsPhase2/slide12.jpg" },
-    { "slidePath": "instructionsPhase1/slide13.jpg" },
+    { "slidePath": "instructionsPhase2/slide13.jpg" },
     { "slidePath": "instructionsPhase2/slide14.jpg" },
     { "slidePath": "instructionsPhase2/slide15.jpg" },
     { "slidePath": "instructionsPhase2/slide16.jpg" },
-    { "slidePath": "instructionsPhase2/slide17.jpg" },
     { "slidePath": "instructionsPhase2/slide17.jpg", "setPhase": "CoDe", "setPhaseNumber": 2, "setBlock": "p(0|-A)=0", "setBlockNumber": 1 },
     { "type": "contingency", "probabilityOutcomeNoAction": 0 },
     {
@@ -77,6 +76,7 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
+    { "slidePath": "phase2/slide4.jpg" },
     { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 6, "probabilityOutcomeNoAction": 0 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -86,6 +86,7 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
+    { "slidePath": "phase2/slide4.jpg" },
     { "type": "contingency", "setBlock": "p(0|-A)=0.3", "setBlockNumber": 7, "probabilityOutcomeNoAction": 0.3 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -105,11 +106,10 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
-    { "slidePath": "phase2/slide4.jpg" },
 
     { "slidePath": "instructionsPhase3/slide1.jpg", "type": "VAS", "variableName": "VAS_claim_satisfaction", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
     { "slidePath": "instructionsPhase3/slide2.jpg", "type": "VAS", "variableName": "VAS_claim_satisfaction2", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
-    { "slidePath": "instructionsPhase3/slide3.jpg" },
+    { "slidePath": "instructionsPhase3/slide3.jpg", "type": "bidSummarySlide" },
     { "slidePath": "instructionsPhase3/slide4.jpg" },
     { "slidePath": "instructionsPhase3/slide5.jpg", "type": "quiz" },
     { "type": "onlineShopControl" },

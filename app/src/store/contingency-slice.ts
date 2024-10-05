@@ -27,6 +27,10 @@ export interface ContingencySlice {
   setOutcomeImage: (image: string) => void;
   showImage: boolean;
   setShowImage: (showImage: boolean) => void;
+  bidsSelf: number;
+  incrementBidsSelf: () => void;
+  bidsOther: number;
+  incrementBidsOther: () => void;
 }
 
 const createContingencySlice: StateCreator<
@@ -109,6 +113,11 @@ const createContingencySlice: StateCreator<
 
       return { trialPhase: nextTrialPhase };
     }),
+  bidsSelf: 0,
+  incrementBidsSelf: () => set((state) => ({ bidsSelf: state.bidsSelf + 1 })),
+  bidsOther: 0,
+  incrementBidsOther: () =>
+    set((state) => ({ bidsOther: state.bidsOther + 1 })),
 });
 
 export default createContingencySlice;

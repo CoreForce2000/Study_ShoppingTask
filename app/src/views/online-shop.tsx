@@ -247,7 +247,13 @@ const OnlineShop: React.FC<{}> = () => {
         style={{ borderBottom: `7px solid ${config.colors.lineColor}` }}
       >
         <EvenlySpacedRow
-          firstChild={<div>Budget : £{store.budget}</div>}
+          firstChild={
+            store.budget < 0 ? (
+              <div>Budget : unlimited</div>
+            ) : (
+              <div>Budget : £{store.budget}</div>
+            )
+          }
           secondChild={<Timer />}
           lastChild={
             <Button

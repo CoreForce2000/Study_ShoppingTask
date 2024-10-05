@@ -105,28 +105,6 @@ const DataEntry: React.FC = () => {
     (category) => !storeCategories.includes(category)
   );
 
-  document.addEventListener("keydown", (event) => {
-    if ((event.ctrlKey || event.metaKey) && event.key === "d") {
-      event.preventDefault();
-      store.activateDevMode();
-      fillAndSubmitForm();
-    }
-  });
-
-  const fillAndSubmitForm = () => {
-    store.setSurveyResponse("participantId", "1234");
-    store.setSurveyResponse("gender", "male");
-    store.setSurveyResponse("group", "Control");
-    store.setSurveyResponse("age", "18");
-    store.setSurveyResponse("handedness", "right");
-    store.setSurveyResponse("time", "1 min");
-
-    setParticipantIdError("");
-    setAgeError("");
-
-    navigate("/slide/1");
-  };
-
   const handleChange = (
     e: ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ): void => {

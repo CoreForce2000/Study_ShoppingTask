@@ -181,7 +181,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
       }
 
       let newBudget = state.budget - price;
-      if (state.budget < price) {
+      if (state.budget < price && !(state.budget < 0)) {
         // sum of trolley items plus budget is above initial budget value
         if (
           sumArray(state.trolley.map((item) => item.price)) + state.budget ===
@@ -189,8 +189,8 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
         ) {
           LUCKY_CUSTOMER_SOUND.play();
           state.setTrialIndex(3);
+          newBudget = newBudget - 1001;
         }
-        newBudget = config.shop.general.initialBudget + state.budget - price;
       }
 
       return {

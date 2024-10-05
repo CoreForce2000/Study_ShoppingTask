@@ -4,6 +4,10 @@
     "fileName": "data"
   },
 
+  "dev": {
+    "slidesOnly": false
+  },
+
   "general": {
     "phase": {
       "1": "Shopping",

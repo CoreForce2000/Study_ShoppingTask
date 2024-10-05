@@ -86,15 +86,27 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   const keyPressHandlerRef = useRef<((event: KeyboardEvent) => void) | null>(
     null
   );
+  const navKeyPressHandlerRef = useRef<((event: KeyboardEvent) => void) | null>(
+    null
+  );
+  const nastyKeyPressHandlerRef = useRef<
+    ((event: KeyboardEvent) => void) | null
+  >(null);
+  const nastyKeyLiftHandlerRef = useRef<
+    ((event: KeyboardEvent) => void) | null
+  >(null);
 
   const clearListeners = () => {
     if (timeoutIdRef.current) clearTimeout(timeoutIdRef.current);
     if (keyPressHandlerRef.current)
       window.removeEventListener("keydown", keyPressHandlerRef.current);
+    if (navKeyPressHandlerRef.current)
+      window.removeEventListener("keydown", navKeyPressHandlerRef.current);
   };
 
   const changeSlideIndex = (newSlideNumber: number) => {
     clearListeners();
+    console.log("Navigating to slide", `/slide/${newSlideNumber}/1`);
     navigate(`/slide/${newSlideNumber}/1`);
   };
 
@@ -127,39 +139,40 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   const initNastySound = () => {
     let spaceHeldTimeout: NodeJS.Timeout | undefined;
 
-    const handleKeyDown = (event: KeyboardEvent) => {
+    if (nastyKeyPressHandlerRef.current || nastyKeyLiftHandlerRef.current)
+      return;
+    console.log("Init nasty sound");
+
+    nastyKeyPressHandlerRef.current = (event: KeyboardEvent) => {
       if (event.key === KEY_SPACE && spaceHeldTimeout === undefined) {
         setTimeout(() => {
           setInitialPress(false);
         }, 0);
 
-        spaceHeldTimeout = setTimeout(() => {
-          console.log("Nasty sound");
-          // CONSTANT_PRESSING_SOUND.play();
-        }, 3000);
+        if (!spaceHeldTimeout) {
+          spaceHeldTimeout = setTimeout(() => {
+            console.log("Nasty sound");
+            CONSTANT_PRESSING_SOUND.play();
+          }, 3000);
+        }
       }
     };
 
-    const handleKeyUp = (event: KeyboardEvent) => {
+    nastyKeyLiftHandlerRef.current = (event: KeyboardEvent) => {
       if (event.key === KEY_SPACE) {
         setTimeout(() => {
-          spaceHeldTimeout = undefined;
           setInitialPress(true);
-
           console.log("Key up");
           clearTimeout(spaceHeldTimeout);
+          spaceHeldTimeout = undefined;
+
           CONSTANT_PRESSING_SOUND.pause();
         }, 0);
       }
     };
 
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("keyup", handleKeyUp);
-    };
+    window.addEventListener("keydown", nastyKeyPressHandlerRef.current);
+    window.addEventListener("keyup", nastyKeyLiftHandlerRef.current);
   };
 
   const waitKeyPress = (key?: string, customFunction?: () => void) => {
@@ -263,8 +276,6 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
         store.setShowImage(positiveOutcome);
 
-        console.log(store.reactionTime);
-
         store.logExperimentAction({
           cue: trialInfo.color,
           stimuli_type: isSelfItem ? "self" : "other",
@@ -274,6 +285,16 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           category: item?.category ?? "none",
           RT: store.reactionTime,
         });
+
+        if (positiveOutcome) {
+          if (isSelfItem) {
+            store.incrementBidsSelf();
+            console.log("BidsSelf", store.bidsSelf);
+          } else {
+            store.incrementBidsOther();
+            console.log("BidsOther", store.bidsOther);
+          }
+        }
 
         return positiveOutcome
           ? {
@@ -417,7 +438,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     return {
       slide: slidePath,
       children: (
-        <div className="pt-[3.6em] pl-[0.5em]">
+        <div className="pt-[3.6em] pl-[0.6em]">
           <Checkbox
             key={`${slidePath.slice(-3, -1)}_${index}`}
             initialOptions={["blue", "orange"]}
@@ -427,7 +448,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               store.logAction({ [variableName]: value });
               waitTimeout(1000);
             }}
-            gap={"3.3em"}
+            gap={"2.1em"}
             disableOnClick={true}
             hideLabel={true}
           />
@@ -452,13 +473,37 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       //button "Continuge Shopping" with same style as next, and navigates to same slide but trial /1
       children: (
         <Button
-          className="absolute cursor-pointer p-0 bottom-[1em] text-base"
+          className="absolute cursor-pointer p-0 bottom-[2em] text-base"
           onClick={() => store.setTrialIndex(1)}
         >
           Continue Shopping
         </Button>
       ),
       execute: () => setButtonVisible(false),
+    };
+  };
+
+  const bidSummarySlide = (slidePath: string) => {
+    const outcome = Math.floor(Math.random() * 50) + 50;
+
+    return {
+      slide: slidePath,
+      children: (
+        <div className="w-full h-full">
+          {/* the text field has a fixed width of three digets, and the number is always centered */}
+          <div className="absolute top-0 left-0 mt-[12.6em] ml-[14.4em] text-[0.7em] w-[2em] text-center">
+            {store.bidsSelf}
+          </div>
+          <div className="absolute top-0 left-0 mt-[13.95em] ml-[5.5em] text-[0.7em] w-[2em] text-center">
+            {store.bidsOther}
+          </div>
+          {/* Font Color with #03007e */}
+          <div className="absolute top-0 left-0 mt-[16.3em] ml-[22.3em] text-[0.7em] w-[2em] text-center text-[#03007e]">
+            {outcome}
+          </div>
+        </div>
+      ),
+      execute: () => setButtonVisible(true),
     };
   };
 
@@ -488,6 +533,21 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const renderSlide: () => Slide = () => {
+    navKeyPressHandlerRef.current = (event: KeyboardEvent) => {
+      if (event.key === "b") {
+        console.log("b Pressed");
+        event.preventDefault();
+        decrementSlideIndex();
+      }
+      if (event.key === "d") {
+        console.log("d Pressed");
+        event.preventDefault();
+        incrementSlideIndex();
+      }
+    };
+
+    window.addEventListener("keydown", navKeyPressHandlerRef.current);
+
     if (!store.slideNumber) return { slide: "white.jpg" };
     const currentSlideJson =
       typeof task[store.slideNumber - 1] === "string"
@@ -559,72 +619,83 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     }
 
     if (isCustomSlide) {
-      switch (currentSlideJson.type) {
-        case "VAS":
-          return vas(
-            slidePath,
-            currentSlideJson.variableName!,
-            currentSlideJson.minLabel!,
-            currentSlideJson.maxLabel!
-          );
-        case "checkboxShopping":
-          return checkboxShopping(slidePath);
-        case "checkboxDrugs":
-          return checkboxDrugs(slidePath);
-        case "checkboxBulb":
-          return checkboxBulb(
-            slidePath,
-            store.slideNumber,
-            currentSlideJson.variableName!
-          );
-        case "drugCravingPre":
-          return drugCravingSlide("pre");
-        case "drugCravingPost":
-          return drugCravingSlide("post");
-        case "contingency":
-          initNastySound();
-          return contingencySlide();
-        case "quiz":
-          return quizSlide();
-        case "onlineShop":
-          if (store.trialNumber === 2) {
-            return interSlideTime("phase1_and_3/slide1.jpg");
-          }
-          if (store.trialNumber === 3) {
-            return interSlideBudget("phase1_and_3/slide2.jpg");
-          }
-          return {
-            slide: "white.jpg",
-            children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(quickNext ? true : false),
-          };
-        case "onlineShopControl":
-          store.resetTrolley();
-          store.switchToPhase3();
-          store.setTime(config.shop.general.time.phase3);
-          if (store.trialNumber === 2) {
-            return interSlideTime("phase1_and_3/slide1.jpg");
-          }
-          if (store.trialNumber === 3) {
-            return interSlideBudget("phase1_and_3/slide2.jpg");
-          }
-          return {
-            slide: "white.jpg",
-            children: <OnlineShop></OnlineShop>,
-            execute: () => setButtonVisible(quickNext ? true : false),
-          };
-        case "exportData":
-          exportCsv(store, currentSlideJson.variableName!);
-          store.generateSelfOtherSequence();
-          incrementSlideIndex();
-          return { slide: "white.jpg" };
-        case "set":
-          incrementSlideIndex();
-          return { slide: "white.jpg" };
-        default:
-          console.error("Unknown slide type", currentSlideJson.type);
-          setButtonVisible(false);
-          return { slide: slidePath };
+      if (
+        ["onlineShop", "onlineShopControl", "contingency"].includes(
+          currentSlideJson.type ?? ""
+        ) &&
+        config.dev.slidesOnly
+      ) {
+        return { execute: () => incrementSlideIndex() };
+      } else {
+        switch (currentSlideJson.type) {
+          case "VAS":
+            return vas(
+              slidePath,
+              currentSlideJson.variableName!,
+              currentSlideJson.minLabel!,
+              currentSlideJson.maxLabel!
+            );
+          case "checkboxShopping":
+            return checkboxShopping(slidePath);
+          case "checkboxDrugs":
+            return checkboxDrugs(slidePath);
+          case "checkboxBulb":
+            return checkboxBulb(
+              slidePath,
+              store.slideNumber,
+              currentSlideJson.variableName!
+            );
+          case "bidSummarySlide":
+            return bidSummarySlide(slidePath);
+          case "drugCravingPre":
+            return drugCravingSlide("pre");
+          case "drugCravingPost":
+            return drugCravingSlide("post");
+          case "contingency":
+            initNastySound();
+            return contingencySlide();
+          case "quiz":
+            return quizSlide();
+          case "onlineShop":
+            if (store.trialNumber === 2) {
+              return interSlideTime("phase1_and_3/slide1.jpg");
+            }
+            if (store.trialNumber === 3) {
+              return interSlideBudget("phase1_and_3/slide2.jpg");
+            }
+            return {
+              slide: "white.jpg",
+              children: <OnlineShop></OnlineShop>,
+              execute: () => setButtonVisible(quickNext ? true : false),
+            };
+          case "onlineShopControl":
+            store.resetTrolley();
+            store.switchToPhase3();
+            store.setTime(config.shop.general.time.phase3);
+            if (store.trialNumber === 2) {
+              return interSlideTime("phase1_and_3/slide1.jpg");
+            }
+            if (store.trialNumber === 3) {
+              return interSlideBudget("phase1_and_3/slide2.jpg");
+            }
+            return {
+              slide: "white.jpg",
+              children: <OnlineShop></OnlineShop>,
+              execute: () => setButtonVisible(quickNext ? true : false),
+            };
+          case "exportData":
+            exportCsv(store, currentSlideJson.variableName!);
+            store.generateSelfOtherSequence();
+            incrementSlideIndex();
+            return { slide: "white.jpg" };
+          case "set":
+            incrementSlideIndex();
+            return { slide: "white.jpg" };
+          default:
+            console.error("Unknown slide type", currentSlideJson.type);
+            setButtonVisible(false);
+            return { slide: slidePath };
+        }
       }
     } else {
       return {
@@ -649,24 +720,6 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   // listener for moving forward and backward one slide, using ctrl+b for back and ctrl+f for forward
   useEffect(() => {
     store.initializeStoreNavigate(navigate);
-
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.ctrlKey) {
-        if (event.key === "b") {
-          event.preventDefault();
-          decrementSlideIndex();
-        } else if (event.key === "d") {
-          event.preventDefault();
-          incrementSlideIndex();
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyPress);
-    };
   }, []);
 
   return (

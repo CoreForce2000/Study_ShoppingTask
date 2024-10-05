@@ -49,7 +49,7 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
       age: "",
       // group: "Select group",
       group: "Control",
-      time: config.version.split("-")[1],
+      time: "15",
       participantId: "",
       handedness: "",
       onlineShoppingFrequency: "",

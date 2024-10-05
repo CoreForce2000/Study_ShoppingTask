@@ -1,92 +1,103 @@
 import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { preloadImage } from "./util/functions";
 import DataEntry from "./views/data-entry";
 import ImageViewer from "./views/image-viewer";
 import SlideShow from "./views/slide";
 
-import Slide29 from "./assets/slides/end/slide1.jpg";
-import Slide30 from "./assets/slides/end/slide2.jpg";
-import Slide1 from "./assets/slides/instructionsPhase1/slide1.jpg";
-import Slide2 from "./assets/slides/instructionsPhase1/slide2.jpg";
-import Slide3 from "./assets/slides/instructionsPhase1/slide3.jpg";
-import Slide4 from "./assets/slides/instructionsPhase1/slide4.jpg";
-import Slide5_1 from "./assets/slides/instructionsPhase1/slide5_10.jpg";
-import Slide5_2 from "./assets/slides/instructionsPhase1/slide5_15.jpg";
-import Slide6 from "./assets/slides/instructionsPhase1/slide6.jpg";
-import Slide7_1 from "./assets/slides/instructionsPhase1/slide7_10.jpg";
-import Slide7_2 from "./assets/slides/instructionsPhase1/slide7_15.jpg";
-import Slide9 from "./assets/slides/instructionsPhase2/slide1.jpg";
-import Slide18 from "./assets/slides/instructionsPhase2/slide10.jpg";
-import Slide19 from "./assets/slides/instructionsPhase2/slide11.jpg";
-import Slide20 from "./assets/slides/instructionsPhase2/slide12.jpg";
-import Slide21 from "./assets/slides/instructionsPhase2/slide13.jpg";
-import Slide10 from "./assets/slides/instructionsPhase2/slide2.jpg";
-import Slide11 from "./assets/slides/instructionsPhase2/slide3.jpg";
-import Slide12 from "./assets/slides/instructionsPhase2/slide4.jpg";
-import Slide13 from "./assets/slides/instructionsPhase2/slide5.jpg";
-import Slide14 from "./assets/slides/instructionsPhase2/slide6.jpg";
-import Slide15 from "./assets/slides/instructionsPhase2/slide7.jpg";
-import Slide16 from "./assets/slides/instructionsPhase2/slide8.jpg";
-import Slide17 from "./assets/slides/instructionsPhase2/slide9.jpg";
-import Slide26 from "./assets/slides/instructionsPhase3/slide1.jpg";
-import Slide27 from "./assets/slides/instructionsPhase3/slide2.jpg";
-import Slide28 from "./assets/slides/instructionsPhase3/slide3.jpg";
-import Slide31 from "./assets/slides/phase1_and_3/slide1.jpg";
-import Slide32 from "./assets/slides/phase1_and_3/slide2.jpg";
-import Slide22 from "./assets/slides/phase2/slide1.jpg";
-import Slide23 from "./assets/slides/phase2/slide2.jpg";
-import Slide24 from "./assets/slides/phase2/slide3.jpg";
-import Slide25 from "./assets/slides/phase2/slide4.jpg";
-import Slide221 from "./assets/slides/phase2/trial/slide1.jpg";
-import Slide232 from "./assets/slides/phase2/trial/slide2.jpg";
-import Slide243 from "./assets/slides/phase2/trial/slide3.jpg";
-import Slide254 from "./assets/slides/phase2/trial/slide4.jpg";
-
-import VasSlide from "./assets/slides/vasslide.jpg";
+import End_slide1 from "./assets/slides/end/slide1.jpg";
+import End_slide2 from "./assets/slides/end/slide2.jpg";
+import Instructionsphase1_slide1 from "./assets/slides/instructionsPhase1/slide1.jpg";
+import Instructionsphase1_slide2 from "./assets/slides/instructionsPhase1/slide2.jpg";
+import Instructionsphase1_slide3 from "./assets/slides/instructionsPhase1/slide3.jpg";
+import Instructionsphase1_slide4 from "./assets/slides/instructionsPhase1/slide4.jpg";
+import Instructionsphase1_slide5 from "./assets/slides/instructionsPhase1/slide5.jpg";
+import Instructionsphase1_slide6 from "./assets/slides/instructionsPhase1/slide6.jpg";
+import Instructionsphase1_slide7 from "./assets/slides/instructionsPhase1/slide7.jpg";
+import Instructionsphase2_slide1 from "./assets/slides/instructionsPhase2/slide1.jpg";
+import Instructionsphase2_slide10 from "./assets/slides/instructionsPhase2/slide10.jpg";
+import Instructionsphase2_slide11 from "./assets/slides/instructionsPhase2/slide11.jpg";
+import Instructionsphase2_slide12 from "./assets/slides/instructionsPhase2/slide12.jpg";
+import Instructionsphase2_slide13 from "./assets/slides/instructionsPhase2/slide13.jpg";
+import Instructionsphase2_slide14 from "./assets/slides/instructionsPhase2/slide14.jpg";
+import Instructionsphase2_slide15 from "./assets/slides/instructionsPhase2/slide15.jpg";
+import Instructionsphase2_slide16 from "./assets/slides/instructionsPhase2/slide16.jpg";
+import Instructionsphase2_slide17 from "./assets/slides/instructionsPhase2/slide17.jpg";
+import Instructionsphase2_slide2_craving from "./assets/slides/instructionsPhase2/slide2_craving.jpg";
+import Instructionsphase2_slide2_nocraving from "./assets/slides/instructionsPhase2/slide2_nocraving.jpg";
+import Instructionsphase2_slide3 from "./assets/slides/instructionsPhase2/slide3.jpg";
+import Instructionsphase2_slide4 from "./assets/slides/instructionsPhase2/slide4.jpg";
+import Instructionsphase2_slide5 from "./assets/slides/instructionsPhase2/slide5.jpg";
+import Instructionsphase2_slide6 from "./assets/slides/instructionsPhase2/slide6.jpg";
+import Instructionsphase2_slide7 from "./assets/slides/instructionsPhase2/slide7.jpg";
+import Instructionsphase2_slide8 from "./assets/slides/instructionsPhase2/slide8.jpg";
+import Instructionsphase2_slide9 from "./assets/slides/instructionsPhase2/slide9.jpg";
+import Instructionsphase3_slide1 from "./assets/slides/instructionsPhase3/slide1.jpg";
+import Instructionsphase3_slide2 from "./assets/slides/instructionsPhase3/slide2.jpg";
+import Instructionsphase3_slide3 from "./assets/slides/instructionsPhase3/slide3.jpg";
+import Instructionsphase3_slide4 from "./assets/slides/instructionsPhase3/slide4.jpg";
+import Instructionsphase3_slide5 from "./assets/slides/instructionsPhase3/slide5.jpg";
+import Phase1_and_3_slide1 from "./assets/slides/phase1_and_3/slide1.jpg";
+import Phase1_and_3_slide2 from "./assets/slides/phase1_and_3/slide2.jpg";
+import Phase2_slide1 from "./assets/slides/phase2/slide1.jpg";
+import Phase2_slide2 from "./assets/slides/phase2/slide2.jpg";
+import Phase2_slide3 from "./assets/slides/phase2/slide3.jpg";
+import Phase2_slide4 from "./assets/slides/phase2/slide4.jpg";
+import Phase2_trial_slide1 from "./assets/slides/phase2/trial/slide1.jpg";
+import Phase2_trial_slide2 from "./assets/slides/phase2/trial/slide2.jpg";
+import Phase2_trial_slide3 from "./assets/slides/phase2/trial/slide3.jpg";
+import Phase2_trial_slide4 from "./assets/slides/phase2/trial/slide4.jpg";
+import Phase2_trial_slide5 from "./assets/slides/phase2/trial/slide5.jpg";
+import Vasslide from "./assets/slides/vasslide.jpg";
 import White from "./assets/slides/white.jpg";
-import { preloadImage } from "./util/functions";
 
-// mapping dict that mapps all file paths starting after slides/ to the imported slide
 const slideMapping: Record<string, string> = {
-  "instructionsPhase1/slide1.jpg": Slide1,
-  "instructionsPhase1/slide2.jpg": Slide2,
-  "instructionsPhase1/slide3.jpg": Slide3,
-  "instructionsPhase1/slide4.jpg": Slide4,
-  "instructionsPhase1/slide5_10.jpg": Slide5_1,
-  "instructionsPhase1/slide5_15.jpg": Slide5_2,
-  "instructionsPhase1/slide6.jpg": Slide6,
-  "instructionsPhase1/slide7_10.jpg": Slide7_1,
-  "instructionsPhase1/slide7_15.jpg": Slide7_2,
-  "instructionsPhase2/slide1.jpg": Slide9,
-  "instructionsPhase2/slide2.jpg": Slide10,
-  "instructionsPhase2/slide3.jpg": Slide11,
-  "instructionsPhase2/slide4.jpg": Slide12,
-  "instructionsPhase2/slide5.jpg": Slide13,
-  "instructionsPhase2/slide6.jpg": Slide14,
-  "instructionsPhase2/slide7.jpg": Slide15,
-  "instructionsPhase2/slide8.jpg": Slide16,
-  "instructionsPhase2/slide9.jpg": Slide17,
-  "instructionsPhase2/slide10.jpg": Slide18,
-  "instructionsPhase2/slide11.jpg": Slide19,
-  "instructionsPhase2/slide12.jpg": Slide20,
-  "instructionsPhase2/slide13.jpg": Slide21,
-  "phase2/slide1.jpg": Slide22,
-  "phase2/slide2.jpg": Slide23,
-  "phase2/slide3.jpg": Slide24,
-  "phase2/slide4.jpg": Slide25,
-  "phase2/trial/slide1.jpg": Slide221,
-  "phase2/trial/slide2.jpg": Slide232,
-  "phase2/trial/slide3.jpg": Slide243,
-  "phase2/trial/slide4.jpg": Slide254,
-  "instructionsPhase3/slide1.jpg": Slide26,
-  "instructionsPhase3/slide2.jpg": Slide27,
-  "instructionsPhase3/slide3.jpg": Slide28,
-  "end/slide1.jpg": Slide29,
-  "end/slide2.jpg": Slide30,
+  "vasslide.jpg": Vasslide,
   "white.jpg": White,
-  "vasslide.jpg": VasSlide,
-  "phase1_and_3/slide1.jpg": Slide31,
-  "phase1_and_3/slide2.jpg": Slide32,
+  "end/slide1.jpg": End_slide1,
+  "end/slide2.jpg": End_slide2,
+  "instructionsPhase1/slide1.jpg": Instructionsphase1_slide1,
+  "instructionsPhase1/slide2.jpg": Instructionsphase1_slide2,
+  "instructionsPhase1/slide3.jpg": Instructionsphase1_slide3,
+  "instructionsPhase1/slide4.jpg": Instructionsphase1_slide4,
+  "instructionsPhase1/slide5.jpg": Instructionsphase1_slide5,
+  "instructionsPhase1/slide6.jpg": Instructionsphase1_slide6,
+  "instructionsPhase1/slide7.jpg": Instructionsphase1_slide7,
+  "instructionsPhase2/slide1.jpg": Instructionsphase2_slide1,
+  "instructionsPhase2/slide10.jpg": Instructionsphase2_slide10,
+  "instructionsPhase2/slide11.jpg": Instructionsphase2_slide11,
+  "instructionsPhase2/slide12.jpg": Instructionsphase2_slide12,
+  "instructionsPhase2/slide13.jpg": Instructionsphase2_slide13,
+  "instructionsPhase2/slide14.jpg": Instructionsphase2_slide14,
+  "instructionsPhase2/slide15.jpg": Instructionsphase2_slide15,
+  "instructionsPhase2/slide16.jpg": Instructionsphase2_slide16,
+  "instructionsPhase2/slide17.jpg": Instructionsphase2_slide17,
+  "instructionsPhase2/slide2_craving.jpg": Instructionsphase2_slide2_craving,
+  "instructionsPhase2/slide2_nocraving.jpg":
+    Instructionsphase2_slide2_nocraving,
+  "instructionsPhase2/slide3.jpg": Instructionsphase2_slide3,
+  "instructionsPhase2/slide4.jpg": Instructionsphase2_slide4,
+  "instructionsPhase2/slide5.jpg": Instructionsphase2_slide5,
+  "instructionsPhase2/slide6.jpg": Instructionsphase2_slide6,
+  "instructionsPhase2/slide7.jpg": Instructionsphase2_slide7,
+  "instructionsPhase2/slide8.jpg": Instructionsphase2_slide8,
+  "instructionsPhase2/slide9.jpg": Instructionsphase2_slide9,
+  "instructionsPhase3/slide1.jpg": Instructionsphase3_slide1,
+  "instructionsPhase3/slide2.jpg": Instructionsphase3_slide2,
+  "instructionsPhase3/slide3.jpg": Instructionsphase3_slide3,
+  "instructionsPhase3/slide4.jpg": Instructionsphase3_slide4,
+  "instructionsPhase3/slide5.jpg": Instructionsphase3_slide5,
+  "phase1_and_3/slide1.jpg": Phase1_and_3_slide1,
+  "phase1_and_3/slide2.jpg": Phase1_and_3_slide2,
+  "phase2/slide1.jpg": Phase2_slide1,
+  "phase2/slide2.jpg": Phase2_slide2,
+  "phase2/slide3.jpg": Phase2_slide3,
+  "phase2/slide4.jpg": Phase2_slide4,
+  "phase2/trial/slide1.jpg": Phase2_trial_slide1,
+  "phase2/trial/slide2.jpg": Phase2_trial_slide2,
+  "phase2/trial/slide3.jpg": Phase2_trial_slide3,
+  "phase2/trial/slide4.jpg": Phase2_trial_slide4,
+  "phase2/trial/slide5.jpg": Phase2_trial_slide5,
 };
 
 const App: React.FC = () => {
