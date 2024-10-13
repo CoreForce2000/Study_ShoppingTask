@@ -89,6 +89,7 @@ const createContingencySlice: StateCreator<
           ) &&
           !selfItems.map((x) => x.category).includes(item.category)
       );
+      console.log("otherItems", otherItems);
 
       const sequence = {
         selfItems: extendArray(

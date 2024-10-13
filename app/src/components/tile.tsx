@@ -43,7 +43,7 @@ const Tile: React.FC<TileProps> = ({
   if (text.includes(" ")) {
     newText = text.split(" ").join("\n");
   } else if (text.length > 10) {
-    newText = text.slice(0, 10) + "\n" + text.slice(10);
+    newText = text.slice(0, 12) + "\n" + text.slice(12);
   }
 
   const [displayText, setDisplayText] = useState(newText);

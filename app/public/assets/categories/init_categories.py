@@ -7,6 +7,14 @@ from typing import Tuple
 
 category_path = "./"
 
+# Load the generic and subcategories Excel file
+subcategory_file = "./Generic and subcategories.xlsx"
+subcategory_df = pd.read_excel(subcategory_file)
+
+# Ensure the category names are lowercase for case-insensitive comparison
+subcategory_df["Category"] = subcategory_df["Category"].str.lower()
+
+
 
 def find_item_id(name_column: pd.Series) -> pd.Series:
     return name_column.apply(
@@ -82,6 +90,11 @@ def create_image_dataframe(image_files: list) -> pd.DataFrame:
 def process_category(
     category_name: str, categories_path: str
 ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+    # Check if the category exists in the "Categories" column of the Excel file
+    if category_name.lower() not in subcategory_df["Category"].values:
+        print(f"Category '{category_name}' not found in the 'Categories' column of the Excel file.")
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame()  # Return empty dataframes
+    
     # Define the paths for images and Excel file
     category_path = os.path.join(categories_path, category_name)
     files_in_category = os.listdir(category_path)
@@ -123,15 +136,15 @@ def process_category(
 
     highlight = "Err >>" if len(unmatched_images) > 0 or len(unmatched_excel_rows) > 0 else ""
 
-    # print(category_name, sep="\t")
     global counter
     counter = 1 if "counter" not in globals() else counter
     counter += 1
 
-    if(highlight):
+    if highlight:
         print(f"unmatched images: {len(unmatched_images)} (N={len(image_files)})\tunmatched excel rows: {len(unmatched_excel_rows)} (N={len(df_merged)})\t{category_name}")
-# {highlight}
+
     return df_merged, unmatched_images, unmatched_excel_rows
+
 
 
 def combine_all_categories(categories_path: str) -> pd.DataFrame:
@@ -201,6 +214,25 @@ for category in combined_categories_df["category"].unique():
         }
         data.append(item_data) 
 
+
+# Create the JSON mapping of Category to Generic Category
+category_mapping = [
+    {"name": row["Category"], "genericCategory": row["Generic Category"]}
+    for _, row in subcategory_df.iterrows()
+]
+
+# Write the mapping to a JSON file
+with open('../../../src/assets/configs/category_mapping.json', 'w') as json_file:
+    json.dump(category_mapping, json_file, indent=4)
+
+# Get all Generic Categories where Flagged is 1
+flagged_generic_categories = subcategory_df[subcategory_df["Flagged"] == 1]["Generic Category"].unique().tolist()
+
+print("Flagged Generic Categories:", flagged_generic_categories)
+
+# Write the mapping to a JSON file
+with open('../../../src/assets/configs/flagged_generic_categories.json', 'w') as json_file:
+    json.dump(flagged_generic_categories, json_file, indent=4)
 
 # Write the dictionary to a JSON file
 with open("../../../src/assets/categories/image_data.json", "w") as f:

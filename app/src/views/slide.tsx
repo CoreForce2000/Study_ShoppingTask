@@ -339,9 +339,12 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
         className="text-[0.7em] mt-[6.5em] w-[95%] pl-2.5 grid grid-cols-4 gap-0"
       >
         {config.memoryQuestionConfig.map((person, index) => (
-          <div key={`checkbox-${index}`} className="bg-white w-[80%]">
+          <div
+            key={`checkbox-${index}`}
+            className="bg-white w-[80%] ml-[0.3em]"
+          >
             <Checkbox
-              gap="0.7em"
+              gap="0.9em"
               key={`column${index}`}
               initialOptions={person.options}
               columnLayout="single"
@@ -538,11 +541,11 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       window.removeEventListener("keydown", navKeyPressHandlerRef.current);
     }
     navKeyPressHandlerRef.current = (event: KeyboardEvent) => {
-      if (event.key === "b") {
+      if (event.ctrlKey && event.key === "b") {
         event.preventDefault();
         decrementSlideIndex();
       }
-      if (event.key === "d") {
+      if (event.ctrlKey && event.key === "d") {
         event.preventDefault();
         incrementSlideIndex();
       }
@@ -652,6 +655,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           case "drugCravingPre":
             return drugCravingSlide("pre");
           case "drugCravingPost":
+            store.generateSelfOtherSequence();
             return drugCravingSlide("post");
           case "contingency":
             initNastySound();
@@ -687,7 +691,6 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
             };
           case "exportData":
             exportCsv(store, currentSlideJson.variableName!);
-            store.generateSelfOtherSequence();
             incrementSlideIndex();
             return { slide: "white.jpg" };
           case "set":

@@ -18,7 +18,6 @@
     { "slidePath": "instructionsPhase2/slide6.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation4", "minLabel": "Not at all", "maxLabel": "Very much" },
     { "slidePath": "instructionsPhase2/slide7.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation5", "minLabel": "Not at all", "maxLabel": "Very much" },
     { "slidePath": "vasslide.jpg", "type": "drugCravingPost" },
-    { "type": "exportData", "variableName": "_phase1" },
     { "slidePath": "instructionsPhase2/slide8.jpg" },
     { "slidePath": "instructionsPhase2/slide9.jpg" },
     { "slidePath": "instructionsPhase2/slide10.jpg" },
@@ -114,9 +113,8 @@
     { "slidePath": "instructionsPhase3/slide5.jpg", "type": "quiz" },
     { "type": "onlineShopControl" },
 
-    { "type": "exportData", "variableName": "_final" },
-
     { "slidePath": "end/slide1.jpg", "delay": 10000, "playSound": "Final.mp3" },
+    { "type": "exportData", "variableName": "_final" },
     { "slidePath": "end/slide2.jpg", "delay": 99999999 }
   ]
 }

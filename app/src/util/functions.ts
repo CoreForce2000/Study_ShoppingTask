@@ -1,4 +1,5 @@
 import imageData from "../assets/categories/image_data.json";
+import genericCategoryMapping from "../assets/configs/category_mapping.json";
 import config from "../assets/configs/config.json";
 import { TaskStore } from "../store/store";
 import { IMAGE_BASE_PATH } from "./constants";
@@ -18,8 +19,9 @@ export const preloadImage = (path: string) => {
 };
 
 export const getGenericCategory = (category: string) => {
-  const genericCategory = config.shop.genericCategoryMapping.find(
-    (mappedCategory) => mappedCategory.name === category
+  const genericCategory = genericCategoryMapping.find(
+    (mappedCategory) =>
+      mappedCategory.name.toLowerCase() === category.toLowerCase()
   )?.genericCategory;
   if (!genericCategory) {
     throw new Error(`No generic category found for ${category}`);

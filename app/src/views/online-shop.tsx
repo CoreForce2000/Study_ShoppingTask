@@ -134,7 +134,7 @@ const ItemPage: React.FC<{ hidden: boolean }> = ({ hidden = false }) => {
         )}
       >
         <img
-          className="h-[6.5em] object-cover pb-2"
+          className="h-[6.5em] object-fit pb-2"
           src={`${getImagePath(
             store.currentItem.item.category,
             store.currentItem.item.image_name

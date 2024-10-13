@@ -1,0 +1,802 @@
+[
+    {
+        "name": "alcopops",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "beer",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "brandy",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "champagne",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "cider",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "cocktails",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "fine wines",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "gin",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "prosecco",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "red wine",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "rum",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "vodka",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "whiskey",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "white wine",
+        "genericCategory": "Alcohol"
+    },
+    {
+        "name": "wine racks",
+        "genericCategory": "Alcohol-related"
+    },
+    {
+        "name": "bottle opener",
+        "genericCategory": "Alcohol-related"
+    },
+    {
+        "name": "cocktail books",
+        "genericCategory": "Alcohol-related"
+    },
+    {
+        "name": "beer books",
+        "genericCategory": "Alcohol-related"
+    },
+    {
+        "name": "wine books",
+        "genericCategory": "Alcohol-related"
+    },
+    {
+        "name": "ashtrays",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "cannabis books",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "cannabis products",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "cannabis edibles",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "lighters",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "pipes",
+        "genericCategory": "Drug-related"
+    },
+    {
+        "name": "amphetamines",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "rolling tobacco",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "cigarettes",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "cigars",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "cocaine",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "crack",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "ecstasy",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "hashish",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "heroin",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "hookah",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "marijuana",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "meth",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "vaping",
+        "genericCategory": "Drugs"
+    },
+    {
+        "name": "swatch watches",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "apple accessories",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "fitness tracker",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "computing accessories",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "navigators",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "webcams",
+        "genericCategory": "Electronics"
+    },
+    {
+        "name": "computer gaming",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "gaming",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "gaming accessories",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "gaming controllers",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "gaming headsets",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "gaming merchandise",
+        "genericCategory": "Gaming"
+    },
+    {
+        "name": "adult toys",
+        "genericCategory": "Sex"
+    },
+    {
+        "name": "erotic calendars female",
+        "genericCategory": "Sex"
+    },
+    {
+        "name": "erotic calendars male",
+        "genericCategory": "Sex"
+    },
+    {
+        "name": "female erotica",
+        "genericCategory": "Sex"
+    },
+    {
+        "name": "male erotica",
+        "genericCategory": "Sex"
+    },
+    {
+        "name": "shavers",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "tooth brushes",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "trimmers",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "electric fans",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "electric heaters",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "hair dryers",
+        "genericCategory": "Appliances"
+    },
+    {
+        "name": "earbud cases",
+        "genericCategory": "Audio Devices"
+    },
+    {
+        "name": "airpods & earbuds",
+        "genericCategory": "Audio Devices"
+    },
+    {
+        "name": "headphones",
+        "genericCategory": "Audio Devices"
+    },
+    {
+        "name": "phone cases",
+        "genericCategory": "Audio Devices"
+    },
+    {
+        "name": "speakers",
+        "genericCategory": "Audio Devices"
+    },
+    {
+        "name": "aftershaves",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "cufflinks",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "hair accessories",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "jewellery men",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "jewellery women",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "make up",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "perfumes",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "skincare",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "sunglasses men",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "sunglasses women",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "trendy jewellery",
+        "genericCategory": "Beauty"
+    },
+    {
+        "name": "art books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "baking books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "biography books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "chess books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "cook books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "fiction books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "manga books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "music books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "non-fiction books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "travel books",
+        "genericCategory": "Books"
+    },
+    {
+        "name": "chocolates",
+        "genericCategory": "Gifts"
+    },
+    {
+        "name": "flowers",
+        "genericCategory": "Gifts"
+    },
+    {
+        "name": "gift sets men",
+        "genericCategory": "Gifts"
+    },
+    {
+        "name": "gift sets women",
+        "genericCategory": "Gifts"
+    },
+    {
+        "name": "gifts for him",
+        "genericCategory": "Gifts"
+    },
+    {
+        "name": "art",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "arts & crafts",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "baking",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "binoculars",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "camping equipment",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "chess",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "coins",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "figurines",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "harley davidson",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "knitting",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "miniature cars",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "model trains",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "stamps",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "trading cards",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "vinyl",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "football merchandise",
+        "genericCategory": "Hobby"
+    },
+    {
+        "name": "alarm clocks",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "candles",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "clocks",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "garden",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "home decor",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "party decorations",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "plants",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "table lamps",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "vases",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "bath accessories",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "cushions",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "blankets",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "towels",
+        "genericCategory": "Home Decor"
+    },
+    {
+        "name": "coffee machines",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "kettles",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "kitchen aids",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "knife sets",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "saucepan sets",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "toasters",
+        "genericCategory": "Kitchenware "
+    },
+    {
+        "name": "cleaning",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "laundry",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "baskets",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "storage",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "tins & jars",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "lunch boxes adults",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "lunch boxes kids",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "food containers",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "packaging & wrapping",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "organisers",
+        "genericCategory": "Laundry&Cleaning&Storage"
+    },
+    {
+        "name": "bags men",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "handbags",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "rucksacks",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "sport bags",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "travel bags",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "wallets men",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "wallets women",
+        "genericCategory": "Luggage&Bags&Wallets"
+    },
+    {
+        "name": "lgbtq+ merchandise",
+        "genericCategory": "Misangelous"
+    },
+    {
+        "name": "baby accessories",
+        "genericCategory": "Misangelous"
+    },
+    {
+        "name": "bathrobes",
+        "genericCategory": "Misangelous"
+    },
+    {
+        "name": "travel accessories",
+        "genericCategory": "Misangelous"
+    },
+    {
+        "name": "umbrellas",
+        "genericCategory": "Misangelous"
+    },
+    {
+        "name": "cat accessories",
+        "genericCategory": "Animals"
+    },
+    {
+        "name": "dog accessories",
+        "genericCategory": "Animals"
+    },
+    {
+        "name": "pet accessories",
+        "genericCategory": "Animals"
+    },
+    {
+        "name": "bird houses",
+        "genericCategory": "Animals"
+    },
+    {
+        "name": "religion",
+        "genericCategory": "Spiritual"
+    },
+    {
+        "name": "spiritual accessories",
+        "genericCategory": "Spiritual"
+    },
+    {
+        "name": "rugby",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "running",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "badminton",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "boxing",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "climbing",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "cricket",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "fitness",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "football",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "golf",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "swimming",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "tennis",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "fishing",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "skateboards",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "yoga",
+        "genericCategory": "Sport"
+    },
+    {
+        "name": "greeting cards",
+        "genericCategory": "Stationary"
+    },
+    {
+        "name": "luxury stationery",
+        "genericCategory": "Stationary"
+    },
+    {
+        "name": "office supplies",
+        "genericCategory": "Stationary"
+    },
+    {
+        "name": "stationery sets",
+        "genericCategory": "Stationary"
+    },
+    {
+        "name": "coffee pots",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "dinner sets",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "glassware",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "mugs",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "teapots",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "travel mugs",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "water bottles",
+        "genericCategory": "Tableware"
+    },
+    {
+        "name": "bike accessories",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "assistive devices",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "bbq",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "car accessories",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "diy",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "gardening accessories",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "victorinox",
+        "genericCategory": "Tools"
+    },
+    {
+        "name": "barbie",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "board games",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "cuddly toys",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "gambling accessories",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "lego adult",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "lego kids",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "playmobil",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "puzzles",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "toys boys",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "toys girls",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "outdoor games kids",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "outdoor games adults",
+        "genericCategory": "Toys&Games"
+    },
+    {
+        "name": "video games",
+        "genericCategory": "Toys&Games"
+    }
+]
