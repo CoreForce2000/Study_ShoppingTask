@@ -1,0 +1,59 @@
+{
+  "hash": "155d0d35",
+  "browserHash": "d5b3b09b",
+  "optimized": {
+    "classnames": {
+      "src": "../../node_modules/classnames/index.js",
+      "file": "classnames.js",
+      "fileHash": "c0cadd58",
+      "needsInterop": true
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "123abd66",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "38c2fbdb",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "d7c3d222",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.js",
+      "file": "react-router-dom.js",
+      "fileHash": "c1aa5f22",
+      "needsInterop": false
+    },
+    "react-use-precision-timer": {
+      "src": "../../node_modules/react-use-precision-timer/dist/index.js",
+      "file": "react-use-precision-timer.js",
+      "fileHash": "cc2c5232",
+      "needsInterop": true
+    },
+    "zustand": {
+      "src": "../../node_modules/zustand/esm/index.mjs",
+      "file": "zustand.js",
+      "fileHash": "22f32d12",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-U56BQHLO": {
+      "file": "chunk-U56BQHLO.js"
+    },
+    "chunk-XMMJGW5B": {
+      "file": "chunk-XMMJGW5B.js"
+    },
+    "chunk-5WWUZCGV": {
+      "file": "chunk-5WWUZCGV.js"
+    }
+  }
+}
