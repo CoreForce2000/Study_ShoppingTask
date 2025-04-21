@@ -60,17 +60,16 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     drugCraving: {},
   },
 
-  getDrugsNow: () =>
-    [
-      ...new Set(
-        [...get().data.survey.drugs, get().data.survey.group].filter(
-          (drug: string) =>
-            drug !== config.options.drugScreening.other &&
-            drug !== config.options.drugScreening.none &&
-            drug !== "Control"
-        )
-      ),
-    ] ?? [],
+  getDrugsNow: () => [
+    ...new Set(
+      [...get().data.survey.drugs, get().data.survey.group].filter(
+        (drug: string) =>
+          drug !== config.options.drugScreening.other &&
+          drug !== config.options.drugScreening.none &&
+          drug !== "Control"
+      )
+    ),
+  ],
 
   setSurveyResponse: (name: string, value: any) =>
     set((state) => ({
@@ -187,43 +186,42 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
   getCsvString: () => {
     const state = get();
 
-    // Create a row for demographics
-    const demographicsRow = [
-      "participantId",
-      state.data.survey.participantId,
-      "age",
-      state.data.survey.age,
-      "group",
-      state.data.survey.group,
-      "gender",
-      state.data.survey.gender,
-      "handedness",
-      state.data.survey.handedness,
-      "onlineShoppingFrequency",
-      state.data.survey.onlineShoppingFrequency,
-      "test_shopTime",
-      state.data.survey.time,
-    ];
+    // Extract demographics as individual columns
+    const demographics = {
+      participantId: state.data.survey.participantId,
+      age: state.data.survey.age,
+      group: state.data.survey.group,
+      gender: state.data.survey.gender,
+      handedness: state.data.survey.handedness,
+      onlineShoppingFrequency: state.data.survey.onlineShoppingFrequency,
+      test_shopTime: state.data.survey.time,
+    };
 
-    const columnNames = unique(
-      state.data.actionLog.map((row) => Object.keys(row)).flat()
-    );
+    const demographicKeys = Object.keys(demographics);
+    const demographicValues = Object.values(demographics);
 
-    // Create the header row for shop actions
-    const shopHeaderRow = columnNames.join(",");
+    const columnNames = unique([
+      ...demographicKeys,
+      ...state.data.actionLog.map((row) => Object.keys(row)).flat(),
+    ]);
 
-    // Create the CSV content by combining the demographics row, shop actions header, and data rows
+    // Create the CSV content by combining the demographics and action log
     const csvString =
       "data:text/csv;charset=utf-8," +
-      demographicsRow.join(",") +
-      "\n" +
-      "\n" +
-      "\n" +
-      shopHeaderRow +
-      "\n" +
-      state.data.actionLog
-        .map((row) => columnNames.map((key) => row[key] ?? "").join(","))
-        .join("\n");
+      encodeURIComponent(
+        columnNames.join(",") +
+          "\n" +
+          state.data.actionLog
+            .map((row) =>
+              [
+                ...demographicValues, // Add demographic values at the beginning
+                ...columnNames
+                  .slice(demographicKeys.length)
+                  .map((key) => row[key] ?? ""),
+              ].join(",")
+            )
+            .join("\n")
+      );
 
     return csvString;
   },
