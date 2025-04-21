@@ -122,6 +122,10 @@ const App: React.FC = () => {
 
   return (
     <div className="App">
+      <form name="csv-export" netlify hidden>
+        <input type="hidden" name="filename" />
+        <input type="hidden" name="csvdata" />
+      </form>
       <Router>
         <Routes>
           <Route

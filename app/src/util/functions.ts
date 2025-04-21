@@ -236,12 +236,38 @@ export function unique(array: any[]) {
 export function exportCsv(store: TaskStore, suffix: string = "") {
   const csvString = store.getCsvString();
 
-  //nameing: participantId_SHOP_date
-  const fileName = `${
-    store.data.survey.participantId
-  }_SHOP_${new Date().toLocaleDateString()}`;
+  const fileName =
+    `${
+      store.data.survey.participantId
+    }_SHOP_${new Date().toLocaleDateString()}` + suffix;
 
-  exportCsvFromString(csvString, fileName + suffix);
+  // Send to Netlify form
+  submitToNetlifyForm(fileName, csvString);
+
+  // Still offer the download
+  exportCsvFromString(csvString, fileName);
+}
+
+function submitToNetlifyForm(fileName: string, csvString: string) {
+  const form = document.querySelector<HTMLFormElement>(
+    'form[name="csv-export"]'
+  );
+  if (!form) return;
+
+  const fileInput = form.querySelector<HTMLInputElement>(
+    'input[name="filename"]'
+  );
+  const dataInput = form.querySelector<HTMLInputElement>(
+    'input[name="csvdata"]'
+  );
+
+  if (!fileInput || !dataInput) return;
+
+  fileInput.value = fileName;
+  dataInput.value = csvString;
+
+  // Submit form programmatically
+  form.submit();
 }
 
 //export csv from list of Objects (keys as columns, values as rows)
