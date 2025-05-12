@@ -39,6 +39,8 @@ export interface ShopSlice {
   items: Item[];
   numVisibleRows: number;
   addVisibleRows: () => void;
+  numVisibleItemRows: { [key: string]: number };
+  addVisibleItemRows: (category: string) => void;
   selectedTrolleyItems: TrolleyItem[];
   selectTrolleyItem: (trolleyItem: TrolleyItem) => void;
   categories: string[];
@@ -130,6 +132,17 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
     set((state) => ({
       numVisibleRows:
         state.numVisibleRows + config.shop.general.newVisibleRowsOnScroll,
+    })),
+
+  numVisibleItemRows: {},
+  addVisibleItemRows: (category) =>
+    set((state) => ({
+      numVisibleItemRows: {
+        ...state.numVisibleItemRows,
+        [category]:
+          (state.numVisibleItemRows[category] || state.numVisibleRows) +
+          config.shop.general.newVisibleRowsOnScroll,
+      },
     })),
 
   currentCategory: "",
@@ -338,7 +351,7 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
 
   tickTimer: () =>
     set((state) => {
-      if (state.time <= 1) {
+      if (state.time <= 1 && !state.isPhase3) {
         return { time: config.shop.general.time.phase3 };
       } else {
         if (state.page === "trolley" || state.page === "shoppingList") {
@@ -347,8 +360,9 @@ const createShopSlice: StateCreator<TaskStore, [], [], ShopSlice> = (
           if (
             state.isPhase3
               ? state.time === 2.5 * 60 && state.trolley.length === 0
-              : (state.time === 5 * 60 && state.trolley.length === 0) ||
-                (state.time === 2 * 60 && state.trolley.length < 10)
+              : (state.time === 10 * 60 && state.trolley.length === 0) ||
+                (state.time === 7 * 60 &&
+                  (state.trolley.length < 10 || state.budget > 500))
           ) {
             TIME_IS_RUNNING_OUT_SOUND.play();
             state.setTrialIndex(2);

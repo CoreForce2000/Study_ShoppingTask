@@ -74,9 +74,7 @@ const createContingencySlice: StateCreator<
     set(() => ({ reactionTime: newReactionTime })),
   generateSelfOtherSequence: () =>
     set((state) => {
-      const selfItems = Object.values(state.clickedItemTiles)
-        .flat()
-        .map((tileItem) => tileItem.item);
+      const selfItems = state.trolley.map((trolleyItem) => trolleyItem.item);
 
       // shall not contain selfItems
       const otherItems = state.items.filter(
@@ -89,7 +87,6 @@ const createContingencySlice: StateCreator<
           ) &&
           !selfItems.map((x) => x.category).includes(item.category)
       );
-      console.log("otherItems", otherItems);
 
       const sequence = {
         selfItems: extendArray(
@@ -99,8 +96,8 @@ const createContingencySlice: StateCreator<
         ),
         otherItems: extendArray(otherItems, 100 * 8, true),
       };
-      // exportCsvFromListOfObjects(sequence.selfItems, "selfItems");
-      // exportCsvFromListOfObjects(sequence.otherItems, "otherItems");
+      console.log(sequence.selfItems, "selfItems");
+      console.log(sequence.otherItems, "otherItems");
       return sequence;
     }),
   nextTrialPhase: () =>

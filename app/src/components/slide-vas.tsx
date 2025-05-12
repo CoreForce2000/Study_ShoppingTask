@@ -26,7 +26,9 @@ const VAS: React.FC<VASProps> = ({ minLabel, maxLabel, setValue }) => {
   return (
     <div className={styles.rangeSlider}>
       <div className={styles.rangeSliderInner}>
-        <span className={styles.label}>{minLabel}</span>
+        <span className={styles.label} style={{ textAlign: "end" }}>
+          {minLabel}
+        </span>
         <div className={styles.vasContainer} onClick={handleVASClick}>
           <div className={styles.line}></div>
           {indicatorPosition !== null && (

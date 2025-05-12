@@ -41,6 +41,7 @@ export type SlideJson = {
   numTrials?: number;
   probabilityOutcomeNoAction?: number;
   playSound?: string;
+  progress?: number;
 };
 
 export interface Slide {
@@ -188,7 +189,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     window.addEventListener("keydown", keyPressHandlerRef.current);
   };
 
-  const drugCravingSlide = (stage: "pre" | "post") => {
+  const drugCravingSlide = (stage: "pre" | "post" | "post2") => {
     const drugs = unique([
       ...store.getDrugsNow(),
       ...store.selectableDrugsPurchased,
@@ -202,9 +203,9 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       children: (
         <VASSlide
           key={drug}
-          text={`How much do you want to use ${
-            drug === "LSD" ? "LSD" : drug.toLowerCase()
-          } right now?`}
+          text={`How much do you want to ${
+            drug === "Alcohol" ? "drink" : "use"
+          } ${drug === "LSD" ? "LSD" : drug.toLowerCase()} right now?`}
           minLabel="not at all"
           maxLabel="very much"
           setValue={(value: number) => {
@@ -225,8 +226,16 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       store.contingencyOrder[store.block - 1][store.trialNumber - 1];
     const isSelfItem = trialInfo.color === store.colorMapping.self;
     const item = isSelfItem
-      ? store.selfItems[store.trialNumber - 1]
-      : store.otherItems[store.trialNumber - 1];
+      ? store.selfItems[
+          (store.block - 1) * config.experimentConfig.numberOfTrials +
+            store.trialNumber -
+            1
+        ]
+      : store.otherItems[
+          (store.block - 1) * config.experimentConfig.numberOfTrials +
+            store.trialNumber -
+            1
+        ];
 
     store.setOutcomeImage(getImagePath(item?.category, item?.image_name));
 
@@ -289,9 +298,16 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
 
         if (positiveOutcome) {
           if (isSelfItem) {
-            store.incrementBidsSelf();
+            if (store.bidsSelf < store.trolley.length) {
+              store.incrementBidsSelf();
+            }
           } else {
-            store.incrementBidsOther();
+            if (
+              trialNumber % 3 === 0 &&
+              store.bidsOther < store.trolley.length * 1.2
+            ) {
+              store.incrementBidsOther();
+            }
           }
         }
 
@@ -332,7 +348,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const quizSlide = () => ({
-    slide: `instructionsPhase3/slide5.jpg`,
+    slide: `instructionsPhase3/slide4.jpg`,
     children: (
       <div
         key={`column1234`}
@@ -367,6 +383,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
                     }
                   );
                 } else {
+                  store.logAction({ [`Quiz_wrong`]: 1 });
                   MEMORY_WRONG_SOUND.play();
                 }
               }}
@@ -486,24 +503,16 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const bidSummarySlide = (slidePath: string) => {
-    const outcome = Math.floor(Math.random() * 50) + 50;
-
     return {
       slide: slidePath,
       children: (
         <div className="w-full h-full">
           {/* the text field has a fixed width of three digets, and the number is always centered */}
-          <div className="absolute top-0 left-0 mt-[12.6em] ml-[14.4em] text-[0.7em] w-[2em] text-center">
+          <div className="absolute top-0 left-0 mt-[9em] ml-[11.15em] text-[0.9em] w-[2em] text-center">
             {store.bidsSelf}
           </div>
-          <div className="absolute top-0 left-0 mt-[13.95em] ml-[5.5em] text-[0.7em] w-[2em] text-center">
+          <div className="absolute top-0 left-0 mt-[10.15em] ml-[3.8em] text-[0.9em] w-[2em] text-center">
             {store.bidsOther}
-          </div>
-          {/* Font Color with #03007e */}
-          <div className="absolute top-0 left-0 mt-[16.3em] ml-[22.3em] text-[0.7em] w-[2em] text-center text-[#03007e]">
-            {outcome < store.bidsSelf + store.bidsOther
-              ? outcome
-              : store.bidsSelf + store.bidsOther}
           </div>
         </div>
       ),
@@ -562,20 +571,36 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
     const isCustomSlide = currentSlideJson.type !== undefined;
 
     const showIf = (expression: string) => {
-      const splitter = expression.includes("!=") ? "!=" : "=";
-      const [group, value] = expression.split(splitter) as [
-        keyof SurveyData,
-        string
-      ];
+      const evaluateCondition = (condition: string) => {
+        const splitter = condition.includes("!=") ? "!=" : "=";
+        const [group, value] = condition.split(splitter) as [
+          keyof SurveyData,
+          string
+        ];
 
-      switch (splitter) {
-        case "=":
-          if (store.data.survey[group] !== value) incrementSlideIndex();
-          return;
-        case "!=":
-          if (store.data.survey[group] === value) incrementSlideIndex();
-          return;
+        switch (splitter) {
+          case "=":
+            return store.data.survey[group] === value;
+          case "!=":
+            return store.data.survey[group] !== value;
+        }
+      };
+
+      const conditions = expression.split(/(&|\|)/).map((part) => part.trim());
+      let result = evaluateCondition(conditions[0]);
+
+      for (let i = 1; i < conditions.length; i += 2) {
+        const operator = conditions[i];
+        const nextCondition = evaluateCondition(conditions[i + 1]);
+
+        if (operator === "&") {
+          result = result && nextCondition;
+        } else if (operator === "|") {
+          result = result || nextCondition;
+        }
       }
+
+      if (!result) incrementSlideIndex();
     };
 
     const renderSlideString = (slidePath: string) =>
@@ -657,6 +682,8 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
           case "drugCravingPost":
             store.generateSelfOtherSequence();
             return drugCravingSlide("post");
+          case "drugCravingPost2":
+            return drugCravingSlide("post2");
           case "contingency":
             initNastySound();
             return contingencySlide();
@@ -674,10 +701,15 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
               children: <OnlineShop></OnlineShop>,
               execute: () => setButtonVisible(quickNext ? true : false),
             };
-          case "onlineShopControl":
-            store.resetTrolley();
+          case "prepareOnlineShopControl":
             store.switchToPhase3();
+            store.resetTrolley();
             store.setTime(config.shop.general.time.phase3);
+            return {
+              slide: slidePath,
+              execute: getExecuteFunction,
+            };
+          case "onlineShopControl":
             if (store.trialNumber === 2) {
               return interSlideTime("phase1_and_3/slide1.jpg");
             }
@@ -737,7 +769,7 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
       >
         <div
           className={classNames(
-            "w-full h-full flex justify-center items-center pb-[3em]",
+            "w-full h-full flex justify-center items-center pb-[3em] text-shadow-lg",
             store.showImage ? "block" : "hidden"
           )}
         >

@@ -143,6 +143,12 @@ const DataEntry: React.FC = () => {
     store.setTime(parseInt(store.data.survey.time.split(" ")[0]) * 60);
     // store.setTime(30);
 
+    // Request fullscreen mode
+    if (document.documentElement.requestFullscreen) {
+      await document.documentElement.requestFullscreen();
+    }
+
+    // Navigate to the first slide
     navigate("/slide/1");
   };
 

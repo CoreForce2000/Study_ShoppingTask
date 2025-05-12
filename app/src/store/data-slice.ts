@@ -60,17 +60,16 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
     drugCraving: {},
   },
 
-  getDrugsNow: () =>
-    [
-      ...new Set(
-        [...get().data.survey.drugs, get().data.survey.group].filter(
-          (drug: string) =>
-            drug !== config.options.drugScreening.other &&
-            drug !== config.options.drugScreening.none &&
-            drug !== "Control"
-        )
-      ),
-    ] ?? [],
+  getDrugsNow: () => [
+    ...new Set(
+      [...get().data.survey.drugs, get().data.survey.group].filter(
+        (drug: string) =>
+          drug !== config.options.drugScreening.other &&
+          drug !== config.options.drugScreening.none &&
+          drug !== "Control"
+      )
+    ),
+  ],
 
   setSurveyResponse: (name: string, value: any) =>
     set((state) => ({

@@ -36,13 +36,16 @@ import Instructionsphase3_slide1 from "./assets/slides/instructionsPhase3/slide1
 import Instructionsphase3_slide2 from "./assets/slides/instructionsPhase3/slide2.jpg";
 import Instructionsphase3_slide3 from "./assets/slides/instructionsPhase3/slide3.jpg";
 import Instructionsphase3_slide4 from "./assets/slides/instructionsPhase3/slide4.jpg";
-import Instructionsphase3_slide5 from "./assets/slides/instructionsPhase3/slide5.jpg";
 import Phase1_and_3_slide1 from "./assets/slides/phase1_and_3/slide1.jpg";
 import Phase1_and_3_slide2 from "./assets/slides/phase1_and_3/slide2.jpg";
 import Phase2_slide1 from "./assets/slides/phase2/slide1.jpg";
 import Phase2_slide2 from "./assets/slides/phase2/slide2.jpg";
 import Phase2_slide3 from "./assets/slides/phase2/slide3.jpg";
 import Phase2_slide4 from "./assets/slides/phase2/slide4.jpg";
+import Phase2_slide5 from "./assets/slides/phase2/slide5.jpg";
+import Phase2_slide6 from "./assets/slides/phase2/slide6.jpg";
+import Phase2_slide7 from "./assets/slides/phase2/slide7.jpg";
+import Phase2_slide8 from "./assets/slides/phase2/slide8.jpg";
 import Phase2_trial_slide1 from "./assets/slides/phase2/trial/slide1.jpg";
 import Phase2_trial_slide2 from "./assets/slides/phase2/trial/slide2.jpg";
 import Phase2_trial_slide3 from "./assets/slides/phase2/trial/slide3.jpg";
@@ -86,13 +89,16 @@ const slideMapping: Record<string, string> = {
   "instructionsPhase3/slide2.jpg": Instructionsphase3_slide2,
   "instructionsPhase3/slide3.jpg": Instructionsphase3_slide3,
   "instructionsPhase3/slide4.jpg": Instructionsphase3_slide4,
-  "instructionsPhase3/slide5.jpg": Instructionsphase3_slide5,
   "phase1_and_3/slide1.jpg": Phase1_and_3_slide1,
   "phase1_and_3/slide2.jpg": Phase1_and_3_slide2,
   "phase2/slide1.jpg": Phase2_slide1,
   "phase2/slide2.jpg": Phase2_slide2,
   "phase2/slide3.jpg": Phase2_slide3,
   "phase2/slide4.jpg": Phase2_slide4,
+  "phase2/slide5.jpg": Phase2_slide5,
+  "phase2/slide6.jpg": Phase2_slide6,
+  "phase2/slide7.jpg": Phase2_slide7,
+  "phase2/slide8.jpg": Phase2_slide8,
   "phase2/trial/slide1.jpg": Phase2_trial_slide1,
   "phase2/trial/slide2.jpg": Phase2_trial_slide2,
   "phase2/trial/slide3.jpg": Phase2_trial_slide3,

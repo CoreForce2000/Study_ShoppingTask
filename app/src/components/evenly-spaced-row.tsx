@@ -18,7 +18,7 @@ const EvenlySpacedRow: React.FC<EvenlySpacedRowProps> = ({
   lastSize = "flex-1",
 }) => {
   return (
-    <div className="flex items-center w-full text-[2.1em]">
+    <div className="flex items-center w-full text-[2.4em]">
       <div className={`${firstSize} text-left`}>{firstChild ?? <></>}</div>
       <div className={`${secondSize} text-center`}>{secondChild ?? <></>}</div>
       <div className={`${lastSize} text-right`}>{lastChild ?? <></>}</div>

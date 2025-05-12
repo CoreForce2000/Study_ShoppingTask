@@ -1,6 +1,6 @@
 {
   "task": [
-    { "slidePath": "instructionsPhase1/slide1.jpg", "showIf": "group!=Control", "type": "checkboxDrugs" },
+    { "slidePath": "instructionsPhase1/slide1.jpg", "showIf": "group!=Control&group!=Alcohol", "type": "checkboxDrugs" },
     { "slidePath": "vasslide.jpg", "type": "drugCravingPre" },
     { "slidePath": "instructionsPhase1/slide2.jpg", "type": "checkboxShopping", "setPhase": "Shopping", "setPhaseNumber": 1, "setBlock": "shopping", "setBlockNumber": 1 },
     { "slidePath": "instructionsPhase1/slide3.jpg", "keyPress": "any" },
@@ -12,11 +12,11 @@
     { "slidePath": "instructionsPhase2/slide1.jpg", "delay": 3000, "playSound": "End of phase1 - thank you.mp3" },
     { "slidePath": "instructionsPhase2/slide2_craving.jpg", "showIf": "craving=True" },
     { "slidePath": "instructionsPhase2/slide2_nocraving.jpg", "showIf": "craving=False" },
-    { "slidePath": "instructionsPhase2/slide3.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation1", "minLabel": "Not at all", "maxLabel": "Very much" },
-    { "slidePath": "instructionsPhase2/slide4.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation2", "minLabel": "Not at all", "maxLabel": "Very much" },
-    { "slidePath": "instructionsPhase2/slide5.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation3", "minLabel": "Not at all", "maxLabel": "Very much" },
-    { "slidePath": "instructionsPhase2/slide6.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation4", "minLabel": "Not at all", "maxLabel": "Very much" },
-    { "slidePath": "instructionsPhase2/slide7.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation5", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "instructionsPhase2/slide3.jpg", "type": "VAS", "variableName": "VAS_shopping_satisfaction", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "instructionsPhase2/slide4.jpg", "type": "VAS", "variableName": "VAS_shopping_continuation", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "instructionsPhase2/slide5.jpg", "type": "VAS", "variableName": "VAS_shopping_personal", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "instructionsPhase2/slide6.jpg", "type": "VAS", "variableName": "VAS_shopping_others", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "instructionsPhase2/slide7.jpg", "type": "VAS", "variableName": "VAS_shopping_expensive", "minLabel": "Not at all", "maxLabel": "Very much" },
     { "slidePath": "vasslide.jpg", "type": "drugCravingPost" },
     { "slidePath": "instructionsPhase2/slide8.jpg" },
     { "slidePath": "instructionsPhase2/slide9.jpg" },
@@ -38,7 +38,10 @@
       "playSound": "rating_phase_2.mp3"
     },
     { "slidePath": "phase2/slide2.jpg", "type": "checkboxBulb", "variableName": "Association_Color_other" },
-    { "slidePath": "phase2/slide3.jpg", "type": "checkboxBulb", "variableName": "Association_Color_own" },
+    { "slidePath": "phase2/slide3.jpg", "type": "VAS", "variableName": "VAS_want_own_items", "minLabel": "Not at all", "maxLabel": "Very much" },
+    { "slidePath": "phase2/slide4.jpg", "type": "checkboxBulb", "variableName": "Association_Color_own" },
+    { "slidePath": "phase2/slide5.jpg", "type": "VAS", "variableName": "VAS_want_other_items", "minLabel": "Not at all", "maxLabel": "Very much" },
+
     { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 2, "probabilityOutcomeNoAction": 0 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -75,7 +78,7 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
-    { "slidePath": "phase2/slide4.jpg" },
+    { "slidePath": "phase2/slide6.jpg" },
     { "type": "contingency", "setBlock": "p(0|-A)=0", "setBlockNumber": 6, "probabilityOutcomeNoAction": 0 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -85,7 +88,7 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
-    { "slidePath": "phase2/slide4.jpg" },
+    { "slidePath": "phase2/slide7.jpg" },
     { "type": "contingency", "setBlock": "p(0|-A)=0.3", "setBlockNumber": 7, "probabilityOutcomeNoAction": 0.3 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -95,7 +98,7 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
-    { "slidePath": "phase2/slide4.jpg" },
+    { "slidePath": "phase2/slide8.jpg" },
     { "type": "contingency", "setBlock": "p(0|-A)=0.6", "setBlockNumber": 8, "probabilityOutcomeNoAction": 0.6 },
     {
       "slidePath": "phase2/slide1.jpg",
@@ -105,12 +108,26 @@
       "maxLabel": "Very much",
       "playSound": "rating_phase_2.mp3"
     },
-
-    { "slidePath": "instructionsPhase3/slide1.jpg", "type": "VAS", "variableName": "VAS_claim_satisfaction", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
-    { "slidePath": "instructionsPhase3/slide2.jpg", "type": "VAS", "variableName": "VAS_claim_satisfaction2", "minLabel": "Not at all satisfied", "maxLabel": "Very satisfied" },
-    { "slidePath": "instructionsPhase3/slide3.jpg", "type": "bidSummarySlide" },
-    { "slidePath": "instructionsPhase3/slide4.jpg" },
-    { "slidePath": "instructionsPhase3/slide5.jpg", "type": "quiz" },
+    {
+      "slidePath": "instructionsPhase3/slide1.jpg",
+      "type": "VAS",
+      "setBlock": "VAS_ratings",
+      "setBlockNumber": 9,
+      "variableName": "VAS_claim_satisfaction",
+      "minLabel": "Not at all satisfied",
+      "maxLabel": "Very satisfied"
+    },
+    { "slidePath": "vasslide.jpg", "type": "drugCravingPost2" },
+    { "slidePath": "instructionsPhase3/slide2.jpg", "type": "bidSummarySlide" },
+    {
+      "slidePath": "instructionsPhase3/slide3.jpg",
+      "type": "prepareOnlineShopControl",
+      "setPhase": "Control_shopping",
+      "setPhaseNumber": 3,
+      "setBlock": "Control",
+      "setBlockNumber": 1
+    },
+    { "slidePath": "instructionsPhase3/slide4.jpg", "type": "quiz" },
     { "type": "onlineShopControl" },
 
     { "slidePath": "end/slide1.jpg", "delay": 10000, "playSound": "Final.mp3" },

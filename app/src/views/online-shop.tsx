@@ -57,7 +57,11 @@ const GridPage: React.FC<{
       {view === "items" &&
         category &&
         Array.from(
-          { length: config.shop.randomization.numberOfItemTiles },
+          {
+            length:
+              (store.numVisibleItemRows[store.currentCategory] ||
+                config.shop.general.initialVisilbeRows) * 7,
+          },
           (_, index) => {
             const tileItem = (
               store.clickedItemTiles[store.currentCategory] || []
@@ -234,6 +238,8 @@ const OnlineShop: React.FC<{}> = () => {
       if (isScrollAreaAtBottom(scrollRef.current, 50)) {
         if (store.page === "categories") {
           store.addVisibleRows();
+        } else if (store.page === "items") {
+          store.addVisibleItemRows(store.currentCategory);
         }
       }
     }

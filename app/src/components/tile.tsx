@@ -42,7 +42,7 @@ const Tile: React.FC<TileProps> = ({
   let newText = text;
   if (text.includes(" ")) {
     newText = text.split(" ").join("\n");
-  } else if (text.length > 10) {
+  } else if (text.length > 12) {
     newText = text.slice(0, 12) + "\n" + text.slice(12);
   }
 
@@ -90,7 +90,10 @@ const Tile: React.FC<TileProps> = ({
           if (actionName) store.logShopAction(actionName);
         }
       }}
-      style={tileStyle}
+      style={{
+        ...tileStyle,
+        fontSize: text.split(" ")[0].length > 10 ? "0.3em" : "0.33em",
+      }}
     >
       <div
         className={styles.tickBox}
