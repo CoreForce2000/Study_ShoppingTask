@@ -14,6 +14,7 @@
     "@types/papaparse": "^5.3.14",
     "@types/react-router-dom": "^5.3.3",
     "classnames": "^2.5.1",
+    "firebase": "^11.7.1",
     "jotai": "^2.8.2",
     "lucide-react": "^0.379.0",
     "papaparse": "^5.4.1",
