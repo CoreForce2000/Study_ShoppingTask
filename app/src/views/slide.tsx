@@ -19,7 +19,12 @@ import {
   MEMORY_WRONG_SOUND,
   SOUND_PATH,
 } from "../util/constants";
-import { exportCsv, getImagePath, unique } from "../util/functions";
+import {
+  exportCsv,
+  getImagePath,
+  printObjectMatrix,
+  unique,
+} from "../util/functions";
 import OnlineShop from "./online-shop";
 
 const quickNext = false;
@@ -222,8 +227,21 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const contingencySlide = () => {
+    try {
+      store.contingencyOrder[store.block - 1][store.trialNumber - 1];
+    } catch (e) {
+      console.error("Error in contingency slide", e);
+      console.log("Index Error:", store.block - 1, store.trialNumber - 1);
+      console.log(
+        "Index Error Matrix:",
+        printObjectMatrix(store.contingencyOrder)
+      );
+      console.log("Index Error:", store.block - 1, store.trialNumber - 1);
+    }
+
     const trialInfo =
       store.contingencyOrder[store.block - 1][store.trialNumber - 1];
+
     const isSelfItem = trialInfo.color === store.colorMapping.self;
     const item = isSelfItem
       ? store.selfItems[

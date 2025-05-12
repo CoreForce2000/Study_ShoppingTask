@@ -48,6 +48,31 @@ export function isScrollAreaAtBottom(
   );
 }
 
+export function printObjectMatrix(
+  matrix: {
+    color: any;
+    spacePressedCorrect: any;
+    noSpacePressedCorrect: any;
+  }[][]
+): void {
+  if (matrix.length === 0) {
+    console.log("Empty matrix");
+    return;
+  }
+
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      const cell = matrix[i][j];
+      const cellStr =
+        `i=${i}, j=${j} => ` +
+        `color: ${cell.color}, ` +
+        `space: ${cell.spacePressedCorrect}, ` +
+        `noSpace: ${cell.noSpacePressedCorrect}`;
+      console.log(cellStr);
+    }
+  }
+}
+
 export interface Trial {
   color: string;
   spacePressedCorrect: boolean;

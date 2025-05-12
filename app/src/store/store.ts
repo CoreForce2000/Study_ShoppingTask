@@ -18,3 +18,4 @@ const useTaskStore = create<TaskStore>()((...a) => ({
 }));
 
 export default useTaskStore;
+export const taskStore = useTaskStore;
