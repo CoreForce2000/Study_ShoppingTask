@@ -1,6 +1,8 @@
+import { ref, uploadString } from "firebase/storage";
 import imageData from "../assets/categories/image_data.json";
 import genericCategoryMapping from "../assets/configs/category_mapping.json";
 import config from "../assets/configs/config.json";
+import { storage } from "../firebaseConfig";
 import { TaskStore } from "../store/store";
 import { IMAGE_BASE_PATH } from "./constants";
 
@@ -233,41 +235,20 @@ export function unique(array: any[]) {
   return array.filter((item, index) => array.indexOf(item) === index);
 }
 
+export const uploadCsv = async (csvString: string, fileName: string) => {
+  const safeFileName = encodeURIComponent(fileName.replace(/\//g, "-")); // replace slashes
+  const storageRef = ref(storage, `results/${safeFileName}.csv`);
+  await uploadString(storageRef, csvString, "data_url");
+  alert("Upload successful!");
+};
+
 export function exportCsv(store: TaskStore, suffix: string = "") {
   const csvString = store.getCsvString();
+  const today = new Date().toISOString().split("T")[0];
+  const fileName = `${store.data.survey.participantId}_SHOP_${today}` + suffix;
 
-  const fileName =
-    `${
-      store.data.survey.participantId
-    }_SHOP_${new Date().toLocaleDateString()}` + suffix;
-
-  // Send to Netlify form
-  submitToNetlifyForm(fileName, csvString);
-
-  // Still offer the download
+  uploadCsv(csvString, fileName);
   exportCsvFromString(csvString, fileName);
-}
-
-function submitToNetlifyForm(fileName: string, csvString: string) {
-  const form = document.querySelector<HTMLFormElement>(
-    'form[name="csv-export"]'
-  );
-  if (!form) return;
-
-  const fileInput = form.querySelector<HTMLInputElement>(
-    'input[name="filename"]'
-  );
-  const dataInput = form.querySelector<HTMLInputElement>(
-    'input[name="csvdata"]'
-  );
-
-  if (!fileInput || !dataInput) return;
-
-  fileInput.value = fileName;
-  dataInput.value = csvString;
-
-  // Submit form programmatically
-  form.submit();
 }
 
 //export csv from list of Objects (keys as columns, values as rows)
