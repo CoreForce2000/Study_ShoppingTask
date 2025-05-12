@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { preloadImage } from "./util/functions";
+import { exportCsv, preloadImage } from "./util/functions";
 import DataEntry from "./views/data-entry";
 import ImageViewer from "./views/image-viewer";
 import SlideShow from "./views/slide";
@@ -53,6 +53,7 @@ import Phase2_trial_slide4 from "./assets/slides/phase2/trial/slide4.jpg";
 import Phase2_trial_slide5 from "./assets/slides/phase2/trial/slide5.jpg";
 import Vasslide from "./assets/slides/vasslide.jpg";
 import White from "./assets/slides/white.jpg";
+import { taskStore } from "./store/store";
 
 const slideMapping: Record<string, string> = {
   "vasslide.jpg": Vasslide,
@@ -124,6 +125,33 @@ const App: React.FC = () => {
         console.error("Failed to preload images:", error);
         setIsLoaded(true); // even on error, we consider it loaded to stop the waiting state
       });
+  }, []);
+
+  useEffect(() => {
+    let hasExported = false;
+
+    const handleGlobalError = () => {
+      if (hasExported) return;
+      hasExported = true;
+      console.log("Global error handler triggered. Exporting CSV...");
+      // Attempt to export CSV here
+      try {
+        const state = taskStore.getState();
+        if (typeof state.getCsvString === "function") {
+          exportCsv(state, "_CRASHED");
+        }
+      } catch (e) {
+        console.error("Failed to auto-export on global error:", e);
+      }
+    };
+
+    window.onerror = handleGlobalError;
+    window.onunhandledrejection = handleGlobalError;
+
+    return () => {
+      window.onerror = null;
+      window.onunhandledrejection = null;
+    };
   }, []);
 
   return (

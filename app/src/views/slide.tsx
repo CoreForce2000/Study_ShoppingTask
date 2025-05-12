@@ -222,8 +222,18 @@ const SlideShow: React.FC<{ slideMapping: Record<string, string> }> = ({
   };
 
   const contingencySlide = () => {
+    try {
+      store.contingencyOrder[store.block - 1][store.trialNumber - 1].color;
+    } catch (e) {
+      console.error("Error in contingency slide", e);
+      console.log("Index Error:", store.block - 1, store.trialNumber - 1);
+      console.log("Index Error Matrix:", store.contingencyOrder);
+      return { execute: () => incrementSlideIndex() };
+    }
+
     const trialInfo =
       store.contingencyOrder[store.block - 1][store.trialNumber - 1];
+
     const isSelfItem = trialInfo.color === store.colorMapping.self;
     const item = isSelfItem
       ? store.selfItems[
