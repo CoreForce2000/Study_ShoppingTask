@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { exportCsv, preloadImage } from "./util/functions";
 import DataEntry from "./views/data-entry";
@@ -110,52 +110,88 @@ const slideMapping: Record<string, string> = {
 const App: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [preload, setPreload] = useState<HTMLImageElement[]>([]);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const [dialogDismissed, setDialogDismissed] = useState(false);
+  const appRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const images = [];
-    for (const key in slideMapping) {
-      images.push(preloadImage(slideMapping[key]));
-    }
+    const images = Object.values(slideMapping).map(preloadImage);
     Promise.all(images)
-      .then((results) => {
-        setPreload(results);
-        setIsLoaded(true);
-      })
+      .then(setPreload)
       .catch((error) => {
         console.error("Failed to preload images:", error);
-        setIsLoaded(true); // even on error, we consider it loaded to stop the waiting state
-      });
+      })
+      .finally(() => setIsLoaded(true));
   }, []);
 
   useEffect(() => {
-    let hasExported = false;
+    const isFullscreen = () =>
+      !!(
+        document.fullscreenElement ||
+        (document as any).webkitFullscreenElement ||
+        (document as any).mozFullScreenElement ||
+        (document as any).msFullscreenElement ||
+        window.innerHeight === screen.height
+      );
 
-    const handleGlobalError = () => {
-      if (hasExported) return;
-      hasExported = true;
-      console.log("Global error handler triggered. Exporting CSV...");
-      // Attempt to export CSV here
+    const handleFullscreenExit = () => {
+      console.log("Exited fullscreen. Exporting CSV...");
       try {
         const state = taskStore.getState();
         if (typeof state.getCsvString === "function") {
-          exportCsv(state, "_CRASHED");
+          exportCsv(state, "_EXIT_FULLSCREEN");
         }
       } catch (e) {
-        console.error("Failed to auto-export on global error:", e);
+        console.error("Failed to export on fullscreen exit:", e);
       }
     };
 
-    window.onerror = handleGlobalError;
-    window.onunhandledrejection = handleGlobalError;
+    let wasFullscreen = isFullscreen();
+
+    const handleFullscreenChange = () => {
+      const nowFullscreen = isFullscreen();
+      if (!nowFullscreen && wasFullscreen) {
+        handleFullscreenExit();
+        if (!dialogDismissed) {
+          setShowExitDialog(true);
+        }
+      }
+      if (nowFullscreen && !wasFullscreen) {
+        // user reentered fullscreen — reset dialog
+        setDialogDismissed(false);
+        setShowExitDialog(false);
+      }
+      wasFullscreen = nowFullscreen;
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    window.addEventListener("resize", handleFullscreenChange);
 
     return () => {
-      window.onerror = null;
-      window.onunhandledrejection = null;
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      window.removeEventListener("resize", handleFullscreenChange);
     };
-  }, []);
+  }, [dialogDismissed]);
+
+  const requestFullscreen = () => {
+    const el = appRef.current;
+    if (!el) return;
+
+    const request =
+      el.requestFullscreen ||
+      (el as any).webkitRequestFullscreen ||
+      (el as any).mozRequestFullScreen ||
+      (el as any).msRequestFullscreen;
+
+    if (request) {
+      request
+        .call(el)
+        .catch((err: any) => console.error("Failed to enter fullscreen:", err));
+    }
+  };
 
   return (
-    <div className="App">
+    <div ref={appRef} className="App">
       <Router>
         <Routes>
           <Route
@@ -166,12 +202,43 @@ const App: React.FC = () => {
           <Route path="/images" element={<ImageViewer />} />
         </Routes>
       </Router>
+
       <div className="absolute top-0 left-0 scale-0">
         {isLoaded &&
           preload.map((img, index) => (
             <img key={index} src={img.src} alt={`Slide ${index + 1}`} />
           ))}
       </div>
+
+      {showExitDialog && (
+        <div className="fixed top-0 left-0 w-full h-full bg-black bg-opacity-60 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm text-center">
+            <h2 className="text-xl font-semibold mb-4">
+              You exited fullscreen
+            </h2>
+            <p className="mb-4">
+              Please return to fullscreen for the best experience.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={requestFullscreen}
+              >
+                Re-enter Fullscreen
+              </button>
+              <button
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded hover:bg-gray-400"
+                onClick={() => {
+                  setDialogDismissed(true);
+                  setShowExitDialog(false);
+                }}
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
