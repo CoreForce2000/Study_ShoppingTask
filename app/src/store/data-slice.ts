@@ -186,42 +186,41 @@ const createDataSlice: StateCreator<TaskStore, [], [], DataSlice> = (
   getCsvString: () => {
     const state = get();
 
-    // Extract demographics as individual columns
-    const demographics = {
-      participantId: state.data.survey.participantId,
-      age: state.data.survey.age,
-      group: state.data.survey.group,
-      gender: state.data.survey.gender,
-      handedness: state.data.survey.handedness,
-      onlineShoppingFrequency: state.data.survey.onlineShoppingFrequency,
-      test_shopTime: state.data.survey.time,
-    };
+    const demographicsRow = [
+      "participantId",
+      state.data.survey.participantId,
+      "age",
+      state.data.survey.age,
+      "group",
+      state.data.survey.group,
+      "gender",
+      state.data.survey.gender,
+      "handedness",
+      state.data.survey.handedness,
+      "onlineShoppingFrequency",
+      state.data.survey.onlineShoppingFrequency,
+      "test_shopTime",
+      state.data.survey.time,
+    ];
 
-    const demographicKeys = Object.keys(demographics);
-    const demographicValues = Object.values(demographics);
+    const columnNames = unique(
+      state.data.actionLog.map((row) => Object.keys(row)).flat()
+    );
 
-    const columnNames = unique([
-      ...demographicKeys,
-      ...state.data.actionLog.map((row) => Object.keys(row)).flat(),
-    ]);
+    const shopHeaderRow = columnNames.join(",");
 
     // Create the CSV content by combining the demographics and action log
     const csvString =
       "data:text/csv;charset=utf-8," +
-      encodeURIComponent(
-        columnNames.join(",") +
-          "\n" +
-          state.data.actionLog
-            .map((row) =>
-              [
-                ...demographicValues, // Add demographic values at the beginning
-                ...columnNames
-                  .slice(demographicKeys.length)
-                  .map((key) => row[key] ?? ""),
-              ].join(",")
-            )
-            .join("\n")
-      );
+      demographicsRow.join(",") +
+      "\n" +
+      "\n" +
+      "\n" +
+      shopHeaderRow +
+      "\n" +
+      state.data.actionLog
+        .map((row) => columnNames.map((key) => row[key] ?? "").join(","))
+        .join("\n");
 
     return csvString;
   },
