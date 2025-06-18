@@ -1,8 +1,6 @@
-import { ref, uploadString } from "firebase/storage";
 import imageData from "../assets/categories/image_data.json";
 import genericCategoryMapping from "../assets/configs/category_mapping.json";
 import config from "../assets/configs/config.json";
-import { storage } from "../firebaseConfig";
 import { TaskStore } from "../store/store";
 import { IMAGE_BASE_PATH } from "./constants";
 
@@ -260,20 +258,12 @@ export function unique(array: any[]) {
   return array.filter((item, index) => array.indexOf(item) === index);
 }
 
-export const uploadCsv = async (csvString: string, fileName: string) => {
-  const safeFileName = encodeURIComponent(fileName.replace(/\//g, "-")); // replace slashes
-  const storageRef = ref(storage, `results/${safeFileName}.csv`);
-  await uploadString(storageRef, csvString, "data_url");
-  alert("Upload successful!");
-};
-
 export function exportCsv(store: TaskStore, suffix: string = "") {
   const csvString = store.getCsvString();
   const today = new Date().toISOString().split("T")[0];
   const fileName = `${store.data.survey.participantId}_SHOP_${today}` + suffix;
 
-  uploadCsv(csvString, fileName);
-  exportCsvFromString(csvString, fileName);
+  uploadCsvOrDownload(csvString, fileName);
 }
 
 //export csv from list of Objects (keys as columns, values as rows)
@@ -285,14 +275,67 @@ export function exportCsvFromListOfObjects(
     Object.keys(list[0]).join(",") +
     list.map((row) => Object.values(row).join(",")).join("\n");
 
-  exportCsvFromString(csvString, fileName);
+  uploadCsvOrDownload(csvString, fileName);
 }
 
-export function exportCsvFromString(csvString: string, fileName: string) {
+/**
+ * Try uploading a CSV to your backend.
+ * If upload fails after maxAttempts, fallback to local download.
+ */
+export async function uploadCsvOrDownload(
+  csvString: string,
+  fileName: string,
+  backendUrl: string = "http://localhost:3000/upload-csv",
+  maxAttempts: number = 3
+): Promise<void> {
+  let attempt = 0;
+  let success = false;
+
+  while (attempt < maxAttempts && !success) {
+    attempt++;
+    try {
+      const response = await fetch(backendUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          csvContent: csvString,
+          filename: `${fileName}.csv`,
+        }),
+      });
+
+      if (!response.ok) throw new Error(`Server error: ${response.status}`);
+
+      const result = await response.json();
+      console.log(`Upload success on attempt ${attempt}`, result);
+
+      // Optional: open the uploaded file link for user confirmation
+      if (result.webViewLink) {
+        window.open(result.webViewLink, "_blank");
+      }
+
+      success = true;
+      return; // Done: uploaded successfully
+    } catch (err) {
+      console.warn(`Upload attempt ${attempt} failed:`, err);
+      // Continue to next attempt
+    }
+  }
+
+  // If upload failed after max attempts, fallback to local download
+  console.warn(
+    `Upload failed after ${maxAttempts} attempts. Downloading instead.`
+  );
+  downloadCsv(csvString, fileName);
+}
+
+/**
+ * Fallback: trigger CSV download in browser.
+ */
+function downloadCsv(csvString: string, fileName: string) {
   const encodedUri = encodeURI("data:text/csv;charset=utf-8," + csvString);
   const link = document.createElement("a");
   link.setAttribute("href", encodedUri);
-  link.setAttribute("download", fileName + ".csv");
+  link.setAttribute("download", `${fileName}.csv`);
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
