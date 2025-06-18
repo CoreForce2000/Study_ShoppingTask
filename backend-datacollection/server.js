@@ -4,8 +4,14 @@ const bodyParser = require("body-parser");
 const { google } = require("googleapis");
 const fs = require("fs");
 const os = require("os");
+const cors = require("cors");
 
 const app = express();
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 app.use(bodyParser.json({ limit: "10mb" }));
 
 // Load your service account key file
