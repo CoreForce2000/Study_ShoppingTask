@@ -1,20 +1,20 @@
 {
 	"geolocation": {
 		"data": {
-			"city": "Berlin",
+			"city": "Heidelberg",
 			"country": {
 				"code": "DE",
 				"name": "Germany"
 			},
 			"subdivision": {
-				"code": "BE",
-				"name": "State of Berlin"
+				"code": "BW",
+				"name": "Baden-Wurttemberg"
 			},
 			"timezone": "Europe/Berlin",
-			"latitude": 52.5196,
-			"longitude": 13.4069,
-			"postalCode": "10178"
+			"latitude": 49.407,
+			"longitude": 8.6879,
+			"postalCode": "69115"
 		},
-		"timestamp": 1750228358968
+		"timestamp": 1750776836553
 	}
 }

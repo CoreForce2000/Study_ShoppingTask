@@ -16,7 +16,7 @@ exports.handler = async (event) => {
 
   // ✅ Use service account credentials from env var (secure!)
   const auth = new google.auth.GoogleAuth({
-    credentials: JSON.parse(process.env.GOOGLE_KEY_JSON),
+    credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS),
     scopes: ["https://www.googleapis.com/auth/drive.file"],
   });
 
