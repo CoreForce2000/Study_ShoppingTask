@@ -3,8 +3,7 @@
   functions = "netlify/functions"
 
 [dev]
-  command = "npm run dev"
-  targetPort = 5173
+  command = "npm run dev"   
 
 [[redirects]]
   from = "/api/*"
